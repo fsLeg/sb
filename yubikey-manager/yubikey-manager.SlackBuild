@@ -1,4 +1,3 @@
-#!/bin/bash
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="yubikey-manager"

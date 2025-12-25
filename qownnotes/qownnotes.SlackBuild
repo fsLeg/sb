@@ -1,4 +1,3 @@
-#!/bin/bash
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="qownnotes"
@@ -17,33 +16,33 @@ unpack () {
 }
 
 build () {
-if [ "${QT6:-no}" != "no" ]; then
-  USE_QT6="-DQON_QT6_BUILD=ON"
-fi
+  if [ "${QT6:-no}" != "no" ]; then
+    USE_QT6="-DQON_QT6_BUILD=ON"
+  fi
 
-if [ "${LIBGIT2:-no}" != "no" ]; then
-  USE_LIBGIT2="-DBUILD_WITH_LIBGIT2=ON"
-fi
+  if [ "${LIBGIT2:-no}" != "no" ]; then
+    USE_LIBGIT2="-DBUILD_WITH_LIBGIT2=ON"
+  fi
 
-if [ "${BOTAN:-no}" != "no" ]; then
-  USE_SYSTEM_BOTAN="-DBUILD_WITH_SYSTEM_BOTAN=ON"
-fi
+  if [ "${BOTAN:-no}" != "no" ]; then
+    USE_SYSTEM_BOTAN="-DBUILD_WITH_SYSTEM_BOTAN=ON"
+  fi
 
-mkdir build
-cmake \
-  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-  -DCMAKE_INSTALL_PREFIX=$_PREFIX \
-  -DBUILD_WITH_ASPELL=ON \
-  $USE_QT6 \
-  $USE_LIBGIT2 \
-  $USE_SYSTEM_BOTAN \
-  -DCMAKE_BUILD_TYPE=Release \
-  -B build
-cmake --build build
-DESTDIR=$PKG cmake --install build
+  mkdir build
+  cmake \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DCMAKE_INSTALL_PREFIX=$_PREFIX \
+    -DBUILD_WITH_ASPELL=ON \
+    $USE_QT6 \
+    $USE_LIBGIT2 \
+    $USE_SYSTEM_BOTAN \
+    -DCMAKE_BUILD_TYPE=Release \
+    -B build
+  cmake --build build
+  DESTDIR=$PKG cmake --install build
 
-mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-cp -a \
-  CHANGELOG.md LICENSE README.md shortcuts.md \
-  $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a \
+    CHANGELOG.md LICENSE README.md shortcuts.md \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
 }

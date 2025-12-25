@@ -1,4 +1,3 @@
-#!/bin/bash
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="popcorntime"
@@ -12,10 +11,7 @@ SHA256SUM="93ab145004b266adce2d0533c6997eeb68757c9533478623fb5ebd7df5293567"
 BUILD_REQUIRES="yarn"
 
 
-if [ "$ARCH" = "i586" ]; then
-  BITS="32"
-  NWVER="0.44.5"
-elif [ "$ARCH" = "i686" ]; then
+if [[ "$ARCH" == i?86 ]]; then
   BITS="32"
   NWVER="0.44.5"
 elif [ "$ARCH" = "x86_64" ]; then

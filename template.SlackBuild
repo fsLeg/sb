@@ -1,4 +1,4 @@
-# Maintainer: Bod Dobbs <bob@dobbs.com>
+# Maintainer: Bob Dobbs <bob@dobbs.com>
 
 PRGNAM="appname"
 VERSION="${VERSION:-1.2.3}"
