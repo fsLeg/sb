@@ -1,0 +1,62 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="popcorntime"
+TARNAM="popcorn-desktop"
+VERSION="${VERSION:-0.5.1}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Stream free movies and TV shows from torrents"
+HOMEPAGE="https://popcorn-time.site/"
+DOWNLOAD="https://sbo.t-rg.ws/${TARNAM}-${VERSION}.tar.gz"
+SHA256SUM="93ab145004b266adce2d0533c6997eeb68757c9533478623fb5ebd7df5293567"
+BUILD_REQUIRES="yarn"
+
+
+if [ "$ARCH" = "i586" ]; then
+  BITS="32"
+  NWVER="0.44.5"
+elif [ "$ARCH" = "i686" ]; then
+  BITS="32"
+  NWVER="0.44.5"
+elif [ "$ARCH" = "x86_64" ]; then
+  BITS="64"
+  NWVER="0.86.0"
+fi
+
+unpack () {
+  tar xvf $CWD/$TARNAM-$VERSION.tar.gz
+  mv $TARNAM-$VERSION $PRGNAM-$VERSION
+
+  # Fix libatomic.so copying
+  # https://aur.archlinux.org/cgit/aur.git/tree/copy-libatomic_fixes.patch?h=popcorntime
+  patch -p1 -d $PRGNAM-$VERSION < $CWD/copy-libatomic_fixes.patch
+
+  # Patch a proper github url
+  # https://aur.archlinux.org/cgit/aur.git/tree/yarn_lock-fixes.patch?h=popcorntime
+  patch -p1 -d $PRGNAM-$VERSION < $CWD/yarn_lock-fixes.patch
+
+  # Use a proper nwjs version
+  sed -i "s|\(const defaultNwVersion = '\)[0-9.]\+|\1${NWVER}|" $PRGNAM-$VERSION/gulpfile.js
+}
+
+build () {
+  yarn install --ignore-engines \
+               --frozen-lockfile
+  yarn build --no-update-notifier
+
+  mkdir -p $PKG/$_PREFIX/lib$LIBDIRSUFFIX
+  cp -aR build/Popcorn-Time/linux$BITS $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+
+  mkdir -p $PKG/$_PREFIX/bin
+  ln -s $_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/Popcorn-Time $PKG/$_PREFIX/bin/
+
+  mkdir -p $PKG/$_PREFIX/share/applications
+  install -Dm644 dist/linux/appimage/Popcorn-Time.desktop $PKG/$_PREFIX/share/applications/
+  for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256; do
+    mkdir -p $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
+    magick dist/linux/appimage/Popcorn-Time.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/Popcorn-Time.png
+  done
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a build/Popcorn-Time/linux$BITS/{CHANGELOG.md,LICENSE.txt,README.md,credits.html} $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+}

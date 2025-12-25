@@ -1,0 +1,49 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="qownnotes"
+VERSION="${VERSION:-25.12.7}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="notepad with markdown support and Nextcloud integration"
+HOMEPAGE="https://www.qownnotes.org/"
+DOWNLOAD="https://github.com/pbek/QOwnNotes/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.xz"
+SHA256SUM="0b4e58353e817eb58cbb3a61f03c4d9dce5ebb66f79ea8f4e9bcd6a845a6d215"
+OPTIONAL="Botan3 libgit2 qt6"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
+  # Set the release string to disable the update check
+  echo '#define RELEASE "SlackBuild"' > release.h
+}
+
+build () {
+if [ "${QT6:-no}" != "no" ]; then
+  USE_QT6="-DQON_QT6_BUILD=ON"
+fi
+
+if [ "${LIBGIT2:-no}" != "no" ]; then
+  USE_LIBGIT2="-DBUILD_WITH_LIBGIT2=ON"
+fi
+
+if [ "${BOTAN:-no}" != "no" ]; then
+  USE_SYSTEM_BOTAN="-DBUILD_WITH_SYSTEM_BOTAN=ON"
+fi
+
+mkdir build
+cmake \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+  -DCMAKE_INSTALL_PREFIX=$_PREFIX \
+  -DBUILD_WITH_ASPELL=ON \
+  $USE_QT6 \
+  $USE_LIBGIT2 \
+  $USE_SYSTEM_BOTAN \
+  -DCMAKE_BUILD_TYPE=Release \
+  -B build
+cmake --build build
+DESTDIR=$PKG cmake --install build
+
+mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+cp -a \
+  CHANGELOG.md LICENSE README.md shortcuts.md \
+  $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

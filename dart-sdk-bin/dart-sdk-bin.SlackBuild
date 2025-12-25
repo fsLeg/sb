@@ -1,0 +1,33 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="dart-sdk-bin"
+VERSION="${VERSION:-3.7.3}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="SDK for application programming language"
+HOMEPAGE="https://www.dartlang.org/"
+DOWNLOAD="https://storage.googleapis.com/dart-archive/channels/stable/release/$VERSION/sdk/dartsdk-linux-${PLATFORM}-release.zip \
+          https://storage.googleapis.com/dart-archive/channels/stable/release/$VERSION/api-docs/dartdocs-gen-api.zip"
+SHA256SUM="b772a2807d2fcf08b4edcff998123b0e87391c12067ad0cf11f7c50ca31982b2 \
+           87c6c8df7655d297e05c349f943c98057f3f823ed054c48cbde2f2ea398c2f15"
+DOWNLOAD_x86="https://storage.googleapis.com/dart-archive/channels/stable/release/$VERSION/sdk/dartsdk-linux-${PLATFORM}-release.zip \
+              https://storage.googleapis.com/dart-archive/channels/stable/release/$VERSION/api-docs/dartdocs-gen-api.zip"
+SHA256SUM_x86="8231834c3da17d281d0ff96d46ebc237cdb2fc7858f1b3091c488376724141b5 \
+               87c6c8df7655d297e05c349f943c98057f3f823ed054c48cbde2f2ea398c2f15"
+SKIP_STRIP=1
+
+unpack () {
+  mkdir -p $PKG/opt
+  unzip -d $PKG/opt $CWD/dartsdk-linux-$PLATFORM-release.zip
+  unzip -d $PKG/opt $CWD/dartdocs-gen-api.zip
+  # silly, but sb requires it
+  mkdir $PRGNAM-$VERSION
+}
+
+build () {
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  mv $PKG/opt/gen-dartdocs $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/doc
+  mkdir -p $PKG/etc/profile.d
+  install -Dm755 -t $PKG/etc/profile.d $CWD/dart-sdk.*sh.new
+  chmod +x $PKG/opt/dart-sdk/bin/resources{,/dartdoc}
+  chmod +rx $PKG/opt/dart-sdk{,/bin,/bin/snapshots}
+}

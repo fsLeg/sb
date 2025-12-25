@@ -1,0 +1,27 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="saflashplayer-legacy"
+VERSION="${VERSION:-11.2.202.644}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Stand-Alone Flash Player"
+HOMEPAGE="https://get.adobe.com/flashplayer"
+DOWNLOAD="UNSUPPORTED"
+DOWNLOAD_x86="https://web.archive.org/web/20171213064640if_/https://fpdownload.macromedia.com/pub/flashplayer/updaters/11/flashplayer_11_sa.i386.tar.gz"
+SHA256SUM_x86="dd498a6f7af8c9c9438ddde92f51a88f84e9cd37787d9af49d2897b5e4b2ab5f"
+CONFLICTS="saflashplayer"
+SKIP_STRIP=1
+
+unpack () {
+  mkdir $PRGNAM-$VERSION
+  tar xvf $CWD/flashplayer_11_sa.i386.tar.gz -C $PRGNAM-$VERSION
+}
+
+build () {
+  mkdir -p $PKG/$_PREFIX/bin $PKG/$_PREFIX/share/applications
+  install flashplayer $PKG/$_PREFIX/bin/saflashplayer
+  cp -a $CWD/saflashplayer-legacy.desktop $PKG/$_PREFIX/share/applications/com.adobe.flashplayer.desktop
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR LGPL $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+}

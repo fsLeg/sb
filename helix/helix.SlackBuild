@@ -1,0 +1,57 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="helix"
+VERSION="${VERSION:-25.07.1}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="post-modern modal text editor"
+HOMEPAGE="https://helix-editor.com/"
+DOWNLOAD="https://github.com/helix-editor/helix/releases/download/${VERSION}/${PRGNAM}-${VERSION}-source.tar.xz"
+SHA256SUM="2d0cf264ac77f8c25386a636e2b3a09a23dec555568cc9a5b2927f84322f544e"
+BUILD_REQUIRES="rust-opt"
+OPTIONAL="mdbook"
+SKIP_PERMS=1
+
+unpack () {
+  mkdir -p $PRGNAM-$VERSION
+  tar xvf $CWD/$PRGNAM-$VERSION-source.tar.xz -C $PRGNAM-$VERSION
+  # Grammar sources are bundled, no need to fetch them again
+  patch -p1 -d $PRGNAM-$VERSION < $CWD/disable-grammar-fetching.patch
+}
+
+build () {
+  HELIX_DEFAULT_RUNTIME=$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
+  cargo build --locked --profile opt
+
+  mkdir -p $PKG/$_PREFIX/bin \
+           $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
+           $PKG/$_PREFIX/share/bash-completion/completions \
+           $PKG/$_PREFIX/share/fish/vendor_completions.d \
+           $PKG/$_PREFIX/share/zsh/site-functions \
+           $PKG/$_PREFIX/share/applications
+  install -Dm 755 -t $PKG/$_PREFIX/bin target/opt/hx
+  cp -R runtime/queries $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/
+  cp -R runtime/themes $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/
+  mkdir -p $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/grammars
+  find runtime/grammars -name "*.so" -type f -exec \
+    install -Dm 755 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/grammars {} \;
+  install -Dm 644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM runtime/tutor
+  install -Dm 644 contrib/completion/hx.bash $PKG/$_PREFIX/share/bash-completion/completions/$PRGNAM
+  install -Dm 644 contrib/completion/hx.fish $PKG/$_PREFIX/share/fish/vendor_completions.d/$PRGNAM.fish
+  install -Dm 644 contrib/completion/hx.zsh $PKG/$_PREFIX/share/zsh/site-functions/_$PRGNAM
+  install -Dm 644 contrib/Helix.desktop $PKG/$_PREFIX/share/applications/$PRGNAM.desktop
+  for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256; do
+    mkdir -p $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
+    magick contrib/helix.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
+  done
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a \
+    LICENSE README.md CHANGELOG.md docs/*.md \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+
+  if [ "${DOCS:-no}" != "no" ]; then
+    mdbook build --dest-dir $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html book
+    rm -rf $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html/{CNAME,404.html,.nojekyll,generated}
+  fi
+}

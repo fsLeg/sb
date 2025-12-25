@@ -1,0 +1,33 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="gxkb"
+VERSION="${VERSION:-0.9.6}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="X11 keyboard indicator and switcher"
+HOMEPAGE="https://zen-tools.github.io/gxkb/"
+DOWNLOAD="https://github.com/zen-tools/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz" # use this for universal or x86_64 tarballs
+SHA256SUM="ab5a243c52ed1fb479ca1ed01d837d61deb246960691695deecaae4ad65b60c4"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  # Patch back Belorussian and Russian flags
+  patch -p1 -d $PRGNAM-$VERSION < $CWD/by-ru-flags.patch
+  cp $CWD/{by,ru}.png $PRGNAM-$VERSION/data/flags/
+}
+
+build () {
+./autogen.sh
+./configure \
+  --prefix=$_PREFIX \
+  --libdir=$_PREFIX/lib${LIBDIRSUFFIX} \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  --mandir=$_PREFIX/man \
+  --docdir=$_PREFIX/doc/$PRGNAM-$VERSION \
+  --build=$ARCH-slackware-linux \
+  --enable-appindicator=no
+make
+make install DESTDIR=$PKG
+cp -a README.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+}

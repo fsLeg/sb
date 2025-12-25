@@ -1,0 +1,31 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="yubikey-manager"
+VERSION="${VERSION:-5.7.2}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Tool for managing your YubiKey configuration"
+HOMEPAGE="https://developers.yubico.com/yubikey-manager/"
+DOWNLOAD="https://github.com/Yubico/yubikey-manager/releases/download/${VERSION}/${PRGNAM/-/_}-${VERSION}.tar.gz"
+SHA256SUM="9aeb4035dcff8f6cb792e83f36e6a9152a9b5b65ac2c2e25e5f20d53c6064e62"
+REQUIRES="ccid click python-fido2 python3-keyring pyscard"
+
+unpack () {
+  tar xvf $CWD/${PRGNAM/-/_}-$VERSION.tar.gz
+  mv ${PRGNAM/-/_}-$VERSION $PRGNAM-$VERSION
+}
+
+build () {
+  python3 -m build --wheel --no-isolation
+  python3 -m installer --destdir "$PKG" dist/*.whl
+
+  mkdir -p $PKG/$_PREFIX/man
+  cp -aR man $PKG/$_PREFIX/man/man1
+
+  mv $PKG/usr/bin $PKG/$_PREFIX
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a \
+    COPYING NEWS README.adoc \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

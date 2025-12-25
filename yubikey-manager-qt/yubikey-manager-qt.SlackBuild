@@ -1,0 +1,40 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="yubikey-manager-qt"
+VERSION="${VERSION:-1.2.6}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Graphical application for configuring a YubiKey"
+HOMEPAGE="https://developers.yubico.com/yubikey-manager-qt/"
+DOWNLOAD="https://github.com/Yubico/yubikey-manager-qt/archive/${PRGNAM}-${VERSION}/${PRGNAM}-${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="58d78b536a1d1e7d8a2a33b9803fc710d551443c8a45c4bb9dee365937fd3b6d"
+REQUIRES="yubikey-manager pyotherside"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$PRGNAM-$VERSION.tar.gz
+  mv $PRGNAM-$PRGNAM-$VERSION $PRGNAM-$VERSION
+
+  # Apply a patch from PR#363 to make ykman-gui work again:
+  # https://github.com/Yubico/yubikey-manager-qt/pull/363
+  patch -p1 -d $PRGNAM-$VERSION < $CWD/363.patch
+}
+
+build () {
+  qmake
+  make
+  make install INSTALL_ROOT=$PKG
+
+  mkdir -p $PKG/$_PREFIX/share/pixmaps
+  cp -a resources/icons/ykman.png $PKG/$_PREFIX/share/pixmaps
+  mkdir -p $PKG/$_PREFIX/share/metainfo/
+  cp -a resources/com.yubico.yubikey_manager.metainfo.xml $PKG/$_PREFIX/share/metainfo/
+  mkdir -p $PKG/$_PREFIX/share/applications
+  cp -a resources/ykman-gui.desktop $PKG/$_PREFIX/share/applications
+
+  mv $PKG/usr/bin $PKG/$_PREFIX
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a \
+    COPYING NEWS README \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

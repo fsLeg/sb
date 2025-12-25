@@ -1,0 +1,38 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="buf"
+VERSION="${VERSION:-1.61.0}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="The best way of working with Protocol Buffers."
+HOMEPAGE="https://buf.build/"
+DOWNLOAD="https://github.com/bufbuild/buf/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="97459176763e09f55311fd99b38f097c8782d4a4abb0eb1e853092220547ecb6"
+BUILD_REQUIRES="google-go-lang"
+SKIP_PERMS=1
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  # Don't fetch another copy of a toolchain
+  sed -i '/^toolchain/d' $PRGNAM-$VERSION/go.mod
+}
+
+build () {
+  mkdir build
+  go build -v \
+    -buildmode=pie \
+    -mod=readonly \
+    -modcacherw \
+    -ldflags "-compressdwarf=false \
+              -linkmode external \
+              -extldflags '${LDFLAGS}'" \
+    -o build \
+    ./cmd/...
+  mkdir -p build/manpages
+  ./build/buf manpages build/manpages
+  install -Dm755 -t "$PKG/$_PREFIX/bin" build/{buf,protoc-gen-buf-lint,protoc-gen-buf-breaking}
+  install -Dm644 -t "$PKG/$_PREFIX/man/man1" build/manpages/*
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a \
+    CHANGELOG.md LICENSE README.md \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

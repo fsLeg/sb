@@ -1,0 +1,27 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="element-desktop-bin"
+VERSION="${VERSION:-1.12.7}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Secure and independent communication via Matrix"
+HOMEPAGE="https://element.io/"
+DOWNLOAD="https://packages.element.io/debian/pool/main/e/${PRGNAM%-bin}/${PRGNAM%-bin}_${VERSION}_${DEBARCH}.deb"
+SHA256SUM="ec8a0281ee492eeef72f233fece4da4d60cc2a29d909dd60523b9d583090be69"
+DOWNLOAD_x86="UNSUPPORTED"
+REQUIRES="sqlcipher"
+CONFLICTS="element-desktop"
+
+unpack () {
+  mkdir $PRGNAM-$VERSION
+  cd $PKG
+  ar p $CWD/${PRGNAM%-bin}_${VERSION}_${DEBARCH}.deb data.tar.xz | tar Jxv
+}
+
+build () {
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a $PKG/usr/share/doc/${PRGNAM%-bin}/* $PKG/opt/Element/LICENSE* \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  rm -rf $PKG/usr/share/doc
+  mv $PKG/usr/share $PKG/$_PREFIX/share
+}

@@ -1,0 +1,34 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="usbimager"
+VERSION="${VERSION:-1.0.10}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="minimal GUI app that writes disk images to USB drives"
+HOMEPAGE="https://bztsrc.gitlab.io/usbimager/"
+DOWNLOAD="https://gitlab.com/bztsrc/usbimager/-/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="582a4121bec523c5f737d4c91a5a96357243c146330d7785ab54aa3730fba4ff"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  # fix install target
+  sed -i 's/@mkdir/& -p/' $PRGNAM-$VERSION/src/Makefile
+}
+
+build () {
+  PREFIX=$_PREFIX \
+  DESTDIR=$PKG \
+  USE_GTK=$(test "$USE_X11" = "yes" && echo "" || echo "yes") \
+  make -C src install
+
+  # make .desktop file compliant
+  mv $PKG/$_PREFIX/share/applications/usbimager.desktop $PKG/$_PREFIX/share/applications/com.gitlab.bztsrc.$PRGNAM.desktop
+  sed -i '/Version=/d' $PKG/$_PREFIX/share/applications/com.gitlab.bztsrc.$PRGNAM.desktop
+  sed -i 's/Application;//' $PKG/$_PREFIX/share/applications/com.gitlab.bztsrc.$PRGNAM.desktop
+
+  mv $PKG/$_PREFIX/share/man $PKG/$_PREFIX/
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a \
+    LICENSE README.md usbimager-manual.pdf \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

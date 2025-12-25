@@ -1,0 +1,30 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="fdpowermon"
+VERSION="${VERSION:-1.20}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="simple battery power monitor for laptops with ACPI"
+HOMEPAGE="https://github.com/yoe/fdpowermon"
+DOWNLOAD="https://github.com/yoe/fdpowermon/archive/${PRGNAM}-${VERSION}/${PRGNAM}-${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="564c739fa5bab315fb588f540ec357073545f22ab7da99ac220e3b58a6c89471"
+REQUIRES="acpi perl-Gtk3"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$PRGNAM-$VERSION.tar.gz
+  mv $PRGNAM-$PRGNAM-$VERSION $PRGNAM-$VERSION
+}
+
+build () {
+mkdir -p $PKG/$_PREFIX/bin $PKG/etc/$PRGNAM $PKG/$_PREFIX/share/icons/oxygen/base/22x22/status
+cp fdpowermon $PKG/$_PREFIX/bin/
+cp theme.cfg $PKG/etc/$PRGNAM/
+cp icons/*.png $PKG/$_PREFIX/share/icons/oxygen/base/22x22/status/
+
+mkdir -p $PKG/$_PREFIX/man/man1
+pod2man < fdpowermon > $PKG/$_PREFIX/man/man1/fdpowermon.1
+
+mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/examples
+cp -a debian/copyright debian/changelog README.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+cp -a theme.pl $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/examples/
+}

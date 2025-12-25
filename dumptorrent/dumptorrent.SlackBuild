@@ -1,0 +1,33 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="dumptorrent"
+VERSION="${VERSION:-1.7.0}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="get torrent metadata"
+HOMEPAGE="https://github.com/tomcdj71/dumptorrent"
+DOWNLOAD="https://github.com/tomcdj71/dumptorrent/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="0550782467b7e30c1b342196605b1d1476809c8508333faab1dc5ba46a933362"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+}
+
+build () {
+  mkdir build
+  cmake \
+    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_COMPILER=g++ \
+    -DCMAKE_C_COMPILER=gcc \
+    -DCMAKE_BUILD_TYPE=Release \
+    -B build/
+  cmake --build build/
+
+  mkdir -p $PKG/$_PREFIX/bin
+  install -Dm755 build/dumptorrent $PKG/$_PREFIX/bin/
+  install -Dm755 build/scrapec $PKG/$_PREFIX/bin/
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a README.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

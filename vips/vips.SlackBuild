@@ -1,0 +1,45 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="vips"
+VERSION="${VERSION:-8.18.0}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="fast image processing library with low memory needs"
+HOMEPAGE="https://www.libvips.org/"
+DOWNLOAD="https://github.com/libvips/libvips/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.xz"
+SHA256SUM="b85ab92280c30d22f5c8fe2f68b809cddb7eaac437d8c33474475dac84ddc574"
+OPTIONAL="libspng highway matio libjxl libheif gi-docgen"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
+}
+
+build () {
+  if [ "${DOCS:-no}" != "no" ]; then
+    DOCS=true
+  else
+    DOCS=false
+  fi
+
+  mkdir build
+  meson setup \
+    --buildtype=release \
+    --libdir=$_PREFIX/lib${LIBDIRSUFFIX} \
+    --localstatedir=/var \
+    --mandir=$_PREFIX/man \
+    --prefix=$_PREFIX \
+    --sysconfdir=/etc \
+    -Ddocs=$DOCS \
+    build
+  meson compile -C build
+  meson install --destdir=$PKG -C build
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  if [ "${DOCS}" == "true" ]; then
+    mv $PKG/$_PREFIX/share/doc/vips $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html
+    rmdir $PKG/$_PREFIX/share/doc
+  fi
+  cp -a \
+    CITATION.cff CODE_OF_CONDUCT.md CONTRIBUTING.md ChangeLog LICENSE README.md \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

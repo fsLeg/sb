@@ -1,0 +1,29 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="pyscard"
+VERSION="${VERSION:-2.3.1}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Smartcard module for Python"
+HOMEPAGE="https://pyscard.sourceforge.io/"
+DOWNLOAD="https://github.com/LudovicRousseau/pyscard/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="6b84eea9f2fd19a0a54e213b3d76870b21a7792f823755a824f49de822c964c7"
+REQUIRES="pcsc-lite"
+OPTIONAL="Sphinx"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+}
+
+build () {
+  python3 setup.py install --root=$PKG
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  if [ "${DOCS:-no}" != "no" ]; then
+    sphinx-build src/smartcard/doc $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html
+    rm -rf $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html/{.buildinfo,.doctrees,objects.inv}
+  fi
+  cp -aR \
+    ACKS ChangeLog LICENSE TODO README.md src/smartcard/Examples \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

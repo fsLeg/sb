@@ -1,0 +1,73 @@
+# Maintainer: Bod Dobbs <bob@dobbs.com>
+
+PRGNAM="appname"
+VERSION="${VERSION:-1.2.3}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="short blurb about the program, like the one from slack-desc"
+HOMEPAGE="https://example.org"
+DOWNLOAD="https://example.org/${VERSION}/${PRGNAM}-${VERSION}.tar.gz" # use this for universal or x86_64 tarballs, "UNSUPPORTED" if x86_64 is not supported
+SHA256SUM="1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+DOWNLOAD_x86="" # optional. only include if there are specific files for x86 systems, "UNSUPPORTED" if x86 is not supported
+SHA256SUM_x86="" # optional. only include if there are specific files for x86 systems
+REQUIRES="" # optional. list runtime dependencies (separate with spaces)
+BUILD_REQUIRES="" # optional. list build-time dependencies
+OPTIONAL="" # optional. list of optional dependencies detected at build- or runtime or enabled with variables
+CONFLICTS="" # optional. list any packages this package would conflict with, i. e. overwrite their files
+
+# There must not be any executable code outside of functions as the
+# SlackBuild is sourced by sb tool.
+
+# You may set or unset variables as you see fit. Available variables
+# inherited from sb that might be useful (same meaning as on SBo):
+# $TMP
+# $CWD
+# $PKG
+# $ARCH
+# $DEBARCH - architecture the way Debian names it (i386, amd64, arm64)
+# $PLATFORM - platform identifier (ia32, x64, arm, arm64)
+# $SLKCFLAGS
+# $LIBDIRSUFFIX
+# $_PREFIX - "/usr/local" by default
+# CFLAGS and the like are already exported, so you don't need to set
+# them, unless you want to change them. For full list of variables see
+# the source of sb.
+
+# You can override package version by setting PKGVER variable.
+
+# If you need to skip permission reset after unpacking, set SKIP_PERMS
+# variable.
+
+# If you need to skip binary stripping, set SKIP_STRIP variable.
+
+unpack () {
+  # This function should prepare the source tree in the directory that
+  # must be named $PRGNAM-$VERSION, i. e. appname-1.2.3. Usually this
+  # does the trick:
+  #
+  # tar xfv appname-1.2.3.tar.gz
+  #
+  # If there are any patches to apply or additional files to place or
+  # move around before building, do that here. At this step you're in
+  # the $TMP directory.
+}
+
+build () {
+  # This function is for entire building process (compilation and
+  # putting files into $PKG), i. e.:
+  #
+  # ./configure
+  # make
+  # make DESTDIR=$PKG install
+  #
+  # At this step you're in the $TMP/$PRGNAM-$VERSION directory.
+  #
+  # To avoid filesystem pollution, try to set variables/configuration
+  # parameters to put cache and other temporary files not covered by sb
+  # into a directory inside $TMP.
+  #
+  # You should use /usr/local as prefix. You can utilize $_PREFIX here.
+  # Don't forget to include documentation if there's be any.
+  # Files for the $PKG/install directory are placed by sb automatically.
+  # If you have to modify those files and put them manually, they won't
+  # be overwritten later.
+}

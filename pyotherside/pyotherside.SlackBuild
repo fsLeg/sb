@@ -1,0 +1,31 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="pyotherside"
+VERSION="${VERSION:-1.6.2}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Python bindings for Qt"
+HOMEPAGE="https://thp.io/2011/pyotherside/"
+DOWNLOAD="https://github.com/thp/pyotherside/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="9afe075f165c78ec584892887a6411fe1476f2115cf3bba026105bde29292a4b"
+OPTIONAL="Sphinx"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+}
+
+build () {
+  qmake
+  make
+  make install INSTALL_ROOT=$PKG
+  rm -rf $PKG/usr/tests
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  if [ "${DOCS:-no}" != "no" ]; then
+    make -C docs html
+    cp -aR _build/html $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  fi
+  cp -aR \
+    LICENSE README.md examples/ \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

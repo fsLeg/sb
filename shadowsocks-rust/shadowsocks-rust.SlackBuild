@@ -1,0 +1,25 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="shadowsocks-rust"
+VERSION="${VERSION:-1.24.0}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="rust port of shadowsocks, a secure socks5 proxy"
+HOMEPAGE="https://github.com/shadowsocks/shadowsocks-rust"
+DOWNLOAD="https://github.com/shadowsocks/shadowsocks-rust/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="a89865d1c5203de1b732017dd032e85f943d1592e8d3152eb7d2c4f3fca387bf"
+BUILD_REQUIRES="rust-opt"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+}
+
+build () {
+  cargo build --locked --release
+  make install DESTDIR=$PKG TARGET=release PREFIX=$_PREFIX/bin
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR \
+    LICENSE README.md examples/ \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}

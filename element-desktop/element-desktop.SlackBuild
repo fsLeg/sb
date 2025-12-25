@@ -1,0 +1,59 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="element-desktop"
+WEBNAM="element-web"
+VERSION="${VERSION:-1.12.7}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="secure and independent communication via Matrix"
+HOMEPAGE="https://element.io/"
+DOWNLOAD="https://github.com/element-hq/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz \
+          https://github.com/element-hq/${WEBNAM}/archive/v$VERSION/${WEBNAM}-$VERSION.tar.gz"
+SHA256SUM="ce68ec2850bda22d0249765531458cb68be8209be7af286f93f0be650d95ee72 \
+           cd046c50583d5c3f6955741e6a49215b3589ca66fa178b2de2e6e701a1a6dc2d"
+DOWNLOAD_x86="UNSUPPORTED"
+REQUIRES="sqlcipher"
+BUILD_REQUIRES="rust-opt nodejs24-bin yarn"
+CONFLICTS="element-desktop-bin"
+
+unpack () {
+  mkdir $PRGNAM-$VERSION
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz -C $PRGNAM-$VERSION
+  tar xvf $CWD/$WEBNAM-$VERSION.tar.gz -C $PRGNAM-$VERSION
+}
+
+build () {
+  cd $WEBNAM-$VERSION
+  yarn install --frozen-lockfile \
+               --ignore-engines \
+               --no-fund \
+               --update-checksums
+  VERSION=$VERSION \
+    yarn build
+
+  cd ../$PRGNAM-$VERSION
+  mkdir -p deploys
+  mv $TMP/$WEBNAM-$VERSION/webapp deploys/element-v$VERSION
+  yarn install --frozen-lockfile \
+               --ignore-engines \
+               --no-fund \
+               --update-checksums
+  yarn run fetch --noverify --cfgdir ""
+  CRATE_CC_NO_DEFAULTS=1 \
+    yarn run build:native
+  yarn run build --publish never
+
+  mkdir -p $PKG/$_PREFIX/{bin,lib$LIBDIRSUFFIX,share/applications}
+  mv dist/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/element-desktop
+
+  install -Dm644 $CWD/element-desktop.desktop $PKG/$_PREFIX/share/applications/io.element.Element.desktop
+  ln -s $_PREFIX/lib$LIBDIRSUFFIX/element-desktop/element-desktop $PKG/$_PREFIX/bin/
+
+  for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256 512x512; do
+    mkdir -p $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
+    magick build/icon.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
+  done
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a CHANGELOG.md CONTRIBUTING.md README.md LICENSE-* docs/* $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+}

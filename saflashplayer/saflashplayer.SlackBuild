@@ -1,0 +1,27 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="saflashplayer"
+VERSION="${VERSION:-32.0.0.465}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Stand-Alone Flash Player"
+HOMEPAGE="https://get.adobe.com/flashplayer"
+DOWNLOAD="https://fpdownload.macromedia.com/pub/flashplayer/updaters/32/flash_player_sa_linux.x86_64.tar.gz"
+SHA256SUM="883f7aa23301fc80de879501157533a4acdbfee0721ed7c57676dc032fdf96c3"
+DOWNLOAD_x86="UNSUPPORTED"
+CONFLICTS="saflashplayer-legacy"
+SKIP_STRIP=1
+
+unpack () {
+  mkdir $PRGNAM-$VERSION
+  tar xvf $CWD/flash_player_sa_linux.x86_64.tar.gz -C $PRGNAM-$VERSION
+}
+
+build () {
+  mkdir -p $PKG/$_PREFIX/bin $PKG/$_PREFIX/share/applications
+  mv flashplayer $PKG/$_PREFIX/bin/saflashplayer
+  cp -a $CWD/saflashplayer.desktop $PKG/$_PREFIX/share/applications/com.adobe.flashplayer.desktop
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR LGPL license.pdf $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+}

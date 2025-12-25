@@ -1,0 +1,49 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="dart-sass"
+VERSION="${VERSION:-1.97.0}"
+EMBEDDED_PROTOCOL_VERSION="3.2.0"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Dart implementation of Sass"
+HOMEPAGE="https://sass-lang.com/dart-sass"
+DOWNLOAD="https://github.com/sass/dart-sass/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz \
+          https://github.com/sass/sass/archive/embedded-protocol-${EMBEDDED_PROTOCOL_VERSION}/sass-embedded-protocol-${EMBEDDED_PROTOCOL_VERSION}.tar.gz"
+SHA256SUM="302be443f1e0ae16180f19c1a98ac3732eed44ba18d2556435971e4c88a06913 \
+           4e1f81684bc1666f03e52ddc790d0c2c22d99a5313fa2efe1dde4a5b5733c186"
+REQUIRES="dart-sdk"
+BUILD_REQUIRES="buf"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  tar xvf $CWD/sass-embedded-protocol-$EMBEDDED_PROTOCOL_VERSION.tar.gz -C $PRGNAM-$VERSION
+  mkdir -p $PRGNAM-$VERSION/build
+  mv $PRGNAM-$VERSION/sass-embedded-protocol-$EMBEDDED_PROTOCOL_VERSION $PRGNAM-$VERSION/build/language
+}
+
+build () {
+  dart --disable-analytics
+  dart pub get
+  UPDATE_SASS_PROTOCOL=false \
+  BUF_CACHE_DIR=$TMP/.buf-cache \
+  dart run grinder protobuf
+  dart -Dversion=$VERSION \
+      -Ddart-version=$(dart --version | cut -d' ' -f4) \
+      -Dprotocol-version=$EMBEDDED_PROTOCOL_VERSION \
+      -Dcompiler-version=$VERSION \
+      --snapshot=build/sass.snapshot-$ARCH \
+      bin/sass.dart
+  mkdir -p $PKG/$_PREFIX/bin $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+
+  cat <<EOF > $PKG/$_PREFIX/bin/sass
+#!/bin/bash
+exec $(which dart) /$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/sass.snapshot-$ARCH "\$@"
+EOF
+
+  chmod +x $PKG/$_PREFIX/bin/sass
+  install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/ build/sass.snapshot-$ARCH
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a README.md AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+}
+

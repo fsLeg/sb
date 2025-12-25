@@ -1,0 +1,31 @@
+#!/bin/bash
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="python-fido2"
+VERSION="${VERSION:-1.2.0}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="FIDO2/WebAuthn library for clients and servers"
+HOMEPAGE="https://github.com/Yubico/python-fido2"
+DOWNLOAD="https://github.com/Yubico/python-fido2/releases/download/${VERSION}/${PRGNAM#python-}-${VERSION}.tar.gz"
+SHA256SUM="e39f95920122d64283fda5e5581d95a206e704fa42846bfa4662f86aa0d3333b"
+REQUIRES="cryptography"
+BUILD_REQUIRES="python3-poetry-core"
+
+unpack () {
+  tar xvf $CWD/${PRGNAM#python-}-$VERSION.tar.gz
+  mv ${PRGNAM#python-}-$VERSION $PRGNAM-$VERSION
+}
+
+build () {
+  python3 -m build --wheel --no-isolation
+  python3 -m installer --destdir "$PKG" dist/*.whl
+
+  mkdir -p $PKG/etc/udev/rules.d
+  cat $CWD/70-u2f.rules > $PKG/etc/udev/rules.d/70-u2f.rules
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR \
+    COPYING COPYING.MPLv2 COPYING.APLv2 NEWS README.adoc examples/\
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  chmod 644 $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/examples/server/poetry.lock
+}

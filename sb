@@ -1,0 +1,231 @@
+#!/bin/bash
+
+TAG="${TAG:-sb}"
+PKGTYPE="${PKGTYPE:-txz}"
+TMP="${TMP:-/tmp/sb}"
+OUTPUT="${OUTPUT:-/tmp}"
+_PREFIX="/usr/local"
+
+if [ -z "${ARCH}" ]; then
+  case "$(uname -m)" in
+    i?86) ARCH="i586" ;;
+    arm*) ARCH="arm" ;;
+       *) ARCH="$(uname -m)" ;;
+  esac
+fi
+
+if [ "${ARCH}" = "i586" ]; then
+  SLKCFLAGS="-O2 -march=i586 -mtune=i686"
+  LIBDIRSUFFIX=""
+  DEBARCH="i386"
+  PLATFORM=ia32
+elif [ "${ARCH}" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686 -mtune=i686"
+  LIBDIRSUFFIX=""
+  DEBARCH="i386"
+  PLATFORM=ia32
+elif [ "${ARCH}" = "arm" ]; then
+  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX=""
+  DEBARCH="armhf"
+  PLATFORM="arm"
+elif [ "${ARCH}" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+  DEBARCH="amd64"
+  PLATFORM=x64
+elif [ "${ARCH}" = "aarch64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+  DEBARCH="arm64"
+  PLATFORM="arm64"
+else
+  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX=""
+fi
+
+# C and C++
+export CFLAGS="${SLKCFLAGS}"
+export CXXFLAGS="${SLKCFLAGS}"
+export CCACHE_DIR="${TMP}/.ccache"
+
+# NodeJS
+export YARN_CACHE_FOLDER="${TMP}/.yarn-cache"
+export npm_config_cache="${TMP}/.npm-cache"
+export npm_config_nodedir="/usr"
+
+# Rust
+export RUSTFLAGS="-C target-cpu=native"
+export CARGO_HOME="${TMP}/.cargo"
+export PATH="/opt/rust/bin:${PATH}"
+export LD_LIBRARY_PATH="/opt/rust/lib${LIBDIRSUFFIX}:${LD_LIBRARY_PATH}"
+
+# Go
+export CGO_ENABLED=1
+export CGO_CFLAGS="${SLKCFLAGS}"
+export CGO_CXXFLAGS="${SLKCFLAGS}"
+export CGO_CPPFLAGS="${SLKCFLAGS}"
+export GOPATH="${TMP}/.go"
+export GOCACHE="${TMP}/.go-cache"
+
+# Dart
+export PUB_CACHE="${TMP}/.pub-cache"
+
+set -e
+
+. "${1}"
+
+cd "$(dirname ${1})"; CWD="$(pwd)"
+PKG="${TMP}/package-${PRGNAM}"
+
+if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+  echo "${PRGNAM}-$(test -n "${PKGVER}" && echo "${PKGVER}" || echo "${VERSION}")-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"
+  exit 0
+fi
+
+# Ownership reset requires root priviledges. But it is only needed for
+# makepkg so tar saves correct permissions when creating the package.
+# For that fakeroot is sufficient. Legacy way was building as root.
+# With modern build systems more and more often requiring Internet
+# access, building as root becomes increasingly dangerous. So the
+# recommended way is using fakeroot, however, users can still use actual
+# root if they so desire. For automation and less annoyance they can set
+# the USE_REAL_ROOT environment variable to anything other than "N".
+# This also implies that Internet access is expected. That's just the
+# world we live in.
+for LPATH in ${LD_LIBRARY_PATH//:/ }; do
+  if [[ "${LPATH}" == *libfakeroot ]]; then
+    IS_FAKEROOT=1
+  fi
+done
+if [ ${UID} = 0 ]; then
+  if [ -z "${IS_FAKEROOT}" ] && [ "${USE_REAL_ROOT:-N}" = "N" ]; then
+    echo "You are using real root. This isn't recommended. Are you sure you want to continue?"
+    read -p "Y/[N] " USE_REAL_ROOT
+    case "${USE_REAL_ROOT}" in
+      "n"|"N"|"") exit 1 ;;
+    esac
+  fi
+else
+  echo "You aren't using fakeroot environment."
+  exit 1
+fi
+
+if ([ "${DOWNLOAD_x86}" = "UNSUPPORTED" ] && [[ ${ARCH} == i?86 ]]) || ([ "${DOWNLOAD}" = "UNSUPPORTED" ] && [[ ${ARCH} == *64 ]]); then
+  echo "Architecture ${ARCH} is not supported."
+  exit 1
+fi
+
+for URL in $(test "${DOWNLOAD}" != "UNSUPPORTED" && [[ ${ARCH} != i?86 ]] && echo "${DOWNLOAD}" || echo "") \
+           $(test -n "${DOWNLOAD_x86}" && test "${DOWNLOAD_x86}" != "UNSUPPORTED" && [[ ${ARCH} == i?86 ]] && echo "${DOWNLOAD_x86}" || echo "")
+do
+  if [ ! -f "$(basename "${URL}")" ]; then
+    wget --tries=inf --retry-on-http-error=503 "${URL}"
+  fi
+done
+
+if [ "$DOWNLOAD" != "UNSUPPORTED" ] && [[ ${ARCH} != i?86 ]]; then
+  declare -a CHECKSUMS
+  SHA256SUMS=(${SHA256SUM})
+  TARBALLS=($(basename -a ${DOWNLOAD}))
+  for i in $(seq 1 ${#TARBALLS[@]}); do
+    i+=-1
+    CHECKSUMS+="${SHA256SUMS[${i}]}  ${TARBALLS[$i]}\n"
+  done
+  sha256sum --check --status <(echo -e "${CHECKSUMS}")
+  unset CHECKSUMS SHA256SUMS TARBALLS
+fi
+
+if [ -n "${DOWNLOAD_x86}" ] && [ "${DOWNLOAD_x86}" != "UNSUPPORTED" ] && [[ ${ARCH} == i?86 ]]; then
+  declare -a CHECKSUMS_x86
+  SHA256SUMS_x86=(${SHA256SUM_x86})
+  TARBALLS_x86=($(basename -a ${DOWNLOAD_x86}))
+  for i in $(seq 1 ${#TARBALLS_x86[@]}); do
+    i+=-1
+    CHECKSUMS_x86+="${SHA256SUMS_x86[${i}]}  ${TARBALLS_x86[$i]}\n"
+  done
+  sha256sum --check --status <(echo -e ${CHECKSUMS_x86})
+  unset CHECKSUMS_x86 SHA256SUMS_x86 TARBALLS_x86
+fi
+
+rm -rf "${PKG}"
+mkdir -p "${TMP}" "${PKG}" "${OUTPUT}"
+cd "${TMP}"
+rm -rf "${PRGNAM}-${VERSION}"
+
+# Some sources are packed weird, so let the script handle unpacking
+# instead of trying to guess everything. This also allows for custom
+# steps when preparing the source tree
+unpack
+
+# Specify full path in case directory was changed when unpacking
+cd "${TMP}/${PRGNAM}-${VERSION}"
+
+if [ -z "${SKIP_PERMS}" ]; then
+  chown -R root:root .
+  find -L . \
+   \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
+    -o -perm 511 \) -exec chmod 755 {} \; -o \
+   \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
+    -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+fi
+
+build
+
+# Failsafe in case directory was changed during the build process
+cd "${TMP}/${PRGNAM}-${VERSION}"
+
+# Don't ship .la files:
+rm -f "${PKG}"/{,usr/local/}lib"${LIBDIRSUFFIX}"/*.la
+
+# Strip binaries and libraries - this can be done with 'make install-strip'
+# in many source trees
+if [ -z "${SKIP_STRIP}" ]; then
+  find "${PKG}" -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
+    | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+fi
+find ${PKG} -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs chmod a+x 2> /dev/null || true
+
+# Compress man pages
+if [ -d "${PKG}${_PREFIX}/man" ]; then
+  find "${PKG}${_PREFIX}/man" -type f -exec gzip -9 {} \;
+  for i in $(find "${PKG}${_PREFIX}/man" -type l); do
+    ln -s "$(readlink "${i}").gz" "${i}.gz"
+    rm "${i}"
+  done
+fi
+
+# Compress info pages and remove the package's dir file
+if [ -d "${PKG}${_PREFIX}/info" ]; then
+  rm -f "${PKG}${_PREFIX}/info/dir"
+  find "${PKG}${_PREFIX}/info" -type f -name "*.info*" -exec gzip -9 {} \;
+fi
+
+# Remove perllocal.pod and other special files that don't need to be installed,
+# as they will overwrite what's already on the system.  If this is not needed,
+# remove it from the script.
+# Remove 'special' files
+find "${PKG}" -name perllocal.pod \
+  -o -name ".packlist" \
+  -o -name "*.bs" \
+  | xargs rm -f
+
+# Include the SlackBuild script in the documentation directory
+mkdir -p "${PKG}${_PREFIX}/doc/${PRGNAM}-${VERSION}"
+cat "${CWD}/${PRGNAM}.SlackBuild" > "${PKG}${_PREFIX}/doc/${PRGNAM}-${VERSION}/${PRGNAM}.SlackBuild"
+
+# Copy the slack-desc (and a custom doinst.sh and douninst.sh if necessary) into ./install
+mkdir -p "${PKG}/install"
+for FILE in slack-desc doinst.sh douninst.sh; do
+  if [ -f "${CWD}/${FILE}" ] && [ ! -f "${PKG}/install/${FILE}" ]; then
+    cat "${CWD}/${FILE}" > "${PKG}/install/${FILE}"
+  fi
+done
+
+# Make the package; be sure to leave it in $OUTPUT
+# If package symlinks need to be created during install *before*
+# your custom contents of doinst.sh runs, then add the -p switch to
+# the makepkg command below -- see makepkg(8) for details
+cd "${PKG}"
+/sbin/makepkg -l y -c n "${OUTPUT}/${PRGNAM}-$(test -n "${PKGVER}" && echo "${PKGVER}" || echo "${VERSION}")-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"

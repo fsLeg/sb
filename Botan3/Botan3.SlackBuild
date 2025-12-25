@@ -1,0 +1,36 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="Botan3"
+VERSION="${VERSION:-3.10.0}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="C++ crypto library"
+HOMEPAGE="https://botan.randombit.net/"
+DOWNLOAD="https://botan.randombit.net/releases/${PRGNAM%3}-${VERSION}.tar.xz"
+SHA256SUM="fde194236f6d5434f136ea0a0627f6cc9d26af8b96e9f1e1c7d8c82cd90f4f24"
+
+unpack () {
+  tar xvf $CWD/${PRGNAM%3}-$VERSION.tar.xz
+  mv ${PRGNAM%3}-$VERSION ${PRGNAM}-$VERSION
+}
+
+build () {
+  python3 configure.py \
+    --prefix=$_PREFIX \
+    --docdir=doc \
+    --libdir=lib$LIBDIRSUFFIX \
+    --mandir=$_PREFIX/man \
+    --disable-static \
+    --with-rst2man \
+    --with-bzip2 \
+    --with-zlib \
+    --with-lzma \
+    --with-boost \
+    --with-sqlite3 \
+    --with-commoncrypto \
+    --program-suffix=3
+  make
+  make install DESTDIR=$PKG
+  mv $PKG/$_PREFIX/man/man1/botan.1 $PKG/$_PREFIX/man/man1/botan3.1
+  mv $PKG/$_PREFIX/doc/$(echo $PRGNAM | sed 's/^B/\L&/;s/3$//')-$VERSION $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a license.txt readme.rst $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+}
