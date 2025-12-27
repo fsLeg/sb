@@ -2,6 +2,15 @@
 
 # Do checks first
 
+# Check for the SlackBuild
+if [ -z "${1}" ]; then
+  echo "Usage: ${0} appname.SlackBuild"
+  exit 1
+elif [ ! -f "${1}" ]; then
+  echo "${1} doesn't exist."
+  exit 1
+fi
+
 # Check for fakeroot
 for LPATH in ${LD_LIBRARY_PATH//:/ }; do
   if [[ "${LPATH}" == *libfakeroot ]]; then
@@ -18,12 +27,6 @@ if [ ${UID} = 0 ]; then
   fi
 else
   echo "You aren't using fakeroot environment."
-  exit 1
-fi
-
-# Check if SlackBuild even exists
-if [ ! -f "${1}" ]; then
-  echo "${1} doesn't exist."
   exit 1
 fi
 
@@ -117,8 +120,9 @@ reset_permissions () {
 # Source the SlackBuild and start building
 
 set -e
+shopt -u sourcepath
 
-. "${1}"
+source "${1}"
 
 cd "$(dirname ${1})"; CWD="$(pwd)"
 PKG="${TMP}/package-${PRGNAM}"
@@ -243,3 +247,5 @@ done
 # the makepkg command below -- see makepkg(8) for details
 cd "${PKG}"
 /sbin/makepkg -l y -c n "${OUTPUT}/${PRGNAM}-$(test -n "${PKGVER}" && echo "${PKGVER}" || echo "${VERSION}")-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"
+
+exit 0
