@@ -9,35 +9,13 @@ DOWNLOAD="https://example.org/${VERSION}/${PRGNAM}-${VERSION}.tar.gz" # use this
 SHA256SUM="1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
 DOWNLOAD_x86="" # optional. only include if there are specific files for x86 systems, "UNSUPPORTED" if x86 is not supported
 SHA256SUM_x86="" # optional. only include if there are specific files for x86 systems
-REQUIRES="" # optional. list runtime dependencies (separate with spaces)
+REQUIRES="" # optional. list runtime dependencies
 BUILD_REQUIRES="" # optional. list build-time dependencies
-OPTIONAL="" # optional. list of optional dependencies detected at build- or runtime or enabled with variables
-CONFLICTS="" # optional. list any packages this package would conflict with, i. e. overwrite their files
+OPTIONAL="" # optional. list of optional dependencies
+CONFLICTS="" # optional. list any packages this package would conflict with
 
 # There must not be any executable code outside of functions as the
 # SlackBuild is sourced by sb tool.
-
-# You may set or unset variables as you see fit. Available variables
-# inherited from sb that might be useful (same meaning as on SBo):
-# $TMP
-# $CWD
-# $PKG
-# $ARCH
-# $DEBARCH - architecture the way Debian names it (i386, amd64, arm64)
-# $PLATFORM - platform identifier (ia32, x64, arm, arm64)
-# $SLKCFLAGS
-# $LIBDIRSUFFIX
-# $_PREFIX - "/usr/local" by default
-# CFLAGS and the like are already exported, so you don't need to set
-# them, unless you want to change them. For full list of variables see
-# the source of sb.
-
-# You can override package version by setting PKGVER variable.
-
-# If you need to skip permission reset after unpacking, set SKIP_PERMS
-# variable.
-
-# If you need to skip binary stripping, set SKIP_STRIP variable.
 
 unpack () {
   # This function should prepare the source tree in the directory that
@@ -67,7 +45,4 @@ build () {
   #
   # You should use /usr/local as prefix. You can utilize $_PREFIX here.
   # Don't forget to include documentation if there's be any.
-  # Files for the $PKG/install directory are placed by sb automatically.
-  # If you have to modify those files and put them manually, they won't
-  # be overwritten later.
 }

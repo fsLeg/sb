@@ -1,5 +1,33 @@
 #!/bin/bash
 
+# Do checks first
+
+# Check for fakeroot
+for LPATH in ${LD_LIBRARY_PATH//:/ }; do
+  if [[ "${LPATH}" == *libfakeroot ]]; then
+    IS_FAKEROOT=1
+  fi
+done
+if [ ${UID} = 0 ]; then
+  if [ -z "${IS_FAKEROOT}" ] && [ "${USE_REAL_ROOT:-N}" = "N" ]; then
+    echo "You are using real root. This isn't recommended. Are you sure you want to continue?"
+    read -p "Y/[N] " USE_REAL_ROOT
+    case "${USE_REAL_ROOT}" in
+      "n"|"N"|"") exit 1 ;;
+    esac
+  fi
+else
+  echo "You aren't using fakeroot environment."
+  exit 1
+fi
+
+# Check if SlackBuild even exists
+if [ ! -f "${1}" ]; then
+  echo "${1} doesn't exist."
+  exit 1
+fi
+
+# Set the environment
 TAG="${TAG:-sb}"
 PKGTYPE="${PKGTYPE:-txz}"
 TMP="${TMP:-/tmp/sb}"
@@ -76,6 +104,18 @@ export GOCACHE="${TMP}/.go-cache"
 # Dart
 export PUB_CACHE="${TMP}/.pub-cache"
 
+# Define useful functions
+reset_permissions () {
+  chown -R root:root .
+  find -L . \
+   \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
+    -o -perm 511 \) -exec chmod 755 {} \; -o \
+   \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
+    -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+}
+
+# Source the SlackBuild and start building
+
 set -e
 
 . "${1}"
@@ -88,39 +128,12 @@ if [ -n "${PRINT_PACKAGE_NAME}" ]; then
   exit 0
 fi
 
-# Ownership reset requires root priviledges. But it is only needed for
-# makepkg so tar saves correct permissions when creating the package.
-# For that fakeroot is sufficient. Legacy way was building as root.
-# With modern build systems more and more often requiring Internet
-# access, building as root becomes increasingly dangerous. So the
-# recommended way is using fakeroot, however, users can still use actual
-# root if they so desire. For automation and less annoyance they can set
-# the USE_REAL_ROOT environment variable to anything other than "N".
-# This also implies that Internet access is expected. That's just the
-# world we live in.
-for LPATH in ${LD_LIBRARY_PATH//:/ }; do
-  if [[ "${LPATH}" == *libfakeroot ]]; then
-    IS_FAKEROOT=1
-  fi
-done
-if [ ${UID} = 0 ]; then
-  if [ -z "${IS_FAKEROOT}" ] && [ "${USE_REAL_ROOT:-N}" = "N" ]; then
-    echo "You are using real root. This isn't recommended. Are you sure you want to continue?"
-    read -p "Y/[N] " USE_REAL_ROOT
-    case "${USE_REAL_ROOT}" in
-      "n"|"N"|"") exit 1 ;;
-    esac
-  fi
-else
-  echo "You aren't using fakeroot environment."
-  exit 1
-fi
-
 if ([ "${DOWNLOAD_x86}" = "UNSUPPORTED" ] && [[ ${ARCH} == i?86 ]]) || ([ "${DOWNLOAD}" = "UNSUPPORTED" ] && [[ ${ARCH} == *64 ]]); then
   echo "Architecture ${ARCH} is not supported."
   exit 1
 fi
 
+# Retrieve the sources if they aren't present
 for URL in $(test "${DOWNLOAD}" != "UNSUPPORTED" && [[ ${ARCH} != i?86 ]] && echo "${DOWNLOAD}" || echo "") \
            $(test -n "${DOWNLOAD_x86}" && test "${DOWNLOAD_x86}" != "UNSUPPORTED" && [[ ${ARCH} == i?86 ]] && echo "${DOWNLOAD_x86}" || echo "")
 do
@@ -129,7 +142,8 @@ do
   fi
 done
 
-if [ "$DOWNLOAD" != "UNSUPPORTED" ] && [[ ${ARCH} != i?86 ]]; then
+# Check if sources are correct
+if [ "${DOWNLOAD}" != "UNSUPPORTED" ] && [[ "${ARCH}" != i?86 ]]; then
   declare -a CHECKSUMS
   SHA256SUMS=(${SHA256SUM})
   TARBALLS=($(basename -a ${DOWNLOAD}))
@@ -137,11 +151,11 @@ if [ "$DOWNLOAD" != "UNSUPPORTED" ] && [[ ${ARCH} != i?86 ]]; then
     i+=-1
     CHECKSUMS+="${SHA256SUMS[${i}]}  ${TARBALLS[$i]}\n"
   done
-  sha256sum --check --status <(echo -e "${CHECKSUMS}")
+  sha256sum --check <(echo -e "${CHECKSUMS}")
   unset CHECKSUMS SHA256SUMS TARBALLS
 fi
 
-if [ -n "${DOWNLOAD_x86}" ] && [ "${DOWNLOAD_x86}" != "UNSUPPORTED" ] && [[ ${ARCH} == i?86 ]]; then
+if [ -n "${DOWNLOAD_x86}" ] && [ "${DOWNLOAD_x86}" != "UNSUPPORTED" ] && [[ "${ARCH}" == i?86 ]]; then
   declare -a CHECKSUMS_x86
   SHA256SUMS_x86=(${SHA256SUM_x86})
   TARBALLS_x86=($(basename -a ${DOWNLOAD_x86}))
@@ -149,7 +163,7 @@ if [ -n "${DOWNLOAD_x86}" ] && [ "${DOWNLOAD_x86}" != "UNSUPPORTED" ] && [[ ${AR
     i+=-1
     CHECKSUMS_x86+="${SHA256SUMS_x86[${i}]}  ${TARBALLS_x86[$i]}\n"
   done
-  sha256sum --check --status <(echo -e ${CHECKSUMS_x86})
+  sha256sum --check <(echo -e ${CHECKSUMS_x86})
   unset CHECKSUMS_x86 SHA256SUMS_x86 TARBALLS_x86
 fi
 
@@ -167,12 +181,7 @@ unpack
 cd "${TMP}/${PRGNAM}-${VERSION}"
 
 if [ -z "${SKIP_PERMS}" ]; then
-  chown -R root:root .
-  find -L . \
-   \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
-    -o -perm 511 \) -exec chmod 755 {} \; -o \
-   \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
-    -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+  reset_permissions
 fi
 
 build
