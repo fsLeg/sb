@@ -4,7 +4,7 @@
 # Intended to be run from the root of the repo.
 # It updates the version and SHA256 checksums in the .SlackBuild file.
 
-set -ex
+set -e
 
 if [ -z "$1" ] || [ -z "$2" ]; then
   echo "Usage: $0 PRGNAM NEWVER"
