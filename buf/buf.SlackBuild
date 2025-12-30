@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="buf"
-VERSION="${VERSION:-1.61.0}"
+VERSION="${VERSION:-1.62.1}"
 BUILD="${BUILD:-1}"
 DESCRIPTION="The best way of working with Protocol Buffers."
 HOMEPAGE="https://buf.build/"
 DOWNLOAD="https://github.com/bufbuild/buf/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="97459176763e09f55311fd99b38f097c8782d4a4abb0eb1e853092220547ecb6"
+SHA256SUM="9f4221484f622ed657c103651f29ca448d0d8ddff72fa1b35b14b8a3e02bb1b5"
 BUILD_REQUIRES="google-go-lang"
 SKIP_PERMS=1
 
