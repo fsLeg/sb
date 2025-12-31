@@ -1,0 +1,12 @@
+# binaries
+*.tar.?z*
+*.zip
+*.deb
+*.rpm
+*.7z
+# duplicates
+*.[1-9]
+# temporary files I might've forgotten to remove
+*~
+# Sometimes JOE crashes or has to be killed
+DEADJOE
