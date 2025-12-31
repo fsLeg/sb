@@ -25,6 +25,8 @@ if [ ${UID} = 0 ]; then
       "n"|"N"|"") exit 1 ;;
     esac
   fi
+elif (which fakeroot &> /dev/null); then
+  exec fakeroot "${0}" "${1}"
 else
   echo "You aren't using fakeroot environment."
   exit 1
