@@ -37,7 +37,7 @@ TAG="${TAG:-sb}"
 PKGTYPE="${PKGTYPE:-txz}"
 TMP="${TMP:-/tmp/sb}"
 OUTPUT="${OUTPUT:-/tmp}"
-_PREFIX="/usr/local"
+_PREFIX="${_PREFIX:-/usr/local}"
 
 if [ -z "${ARCH}" ]; then
   case "$(uname -m)" in
