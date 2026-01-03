@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+             |-----handy-ruler------------------------------------------------------|
+PrismLauncher: PrismLauncher (Open Source Minecraft launcher)
+PrismLauncher:
+PrismLauncher: A custom launcher for Minecraft that allows you to easily manage
+PrismLauncher: multiple installations of Minecraft at once (Fork of MultiMC).
+PrismLauncher:
+PrismLauncher:
+PrismLauncher:
+PrismLauncher:
+PrismLauncher:
+PrismLauncher: Homepage: https://prismlauncher.org/
+PrismLauncher:
