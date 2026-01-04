@@ -7,7 +7,7 @@
 set -e
 shopt -u sourcepath
 
-if [ -z "$1" ] || [ -z "$2" ]; then
+if [[ "${#@}" -ne 2 ]]; then
   echo "Usage: $0 PRGNAM NEWVER"
   exit 1
 fi
@@ -15,6 +15,11 @@ fi
 PRGNAM="${1%/}"
 NEWVER="$2"
 CWD="$(pwd)"
+
+if [[ ! -d "$PRGNAM" ]]; then
+  echo "Directory \"$PRGNAM\" doesn't exist."
+  exit 1
+fi
 
 cd "$PRGNAM"
 
