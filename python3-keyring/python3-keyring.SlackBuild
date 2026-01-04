@@ -1,0 +1,45 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="python3-keyring"
+TARNAM="${PRGNAM#python3-}"
+VERSION="${VERSION:-25.7.0}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Python keyring library"
+HOMEPAGE="https://github.com/jaraco/keyring"
+DOWNLOAD="https://files.pythonhosted.org/packages/source/k/${TARNAM}/${TARNAM}-${VERSION}.tar.gz"
+SHA256SUM="fe01bd85eb3f8fb3dd0405defdeac9a5b4f6f0439edbb3149577f244a2e8245b"
+REQUIRES="python-importlib_metadata python3-jaraco.classes python3-jaraco.context python3-jaraco.functools secretstorage"
+OPTIONAL="python3-shtab"
+
+unpack () {
+  tar xvf $CWD/$TARNAM-$VERSION.tar.gz
+  mv $TARNAM-$VERSION $PRGNAM-$VERSION
+  # drop useless coherent.licensed dependency
+  sed -i '/coherent.licensed/d' $PRGNAM-$VERSION/pyproject.toml
+}
+
+build () {
+  PYVER=$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')
+  export PYTHONPATH=/opt/python$PYVER/site-packages
+
+  python3 -m build --wheel --no-isolation
+  python3 -m installer --destdir "$PKG" dist/*.whl
+
+  mkdir -p $PKG/$_PREFIX
+  mv $PKG/usr/bin $PKG/$_PREFIX || true
+
+  # Add python3-keyring shell completions (requires python3-shtab)
+  if $(python3 -c 'import pkgutil; exit(not pkgutil.find_loader("shtab"))'); then
+    mkdir -p $PKG/$_PREFIX/share/bash-completion/completions \
+             $PKG/$_PREFIX/share/zsh/site-functions \
+             $PKG/etc/profile.d
+    $PKG/$_PREFIX/bin/keyring --print-completion bash > $PKG/$_PREFIX/share/bash-completion/completions/keyring
+    $PKG/$_PREFIX/bin/keyring --print-completion zsh > $PKG/$_PREFIX/share/zsh/site-functions/_keyring
+    $PKG/$_PREFIX/bin/keyring --print-completion tcsh > $PKG/etc/profile.d/keyring.csh
+  fi
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a \
+    LICENSE README.rst NEWS.rst SECURITY.md \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}
