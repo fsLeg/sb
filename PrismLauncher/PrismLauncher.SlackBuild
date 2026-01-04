@@ -8,13 +8,13 @@ HOMEPAGE="https://prismlauncher.org/"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/releases/download/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="77ab52239c2a2a9f77d7c4607e1d9cf40970f9240d2f5061b116a7b1b8fd0277"
 BUILD_REQUIRES="jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
-OPTIONAL="scdoc"
+OPTIONAL="scdoc glfw3 flite orca"
 CONFLICTS=" PrismLauncher-Unlocked"
 
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
   # fix building with newer Java
-  if [ ! $(java -version 2>&1 | head -1 | cut -d' ' -f3 | tr -d '"' | cut -d. -f1) -eq 1 ]; then
+  if [ $(java -version 2>&1 | head -1 | cut -d' ' -f3 | tr -d '"' | cut -d. -f1) -ge 21 ]; then
     sed -i 's/-target 7 -source 7/--release 8 -Xlint:-options/' $PRGNAM-$VERSION/libraries/{javacheck,launcher}/CMakeLists.txt
   fi
 }
