@@ -18,7 +18,7 @@ CWD="$(pwd)"
 cd "$PRGNAM"
 
 . "./$PRGNAM.SlackBuild"
-sed -i "s|$VERSION|$NEWVER|g" "$PRGNAM.SlackBuild"
+sed -i "s|${VERSION/\./\\.}|$NEWVER|g" "$PRGNAM.SlackBuild"
 unset -v VERSION
 . "./$PRGNAM.SlackBuild"
 
