@@ -14,11 +14,16 @@ fi
 # Check for fakeroot
 for LPATH in ${LD_LIBRARY_PATH//:/ }; do
   if [[ "${LPATH}" == *libfakeroot ]]; then
-    IS_FAKEROOT=1
+    ROOT_TYPE="fakeroot"
   fi
 done
+
+if [ "$(awk '{print $2}' /proc/self/uid_map)" != 0 ]; then
+  ROOT_TYPE="unshare"
+fi
+
 if [ ${UID} = 0 ]; then
-  if [ -z "${IS_FAKEROOT}" ] && [ "${USE_REAL_ROOT:-N}" = "N" ]; then
+  if [ -z "${ROOT_TYPE}" ] && [ "${USE_REAL_ROOT:-N}" = "N" ]; then
     echo "You are using real root. This isn't recommended. Are you sure you want to continue?"
     read -p "Y/[N] " USE_REAL_ROOT
     case "${USE_REAL_ROOT}" in
@@ -28,8 +33,7 @@ if [ ${UID} = 0 ]; then
 elif (which fakeroot &> /dev/null); then
   exec fakeroot "${0}" "${1}"
 else
-  echo "You aren't using fakeroot environment."
-  exit 1
+  exec unshare -r "${0}" "${1}"
 fi
 
 # Set the environment
