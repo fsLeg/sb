@@ -13,8 +13,9 @@ CONFLICTS="PrismLauncher-Unlocked"
 
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+
   # fix building with newer Java
-  if [ $(java -version 2>&1 | head -1 | cut -d' ' -f3 | tr -d '"' | cut -d. -f1) -ge 21 ]; then
+  if [ $(java -version 2>&1 | awk -F'[ ".]' '/version/ {print $4}') -ge 21 ]; then
     sed -i 's/-target 7 -source 7/--release 8 -Xlint:-options/' $PRGNAM-$VERSION/libraries/{javacheck,launcher}/CMakeLists.txt
   fi
 }
@@ -23,6 +24,7 @@ build () {
   if [ "${QT6:-no}" = "no" ]; then
     USE_QT5="-DLauncher_QT_VERSION_MAJOR=5"
   fi
+
   cmake -G Ninja \
         -Wno-dev \
         -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
