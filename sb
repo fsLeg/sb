@@ -3,7 +3,7 @@
 # Do checks first
 
 # Check for the SlackBuild
-if [ -z "${1}" ]; then
+if [ ! "${#@}" -eq 1 ]; then
   echo "Usage: ${0} appname.SlackBuild"
   exit 1
 elif [ ! -f "${1}" ]; then
@@ -22,7 +22,7 @@ if [ "$(awk '{print $2}' /proc/self/uid_map)" != 0 ]; then
   ROOT_TYPE="unshare"
 fi
 
-if [ ${UID} = 0 ]; then
+if [ "${EUID}" = 0 ]; then
   if [ -z "${ROOT_TYPE}" ] && [ "${USE_REAL_ROOT:-N}" = "N" ]; then
     echo "You are using real root. This isn't recommended. Are you sure you want to continue?"
     read -p "Y/[N] " USE_REAL_ROOT
