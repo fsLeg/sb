@@ -20,6 +20,7 @@ done
 
 if [ "$(awk '{print $2}' /proc/self/uid_map)" != 0 ]; then
   ROOT_TYPE="unshare"
+  echo "You're using unshare. This is not supported."
 fi
 
 if [ "${EUID}" = 0 ]; then
@@ -33,7 +34,8 @@ if [ "${EUID}" = 0 ]; then
 elif (which fakeroot &> /dev/null); then
   exec fakeroot "${0}" "${1}"
 else
-  exec unshare -r "${0}" "${1}"
+  echo "You aren't using fakeroot environment."
+  exit 1
 fi
 
 # Set the environment
