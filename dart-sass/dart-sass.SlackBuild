@@ -1,14 +1,14 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="dart-sass"
-VERSION="${VERSION:-1.97.0}"
+VERSION="${VERSION:-1.97.2}"
 EMBEDDED_PROTOCOL_VERSION="3.2.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Dart implementation of Sass"
 HOMEPAGE="https://sass-lang.com/dart-sass"
 DOWNLOAD="https://github.com/sass/dart-sass/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz \
           https://github.com/sass/sass/archive/embedded-protocol-${EMBEDDED_PROTOCOL_VERSION}/sass-embedded-protocol-${EMBEDDED_PROTOCOL_VERSION}.tar.gz"
-SHA256SUM="302be443f1e0ae16180f19c1a98ac3732eed44ba18d2556435971e4c88a06913 \
+SHA256SUM="f0cf261d1ecd104bb9609bcef578137f6eeb50941683c36734df3c448fa934e3 \
            4e1f81684bc1666f03e52ddc790d0c2c22d99a5313fa2efe1dde4a5b5733c186"
 REQUIRES="dart-sdk"
 BUILD_REQUIRES="buf"
