@@ -1,14 +1,15 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="PrismLauncher"
-VERSION="${VERSION:-9.4}"
+VERSION="${VERSION:-10.0.0}"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Open Source Minecraft launcher"
 HOMEPAGE="https://prismlauncher.org/"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/releases/download/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="77ab52239c2a2a9f77d7c4607e1d9cf40970f9240d2f5061b116a7b1b8fd0277"
+SHA256SUM="5be4bfe474dbf6161a1d69a4c5c051dd94cb6c4558d093c9599aa748e4b4112b"
+REQUIRES="qt6 gamemode tomlplusplus"
 BUILD_REQUIRES="jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
-OPTIONAL="qt6 scdoc glfw3 flite orca"
+OPTIONAL="scdoc glfw3 flite orca"
 CONFLICTS="PrismLauncher-Unlocked"
 
 unpack () {
@@ -18,14 +19,13 @@ unpack () {
   if [ $(java -version 2>&1 | awk -F'[ ".]' '/version/ {print $4}') -ge 21 ]; then
     sed -i 's/-target 7 -source 7/--release 8 -Xlint:-options/' $PRGNAM-$VERSION/libraries/{javacheck,launcher}/CMakeLists.txt
   fi
+  # fix man path
+  sed -i 's/KDE_INSTALL_MANDIR/MAN_INSTALL_DIR/' $PRGNAM-$VERSION/CMakeLists.txt
 }
 
 build () {
-  if [ "${QT6:-no}" = "no" ]; then
-    USE_QT5="-DLauncher_QT_VERSION_MAJOR=5"
-  fi
-
-  cmake -G Ninja \
+  cmake --preset linux \
+        -G Ninja \
         -Wno-dev \
         -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
         -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
@@ -33,11 +33,10 @@ build () {
         -DLIB_SUFFIX="$LIBDIRSUFFIX" \
         -DMAN_INSTALL_DIR="$_PREFIX/man" \
         -DENABLE_LTO="ON" \
-        $USE_QT5 \
         -DLauncher_BUILD_PLATFORM="slackware" \
         -DCMAKE_BUILD_TYPE="Release" \
         -B build
-  cmake --build build
+  cmake --build --preset linux
   DESTDIR=$PKG cmake --install build
 
   mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
