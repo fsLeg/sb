@@ -1,14 +1,14 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="PrismLauncher"
-VERSION="${VERSION:-10.0.0}"
+VERSION="${VERSION:-10.0.1}"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Open Source Minecraft launcher"
 HOMEPAGE="https://prismlauncher.org/"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/releases/download/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="5be4bfe474dbf6161a1d69a4c5c051dd94cb6c4558d093c9599aa748e4b4112b"
-REQUIRES="qt6 gamemode tomlplusplus"
-BUILD_REQUIRES="jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
+SHA256SUM="fd25af8c53b8a2cf6a3c0428be0f80c6fe38d427b2274e08ce8078fd20d6b5cf"
+REQUIRES="qt6 gamemode tomlplusplus cmark"
+BUILD_REQUIRES="cmake-opt jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
 OPTIONAL="scdoc glfw3 flite orca"
 CONFLICTS="PrismLauncher-Unlocked"
 
@@ -16,28 +16,33 @@ unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
 
   # fix building with newer Java
-  if [ $(java -version 2>&1 | awk -F'[ ".]' '/version/ {print $4}') -ge 21 ]; then
+  if [ "$(java -version 2>&1 | awk -F'[ ".]' '/version/ {print $4}')" -ge 21 ]; then
     sed -i 's/-target 7 -source 7/--release 8 -Xlint:-options/' $PRGNAM-$VERSION/libraries/{javacheck,launcher}/CMakeLists.txt
   fi
+
   # fix man path
   sed -i 's/KDE_INSTALL_MANDIR/MAN_INSTALL_DIR/' $PRGNAM-$VERSION/CMakeLists.txt
 }
 
 build () {
+  # the default linker fails to link a number of targets, hence using gold
+  # the linker also chokes if there's no "-ldl" ldflag
+  # -current doesn't need any of those, it also replaced gold with mold
   cmake --preset linux \
-        -G Ninja \
         -Wno-dev \
-        -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-        -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+        -DENABLE_LTO="ON" \
+        -DCMAKE_LINKER_TYPE="$(echo /usr/bin/ld.?old | awk -F'\\.' '{print toupper($NF)}')" \
+        -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+        -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS -ldl" \
+        -DCMAKE_BUILD_TYPE="Release" \
         -DCMAKE_INSTALL_PREFIX="$_PREFIX" \
         -DLIB_SUFFIX="$LIBDIRSUFFIX" \
         -DMAN_INSTALL_DIR="$_PREFIX/man" \
-        -DENABLE_LTO="ON" \
-        -DLauncher_BUILD_PLATFORM="slackware" \
-        -DCMAKE_BUILD_TYPE="Release" \
-        -B build
-  cmake --build --preset linux
-  DESTDIR=$PKG cmake --install build
+        -DLauncher_BUILD_PLATFORM="slackware"
+  # PrismLauncher 10.0 has broken rules and produces no release binaries, only debug is supported
+  cmake --build --preset linux --config Debug
+  DESTDIR=$PKG cmake --install build --config Debug
 
   mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   cp -a \
