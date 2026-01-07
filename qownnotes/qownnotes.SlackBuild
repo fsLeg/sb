@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="qownnotes"
-VERSION="${VERSION:-25.1.5}"
+VERSION="${VERSION:-26.1.6}"
 BUILD="${BUILD:-1}"
 DESCRIPTION="notepad with markdown support and Nextcloud integration"
 HOMEPAGE="https://www.qownnotes.org/"
 DOWNLOAD="https://github.com/pbek/QOwnNotes/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.xz"
-SHA256SUM="42be6990ace7a2c5063bb1ef5246617a65b0b4aa72600efd573d6353a6213831"
+SHA256SUM="ab2b62c259ee42f1a58e18332e6ed6a7203713c54ca5b85c293ee7e5370bd8fd"
 OPTIONAL="Botan3 libgit2 qt6"
 
 unpack () {
@@ -30,7 +30,6 @@ build () {
 
   mkdir build
   cmake \
-    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
     -DCMAKE_INSTALL_PREFIX=$_PREFIX \
     -DBUILD_WITH_ASPELL=ON \
     $USE_QT6 \
