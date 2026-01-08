@@ -40,9 +40,10 @@ build () {
         -DLIB_SUFFIX="$LIBDIRSUFFIX" \
         -DMAN_INSTALL_DIR="$_PREFIX/man" \
         -DLauncher_BUILD_PLATFORM="slackware"
-  # PrismLauncher 10.0 has broken rules and produces no release binaries, only debug is supported
-  cmake --build --preset linux --config Debug
-  DESTDIR=$PKG cmake --install build --config Debug
+  # --config shouldn't affect ninja in presence of CMAKE_BUILD_TYPE, but
+  # ninja seems to ignore the latter and build debug version without it
+  cmake --build --preset linux --config Release
+  DESTDIR=$PKG cmake --install build --config Release
 
   mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   cp -a \
