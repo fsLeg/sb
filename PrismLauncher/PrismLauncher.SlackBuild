@@ -35,15 +35,15 @@ build () {
         -DCMAKE_C_FLAGS="$SLKCFLAGS" \
         -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
         -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS -ldl" \
-        -DCMAKE_BUILD_TYPE="Release" \
+        -DCMAKE_DEFAULT_BUILD_TYPE="Release" \
         -DCMAKE_INSTALL_PREFIX="$_PREFIX" \
         -DLIB_SUFFIX="$LIBDIRSUFFIX" \
         -DMAN_INSTALL_DIR="$_PREFIX/man" \
-        -DLauncher_BUILD_PLATFORM="slackware"
-  # --config shouldn't affect ninja in presence of CMAKE_BUILD_TYPE, but
-  # ninja seems to ignore the latter and build debug version without it
-  cmake --build --preset linux --config Release
-  DESTDIR=$PKG cmake --install build --config Release
+        -DLauncher_BUILD_PLATFORM="slackware" \
+        -DLauncher_ENABLE_JAVA_DOWNLOADER="ON" \
+        -DBUILD_TESTING="OFF"
+  cmake --build --preset linux
+  DESTDIR=$PKG cmake --install build
 
   mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   cp -a \
