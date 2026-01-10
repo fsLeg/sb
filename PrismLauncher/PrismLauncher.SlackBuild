@@ -15,6 +15,11 @@ CONFLICTS="PrismLauncher-Unlocked"
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
 
+  # get dependencies for git sources
+  if [ -z "$(ls -A $PRGNAM-$VERSION/libraries/libnbtplusplus)" ]; then
+    git -C $PRGNAM-$VERSION/libraries clone --depth 1 "$(git -C $PRGNAM-$VERSION config get -f .gitmodules submodule.libraries/libnbtplusplus.url)"
+  fi
+
   # fix building with newer Java
   if [ "$(java -version 2>&1 | awk -F'[ ".]' '/version/ {print $4}')" -ge 21 ]; then
     sed -i 's/-target 7 -source 7/--release 8 -Xlint:-options/' $PRGNAM-$VERSION/libraries/{javacheck,launcher}/CMakeLists.txt
@@ -22,6 +27,9 @@ unpack () {
 
   # fix man path
   sed -i 's/KDE_INSTALL_MANDIR/MAN_INSTALL_DIR/' $PRGNAM-$VERSION/CMakeLists.txt
+
+  # do not set RPATH
+  sed -i '/RPATH/d' $PRGNAM-$VERSION/CMakeLists.txt
 }
 
 build () {
