@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="PrismLauncher"
-VERSION="${VERSION:-10.0.1}"
+VERSION="${VERSION:-10.0.2}"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Open Source Minecraft launcher"
 HOMEPAGE="https://prismlauncher.org/"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/releases/download/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="fd25af8c53b8a2cf6a3c0428be0f80c6fe38d427b2274e08ce8078fd20d6b5cf"
+SHA256SUM="4b36e8b0345a21a9a8da36633fa5bf4d8f44d992da1529cdfb6bf52a0ff7f33c"
 REQUIRES="qt6 gamemode tomlplusplus cmark"
 BUILD_REQUIRES="cmake-opt jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
 OPTIONAL="scdoc glfw3 flite orca"
