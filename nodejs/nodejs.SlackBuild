@@ -1,0 +1,55 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="nodejs"
+VERSION="${VERSION:-22.21.1}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="JavaScript runtime"
+HOMEPAGE="https://nodejs.org/"
+DOWNLOAD="https://nodejs.org/dist/v${VERSION}/${PRGNAM%js}-v${VERSION}.tar.gz"
+SHA256SUM="5407ff154708e3dd6c9eb40f787b79afc5db8b2461e4ae92ee54605515bba0f1"
+CONFLICTS="nodejs18 nodejs22 nodejs24-bin"
+
+unpack () {
+  tar xvf $CWD/${PRGNAM%js}-v$VERSION.tar.gz
+  mv ${PRGNAM%js}-v$VERSION $PRGNAM-$VERSION
+
+  # Fix man page path
+  sed -i 's|share/||' $PRGNAM-$VERSION/tools/install.py
+
+  # Fix libdir for 64-bit
+  # https://github.com/iojs/io.js/issues/504
+  sed -i "s|lib/|lib${LIBDIRSUFFIX}/|g" $PRGNAM-$VERSION/tools/install.py
+  sed -i "s/'lib'/'lib${LIBDIRSUFFIX}'/" \
+    $PRGNAM-$VERSION/lib/module.js \
+    $PRGNAM-$VERSION/lib/internal/modules/cjs/loader.js \
+    $PRGNAM-$VERSION/deps/npm/lib/npm.js
+
+  # Include the correct header
+  sed -i "s|math.h|cmath|" $PRGNAM-$VERSION/src/node_crypto.cc
+
+  # A workaround for a GCC 11.2 bug that prevents NodeJS 22 from building
+  patch -p1 -d $PRGNAM-$VERSION < $CWD/nodejs22_gcc11.2_bug.patch
+}
+
+build () {
+  ./configure \
+    --prefix=$_PREFIX \
+    --shared-zlib \
+    --experimental-http-parser \
+    --shared-openssl \
+    --shared-nghttp2 \
+    --ninja
+
+  make CFLAGS="$SLKCFLAGS" CXXFLAGS="$SLKCFLAGS" LDFLAGS="-Wl,--copy-dt-needed-entries"
+  make install DESTDIR=$PKG
+
+  ## Add bash completion file for npm.
+  mkdir -p $PKG/$_PREFIX/share/bash-completion/completions
+  $PKG/$_PREFIX/bin/npm completion > $PKG/$_PREFIX/share/bash-completion/completions/npm
+  #(cd $PKG/$_PREFIX/share/bash-completion/completions && ln -sf ../../../lib${LIBDIRSUFFIX}/node_modules/npm/lib/utils/completion.sh npm)
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  mv $PKG/$_PREFIX/doc/node $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  ln -sf $PRGNAM-$VERSION/node $PKG/$_PREFIX/doc/node
+  cp -a LICENSE *.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}
