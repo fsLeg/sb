@@ -2,14 +2,14 @@
 
 PRGNAM="element-desktop"
 WEBNAM="element-web"
-VERSION="${VERSION:-1.12.7}"
+VERSION="${VERSION:-1.12.8}"
 BUILD="${BUILD:-1}"
 DESCRIPTION="secure and independent communication via Matrix"
 HOMEPAGE="https://element.io/"
 DOWNLOAD="https://github.com/element-hq/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz \
           https://github.com/element-hq/${WEBNAM}/archive/v$VERSION/${WEBNAM}-$VERSION.tar.gz"
-SHA256SUM="ce68ec2850bda22d0249765531458cb68be8209be7af286f93f0be650d95ee72 \
-           cd046c50583d5c3f6955741e6a49215b3589ca66fa178b2de2e6e701a1a6dc2d"
+SHA256SUM="d69a1ac85fb8dd9f1aa11a944bd2c797e8b438a3f10fc845814c8599bc1421ac \
+           f3fea14be7da81f465dc93af5f6ee9f1a4bf97af2d5b85c409c7d8bce6d9404f"
 DOWNLOAD_x86="UNSUPPORTED"
 REQUIRES="sqlcipher"
 BUILD_REQUIRES="rust-opt nodejs24-bin yarn"
