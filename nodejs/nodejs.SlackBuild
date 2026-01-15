@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="nodejs"
-VERSION="${VERSION:-22.21.1}"
+VERSION="${VERSION:-22.22.0}"
 BUILD="${BUILD:-1}"
 DESCRIPTION="JavaScript runtime"
 HOMEPAGE="https://nodejs.org/"
 DOWNLOAD="https://nodejs.org/dist/v${VERSION}/${PRGNAM%js}-v${VERSION}.tar.gz"
-SHA256SUM="5407ff154708e3dd6c9eb40f787b79afc5db8b2461e4ae92ee54605515bba0f1"
+SHA256SUM="5a4585d7f26bfb283267194b299243efea5ee6edd2fbf887825469b4ac94aece"
 CONFLICTS="nodejs18 nodejs22 nodejs24-bin"
 
 unpack () {
@@ -44,9 +44,7 @@ build () {
   make install DESTDIR=$PKG
 
   ## Add bash completion file for npm.
-  mkdir -p $PKG/$_PREFIX/share/bash-completion/completions
-  $PKG/$_PREFIX/bin/npm completion > $PKG/$_PREFIX/share/bash-completion/completions/npm
-  #(cd $PKG/$_PREFIX/share/bash-completion/completions && ln -sf ../../../lib${LIBDIRSUFFIX}/node_modules/npm/lib/utils/completion.sh npm)
+  install -D -m 644 $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/lib/utils/completion.sh $PKG/$_PREFIX/share/bash-completion/completions/npm
 
   mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   mv $PKG/$_PREFIX/doc/node $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
