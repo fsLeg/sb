@@ -13,10 +13,10 @@ unpack () {
   tar xvf $CWD/${PRGNAM%js}-v$VERSION.tar.gz
   mv ${PRGNAM%js}-v$VERSION $PRGNAM-$VERSION
 
-  # Fix man page path
+  # fix man page path
   sed -i 's|share/||' $PRGNAM-$VERSION/tools/install.py
 
-  # Fix libdir for 64-bit
+  # fix libdir for 64-bit
   # https://github.com/iojs/io.js/issues/504
   sed -i "s|lib/|lib${LIBDIRSUFFIX}/|g" $PRGNAM-$VERSION/tools/install.py
   sed -i "s/'lib'/'lib${LIBDIRSUFFIX}'/" \
@@ -24,30 +24,60 @@ unpack () {
     $PRGNAM-$VERSION/lib/internal/modules/cjs/loader.js \
     $PRGNAM-$VERSION/deps/npm/lib/npm.js
 
-  # Include the correct header
+  # include the correct header
   sed -i "s|math.h|cmath|" $PRGNAM-$VERSION/src/node_crypto.cc
 
-  # A workaround for a GCC 11.2 bug that prevents NodeJS 22 from building
+  # a workaround for a GCC 11.2 bug that prevents NodeJS 22 from building
   patch -p1 -d $PRGNAM-$VERSION < $CWD/nodejs22_gcc11.2_bug.patch
 }
 
 build () {
   ./configure \
     --prefix=$_PREFIX \
+    --shared-openssl \
     --shared-zlib \
     --experimental-http-parser \
-    --shared-openssl \
     --shared-nghttp2 \
-    --ninja
+    --shared-brotli \
+    --ninja \
+    --dest-cpu=$PLATFORM
 
   make CFLAGS="$SLKCFLAGS" CXXFLAGS="$SLKCFLAGS" LDFLAGS="-Wl,--copy-dt-needed-entries"
   make install DESTDIR=$PKG
 
-  ## Add bash completion file for npm.
-  install -D -m 644 $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/lib/utils/completion.sh $PKG/$_PREFIX/share/bash-completion/completions/npm
+  # add bash completion file for npm
+  mkdir -p $PKG/$_PREFIX/share/bash-completion/completions
+  ln -sf ../../../../lib$LIBDIRSUFFIX/node_modules/npm/lib/utils/completion.sh \
+         $PKG/$_PREFIX/share/bash-completion/completions/npm
 
+  # move npm man pages and symlink them back
+  cp -aR $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man $PKG/$_PREFIX/
+  rm -rf $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man
+  for dir in $PKG/$_PREFIX/man/man?; do
+    mkdir -p $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man/$(basename $dir)
+    for file in $dir/*.?; do
+      ln -sf ../../../../../man/$(basename $dir)/$(basename $file).gz \
+             $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man/$(basename $dir)/
+    done
+  done
+
+  # set NODE_PATH to look for globally installed modules
+  mkdir -p $PKG/etc/profile.d
+  cat > $PKG/etc/profile.d/$PRGNAM.csh << EOF
+#!/bin/csh
+setenv NODE_PATH /$_PREFIX/lib$LIBDIRSUFFIX/node_modules
+EOF
+  cat > $PKG/etc/profile.d/$PRGNAM.sh << EOF
+#!/bin/sh
+export NODE_PATH=/$_PREFIX/lib$LIBDIRSUFFIX/node_modules
+EOF
+  chmod 0755 $PKG/etc/profile.d/*
+
+  # docs
   mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a LICENSE *.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+
+  # move doc/node, but keep a link to it
   mv $PKG/$_PREFIX/doc/node $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   ln -sf $PRGNAM-$VERSION/node $PKG/$_PREFIX/doc/node
-  cp -a LICENSE *.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
 }
