@@ -12,7 +12,7 @@ SHA256SUM="d69a1ac85fb8dd9f1aa11a944bd2c797e8b438a3f10fc845814c8599bc1421ac \
            f3fea14be7da81f465dc93af5f6ee9f1a4bf97af2d5b85c409c7d8bce6d9404f"
 DOWNLOAD_x86="UNSUPPORTED"
 REQUIRES="sqlcipher"
-BUILD_REQUIRES="rust-opt nodejs24-bin yarn"
+BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin yarn"
 CONFLICTS="element-desktop-bin"
 
 unpack () {
