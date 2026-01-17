@@ -41,8 +41,8 @@ The following metadata can be omitted if empty.
 - HOMEPAGE - URL of the program's homepage.
 - DOWNLOAD_x86 - set to URL if there's a special tarball for i586 architecture; set to "UNSUPPORTED" if i586 architecture is explicitly not supported by the program.
 - SHA256_x86 - required if $DOWNLOAD_x86 is set to URL.
-- REQUIRED - list of runtime dependencies, separate with spaces. Alternative dependencies can be specified using `|` symbol, i. e. REQUIRES="appname1|altappname1 appname2".
-- BUILD_REQUIRED - list of build-time dependencies. These are not required to actually run the program in question.
+- REQUIRES - list of runtime dependencies, separate with spaces. Alternative dependencies can be specified using `|` symbol, i. e. REQUIRES="appname1|altappname1 appname2".
+- BUILD_REQUIRES - list of build-time dependencies. These are not required to actually run the program in question.
 - OPTIONAL - list of optional packages, either autodetected at build time or enabled through environment variables.
 - CONFLICTS - list of packages this package will conflict with, i. e. due to installing files to the same path.
 
