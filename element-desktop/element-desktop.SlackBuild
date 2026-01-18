@@ -32,7 +32,7 @@ build () {
 
   cd ../$PRGNAM-$VERSION
   mkdir -p deploys
-  mv $TMP/$WEBNAM-$VERSION/webapp deploys/element-v$VERSION
+  mv ../$WEBNAM-$VERSION/webapp deploys/element-v$VERSION
   yarn install --frozen-lockfile \
                --ignore-engines \
                --no-fund \
