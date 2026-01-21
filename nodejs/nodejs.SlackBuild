@@ -50,28 +50,8 @@ build () {
   ln -sf ../../../../lib$LIBDIRSUFFIX/node_modules/npm/lib/utils/completion.sh \
          $PKG/$_PREFIX/share/bash-completion/completions/npm
 
-  # move npm man pages and symlink them back
-  cp -aR $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man $PKG/$_PREFIX/
-  rm -rf $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man
-  for dir in $PKG/$_PREFIX/man/man?; do
-    mkdir -p $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man/$(basename $dir)
-    for file in $dir/*.?; do
-      ln -sf ../../../../../man/$(basename $dir)/$(basename $file).gz \
-             $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man/$(basename $dir)/
-    done
-  done
-
-  # set NODE_PATH to look for globally installed modules
-  mkdir -p $PKG/etc/profile.d
-  cat > $PKG/etc/profile.d/$PRGNAM.csh << EOF
-#!/bin/csh
-setenv NODE_PATH /$_PREFIX/lib$LIBDIRSUFFIX/node_modules
-EOF
-  cat > $PKG/etc/profile.d/$PRGNAM.sh << EOF
-#!/bin/sh
-export NODE_PATH=/$_PREFIX/lib$LIBDIRSUFFIX/node_modules
-EOF
-  chmod 0755 $PKG/etc/profile.d/*
+  # compress man pages, even though they're only used by 'npm help'
+  compress_files $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man
 
   # docs
   mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
