@@ -90,6 +90,7 @@ These must be set in a SlackBuild outside of functions, preferrably right after 
 ## Functions
 
 - reset_permissions() - recursively set the owner in a current directory to root:root, chmod all executable files and directories to 755 and non-executable files to 644.
+- compress_files() - recursively gzip every file within a current or provided directory.
 
 # Rationale
 

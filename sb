@@ -119,6 +119,19 @@ reset_permissions () {
     -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 }
 
+compress_files () {
+  if [ -z "${1}" ]; then
+    DIR="$(pwd)"
+  else
+    DIR="${1}"
+  fi
+  find "${DIR}" -type f -exec gzip -9 {} \;
+  for i in $(find "${DIR}" -type l); do
+    ln -s "$(readlink "${i}").gz" "${i}.gz"
+    rm "${i}"
+  done
+}
+
 # Source the SlackBuild and start building
 
 set -e
@@ -209,11 +222,7 @@ find ${PKG} -print0 | xargs -0 file | grep -e "executable" -e "shared object" | 
 
 # Compress man pages
 if [ -d "${PKG}${_PREFIX}/man" ]; then
-  find "${PKG}${_PREFIX}/man" -type f -exec gzip -9 {} \;
-  for i in $(find "${PKG}${_PREFIX}/man" -type l); do
-    ln -s "$(readlink "${i}").gz" "${i}.gz"
-    rm "${i}"
-  done
+  compress_files "${PKG}${_PREFIX}/man"
 fi
 
 # Compress info pages and remove the package's dir file
