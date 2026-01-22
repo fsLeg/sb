@@ -40,14 +40,14 @@ if [[ "$DOWNLOAD" != "UNSUPPORTED" ]]; then
   for TARBALL in $(basename -a $DOWNLOAD); do
     CHECKSUMS="$CHECKSUMS$(sha256sum "$TARBALL" | cut -d' ' -f1) "
   done
-  CHECKSUMS="$(echo "${CHECKSUMS% }" | tr ' ' '\\n' | awk '{if(NR>1) printf "\\n%12s%s", "", $0; else printf "%s", $0}')"
+  CHECKSUMS="$(echo "${CHECKSUMS% }" | tr ' ' '\n' | awk '{if(NR>1) printf " \\\\\\\n%11s%s", "", $0; else printf "%s", $0}')"
   perl -0777 -pi -e 's|SHA256SUM="[0-9a-f\s\\]*"|SHA256SUM="'"$CHECKSUMS"'"|' "$PRGNAM.SlackBuild"
 fi
 if [[ -n "$DOWNLOAD_x86" && "$DOWNLOAD_x86" != "UNSUPPORTED" ]]; then
   for TARBALL in $(basename -a $DOWNLOAD_x86); do
     CHECKSUMS32="$CHECKSUMS32$(sha256sum "$TARBALL" | cut -d' ' -f1) "
   done
-  CHECKSUMS32="$(echo "${CHECKSUMS32% }" | tr ' ' '\\n' | awk '{if(NR>1) printf "\\n%15s%s", "", $0; else printf "%s", $0}')"
+  CHECKSUMS32="$(echo "${CHECKSUMS32% }" | tr ' ' '\n' | awk '{if(NR>1) printf " \\\\\\\n%13s%s", "", $0; else printf "%s", $0}')"
   perl -0777 -pi -e 's|SHA256SUM_x86="[0-9a-f\s\\]*"|SHA256SUM_x86="'"$CHECKSUMS32"'"|' "$PRGNAM.SlackBuild"
 fi
 
