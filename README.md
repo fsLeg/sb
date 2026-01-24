@@ -64,9 +64,7 @@ The `sb` tool provides various variables and a few functions in hopes of being u
 - BITS - how many bits architecture has (32, 64)
 - _PREFIX - /usr/local
 
-CFLAGS and the like are already exported, so you don't need to set
-them, unless you want to change them. For full list of variables see
-the source of sb.
+CFLAGS and the like are already exported, so you don't need to set them, unless you want to change them. For full list of variables see the source of sb. CFLAGS and CXXFLAGS are set to use gold or mold as the linker in Slackware-stable and -current respectively.
 
 ## Behaviour variables
 
