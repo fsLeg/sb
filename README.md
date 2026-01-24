@@ -6,7 +6,7 @@ It was inspired by CRUX's Pkgbuild and Arch's PKGBUILD. The main idea is to offl
 
 The main principles that differ from the de facto standard set by SBo:
 - `fakeroot` should be used instead of actual root.
-- online builds are OK, so no need to vendor sources or put hundreds of links inside $DOWNLOAD to vendor later.
+- online builds are OK, so no need to vendor sources or put hundreds of links inside DOWNLOAD to vendor later.
 - everything should be installed under /usr/local to keep the base system clean.
 - x86_64 is the primary target architecture instead of i586.
 - SHA256 is used instead of MD5 for checksums.
@@ -21,9 +21,9 @@ This is similar to SBo's SlackBuilds that are called as `bash appname.SlackBuild
 
 # SlackBuild format
 
-A template for writing SlackBuilds to be used with `sb` tool can be sound in **template.SlackBuild** file in the root of the repo. It should have enough comments for understanding what is expected. The more detailed rundown is below. Knowledge how to write SlackBuilds for SBo is required.
+A template for writing SlackBuilds to be used with `sb` tool can be found in **template.SlackBuild** file in the root of the repo. It should have enough comments for understanding what is expected. The more detailed rundown is below. Knowledge how to write SlackBuilds for SBo is required.
 
-All metadata variables must have their values enclosed in quotes. No executable code must be present outside of funtions as SlackBuilds are sourced by `sb`. Additional variables (like behaviour variables) can be present outside of functions since they aren't an executable code.
+All metadata variables must have their values enclosed in quotes. No executable code should be present outside of funtions as SlackBuilds are sourced by `sb`. Additional variables (like behaviour variables) can be present outside of functions since they aren't an executable code. You can unset or re-set variables from `sb` if you need.
 
 ## Required metadata
 
@@ -31,7 +31,7 @@ All metadata variables must have their values enclosed in quotes. No executable 
 - VERSION - program version.
 - BUILD - package build number.
 - DOWNLOAD - must be set to URL(s) or "UNSUPPORTED" if the program doesn't support x86_64 platform.
-- SHA256SUM - only required if $DOWNLOAD is _not_ set to "UNSUPPORTED", can be omitted otherwise.
+- SHA256SUM - only required if DOWNLOAD is _not_ set to "UNSUPPORTED", can be omitted otherwise.
 
 ## Optional metadata
 
@@ -40,7 +40,7 @@ The following metadata can be omitted if empty.
 - DESCRIPTION - brief description of the program, like the part in parentheses in slack-desc file.
 - HOMEPAGE - URL of the program's homepage.
 - DOWNLOAD_x86 - set to URL if there's a special tarball for i586 architecture; set to "UNSUPPORTED" if i586 architecture is explicitly not supported by the program.
-- SHA256_x86 - required if $DOWNLOAD_x86 is set to URL.
+- SHA256_x86 - required if DOWNLOAD_x86 is set to URL.
 - REQUIRES - list of runtime dependencies, separate with spaces. Alternative dependencies can be specified using `|` symbol, i. e. REQUIRES="appname1|altappname1 appname2".
 - BUILD_REQUIRES - list of build-time dependencies. These are not required to actually run the program in question.
 - OPTIONAL - list of optional packages, either autodetected at build time or enabled through environment variables.
@@ -48,9 +48,9 @@ The following metadata can be omitted if empty.
 
 ## Functions
 
-- unpack() - same as prepare() from Arch's PKGBUILD. The end result must be a directory named $PRGNAM-$VERSION with ready to build sources inside. If there are any patched or other preparations needed, apply them here.
+- unpack - same as prepare() from Arch's PKGBUILD. The end result must be a directory named $PRGNAM-$VERSION with ready to build sources inside. If there are any patched or other preparations needed, apply them here.
 
-- build() - same as build() from CRUX's Pkgbuild. Here you build the program and put files into $PKG the same way you would do in a regular SlackBuild. `sb` will take care of putting slack-desc, doinst.sh and douninst.sh files in a proper place and creating the actual package. If you need to modify slack-desk/doinst.sh/douninst.sh files before packaging them, you can do that and put them into $PKG/install directory, `sb` won't overwrite them.
+- build - same as build() from CRUX's Pkgbuild. Here you build the program and put files into $PKG the same way you would do in a regular SlackBuild. `sb` will take care of putting slack-desc, doinst.sh and douninst.sh files in a proper place and creating the actual package. If you need to modify slack-desk/doinst.sh/douninst.sh files before packaging them, you can do that and put them into $PKG/install directory, `sb` won't overwrite them.
 
 # sb provided variables and funcions
 
@@ -58,11 +58,11 @@ The `sb` tool provides various variables and a few functions in hopes of being u
 
 ## Variables
 
-- $TMP, $CWD, $PKG, $ARCH, $SLKCFLAGS, $LIBDIRSUFFIX - same as on SBo
-- $DEBARCH - architecture the way Debian names it (i386, amd64, armhf, arm64)
-- $PLATFORM - platform identifier (ia32, x64, arm, arm64)
-- $BITS - how many bits architecture has (32, 64)
-- $_PREFIX - /usr/local
+- TMP, CWD, PKG, ARCH, SLKCFLAGS, LIBDIRSUFFIX - same as on SBo
+- DEBARCH - architecture the way Debian names it (i386, amd64, armhf, arm64)
+- PLATFORM - platform identifier (ia32, x64, arm, arm64)
+- BITS - how many bits architecture has (32, 64)
+- _PREFIX - /usr/local
 
 CFLAGS and the like are already exported, so you don't need to set
 them, unless you want to change them. For full list of variables see
@@ -76,21 +76,21 @@ sb also uses some variables that fine-tune what it does.
 
 These must be present in the environment when invoking `sb`.
 
-- $USE_REAL_ROOT - set to anything other than "N" (i. e. USE_REAL_ROOT=y) to supress a warning about not using `fakeroot` when running `sb` as root.
-- $PRINT_PACKAGE_NAME - same as on SBo, set to anything to only print the name of the package that would be built and immediately exit.
+- USE_REAL_ROOT - set to anything other than "N" (i. e. USE_REAL_ROOT=y) to supress a warning about not using `fakeroot` when running `sb` as root.
+- PRINT_PACKAGE_NAME - same as on SBo, set to anything to only print the name of the package that would be built and immediately exit.
 
 ### Script variables
 
 These must be set in a SlackBuild outside of functions, preferrably right after metadata variables.
 
-- $SKIP_PERMS - set to anything (i. e. SKIP_PERMS=1) to skip permission reset after unpacking. Useful when a tarball has some funky files, like a looping symlink in a test directory, that make the script fail at this step.
-- $SKIP_STRIP - set to anything (i. e. SKIP_STRIP=true) to skip stripping binaries and libraries in $PKG after building is done. Useful when repackaging static binaries that stop working after stripping process.
-- $PKGVER - this variable overrides $VERSION when creating the package. Useful when the package version should differ from the sources version, i. e. for kernel modules.
+- SKIP_PERMS - set to anything (i. e. SKIP_PERMS=1) to skip permission reset after unpacking. Useful when a tarball has some funky files, like a looping symlink in a test directory, that make the script fail at this step.
+- SKIP_STRIP - set to anything (i. e. SKIP_STRIP=true) to skip stripping binaries and libraries in $PKG after building is done. Useful when repackaging static binaries that stop working after stripping process.
+- PKGVER - this variable overrides $VERSION when creating the package. Useful when the package version should differ from the sources version, i. e. for kernel modules.
 
 ## Functions
 
-- reset_permissions() - recursively set the owner in a current directory to root:root, chmod all executable files and directories to 755 and non-executable files to 644.
-- compress_files() - recursively gzip every file within a current or provided directory.
+- reset_permissions - recursively set the owner in a current directory to root:root, chmod all executable files and directories to 755 and non-executable files to 644.
+- compress_files - recursively gzip every file within a current or provided directory.
 
 # Rationale
 
