@@ -33,13 +33,10 @@ unpack () {
 }
 
 build () {
-  # the default linker fails to link a number of targets, hence using gold
-  # the linker also chokes if there's no "-ldl" ldflag
-  # -current doesn't need any of those, it also replaced gold with mold
+  # the linker chokes if there's no "-ldl" ldflag; -current doesn't need this
   cmake --preset linux \
         -Wno-dev \
         -DENABLE_LTO="ON" \
-        -DCMAKE_LINKER_TYPE="$(echo /usr/bin/ld.?old | awk -F'\\.' '{print toupper($NF)}')" \
         -DCMAKE_C_FLAGS="$SLKCFLAGS" \
         -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
         -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS -ldl" \
