@@ -62,9 +62,12 @@ The `sb` tool provides various variables and a few functions in hopes of being u
 - DEBARCH - architecture the way Debian names it (i386, amd64, armhf, arm64)
 - PLATFORM - platform identifier (ia32, x64, arm, arm64)
 - BITS - how many bits architecture has (32, 64)
-- _PREFIX - /usr/local
+- _PREFIX - /usr/local, is picked up from the environment if exported there
+- SYSCONFDIR - if $_PREFIX=/usr, then SYSCONFDIR=/etc, else SYSCONFDIR=$_PREFIX/etc
+- LOCALSTATEDIR - if $_PREFIX=/usr, then SYSCONFDIR=/var, else SYSCONFDIR=$_PREFIX/var
+- PYVER - major Python3 version (i. e. 3.9)
 
-CFLAGS and the like are already exported, so you don't need to set them, unless you want to change them. For full list of variables see the source of sb. CFLAGS and CXXFLAGS are set to use gold or mold as the linker in Slackware-stable and -current respectively.
+CFLAGS and the like are already exported, so you don't need to set them, unless you want to change them. For full list of variables see the source of sb. CFLAGS and CXXFLAGS are set to use gold/mold as the linker in Slackware-stable and -current respectively.
 
 ## Behaviour variables
 
