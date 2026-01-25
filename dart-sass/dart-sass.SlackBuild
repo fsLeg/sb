@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="dart-sass"
-VERSION="${VERSION:-1.97.3}"
+VERSION="1.97.3"
 EMBEDDED_PROTOCOL_VERSION="3.2.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Dart implementation of Sass"

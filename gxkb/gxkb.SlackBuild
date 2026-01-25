@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="gxkb"
-VERSION="${VERSION:-0.9.6}"
+VERSION="0.9.6"
 BUILD="${BUILD:-1}"
 DESCRIPTION="X11 keyboard indicator and switcher"
 HOMEPAGE="https://zen-tools.github.io/gxkb/"

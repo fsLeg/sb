@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="saflashplayer-legacy"
-VERSION="${VERSION:-11.2.202.644}"
+VERSION="11.2.202.644"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Stand-Alone Flash Player"
 HOMEPAGE="https://get.adobe.com/flashplayer"

@@ -2,7 +2,7 @@
 
 PRGNAM="element-desktop"
 WEBNAM="element-web"
-VERSION="${VERSION:-1.12.8}"
+VERSION="1.12.8"
 BUILD="${BUILD:-1}"
 DESCRIPTION="secure and independent communication via Matrix"
 HOMEPAGE="https://element.io/"

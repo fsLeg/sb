@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="Botan3"
-VERSION="${VERSION:-3.10.0}"
+VERSION="3.10.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="C++ crypto library"
 HOMEPAGE="https://botan.randombit.net/"

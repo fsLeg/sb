@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="yubikey-manager-qt"
-VERSION="${VERSION:-1.2.6}"
+VERSION="1.2.6"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Graphical application for configuring a YubiKey"
 HOMEPAGE="https://developers.yubico.com/yubikey-manager-qt/"

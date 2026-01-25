@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="helix"
-VERSION="${VERSION:-25.07.1}"
+VERSION="25.07.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="post-modern modal text editor"
 HOMEPAGE="https://helix-editor.com/"

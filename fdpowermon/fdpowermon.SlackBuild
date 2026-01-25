@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="fdpowermon"
-VERSION="${VERSION:-1.20}"
+VERSION="1.20"
 BUILD="${BUILD:-1}"
 DESCRIPTION="simple battery power monitor for laptops with ACPI"
 HOMEPAGE="https://github.com/yoe/fdpowermon"

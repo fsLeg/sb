@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="vips"
-VERSION="${VERSION:-8.18.0}"
+VERSION="8.18.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="fast image processing library with low memory needs"
 HOMEPAGE="https://www.libvips.org/"

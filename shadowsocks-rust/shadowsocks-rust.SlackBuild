@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="shadowsocks-rust"
-VERSION="${VERSION:-1.24.0}"
+VERSION="1.24.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="rust port of shadowsocks, a secure socks5 proxy"
 HOMEPAGE="https://github.com/shadowsocks/shadowsocks-rust"

@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="dart-sdk-bin"
-VERSION="${VERSION:-3.7.3}"
+VERSION="3.7.3"
 BUILD="${BUILD:-1}"
 DESCRIPTION="SDK for application programming language"
 HOMEPAGE="https://www.dartlang.org/"

@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="pyotherside"
-VERSION="${VERSION:-1.6.2}"
+VERSION="1.6.2"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Python bindings for Qt"
 HOMEPAGE="https://thp.io/2011/pyotherside/"

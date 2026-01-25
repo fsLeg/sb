@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="nodejs"
-VERSION="${VERSION:-22.22.0}"
+VERSION="22.22.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="JavaScript runtime"
 HOMEPAGE="https://nodejs.org/"

@@ -2,7 +2,7 @@
 
 PRGNAM="python3-keyring"
 TARNAM="${PRGNAM#python3-}"
-VERSION="${VERSION:-25.7.0}"
+VERSION="25.7.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Python keyring library"
 HOMEPAGE="https://github.com/jaraco/keyring"

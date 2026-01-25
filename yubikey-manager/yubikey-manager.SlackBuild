@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="yubikey-manager"
-VERSION="${VERSION:-5.7.2}"
+VERSION="5.7.2"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Tool for managing your YubiKey configuration"
 HOMEPAGE="https://developers.yubico.com/yubikey-manager/"

@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="dumptorrent"
-VERSION="${VERSION:-1.7.0}"
+VERSION="1.7.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="get torrent metadata"
 HOMEPAGE="https://github.com/tomcdj71/dumptorrent"
