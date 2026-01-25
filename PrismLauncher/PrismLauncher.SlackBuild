@@ -25,11 +25,8 @@ unpack () {
     sed -i 's/-target 7 -source 7/--release 8 -Xlint:-options/' $PRGNAM-$VERSION/libraries/{javacheck,launcher}/CMakeLists.txt
   fi
 
-  # fix man path
-  sed -i 's/KDE_INSTALL_MANDIR/MAN_INSTALL_DIR/' $PRGNAM-$VERSION/CMakeLists.txt
-
-  # do not set RPATH
-  sed -i '/RPATH/d' $PRGNAM-$VERSION/CMakeLists.txt
+  # fix man path, do not set RPATH
+  sed -i 's/KDE_INSTALL_MANDIR/MAN_INSTALL_DIR/; /RPATH/d' $PRGNAM-$VERSION/CMakeLists.txt
 }
 
 build () {
@@ -48,10 +45,8 @@ build () {
         -DLauncher_ENABLE_JAVA_DOWNLOADER="ON" \
         -DBUILD_TESTING="OFF"
   cmake --build --preset linux
-  DESTDIR=$PKG cmake --install build
 
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a \
-    CONTRIBUTING.md COPYING.md README.md LICENSE \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  DESTDIR=$PKG cmake --install build
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CONTRIBUTING.md COPYING.md README.md LICENSE
 }

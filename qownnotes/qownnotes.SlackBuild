@@ -11,6 +11,7 @@ OPTIONAL="Botan3 libgit2 qt6"
 
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
+
   # Set the release string to disable the update check
   echo '#define RELEASE "SlackBuild"' > release.h
 }
@@ -38,10 +39,7 @@ build () {
     -DCMAKE_BUILD_TYPE=Release \
     -B build
   cmake --build build
-  DESTDIR=$PKG cmake --install build
 
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a \
-    CHANGELOG.md LICENSE README.md shortcuts.md \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  DESTDIR=$PKG cmake --install build
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION CHANGELOG.md LICENSE README.md shortcuts.md
 }

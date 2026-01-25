@@ -24,21 +24,19 @@ build () {
   ./configure \
     --prefix=$_PREFIX \
     --libdir=$_PREFIX/lib${LIBDIRSUFFIX} \
-    --sysconfdir=/etc \
-    --localstatedir=/var \
+    --sysconfdir=$SYSCONFDIR \
+    --localstatedir=$LOCALSTATEDIR \
     --mandir=$_PREFIX/man \
     --docdir=$_PREFIX/doc/$PRGNAM-$VERSION \
     --disable-static \
     --build=$ARCH-slackware-linux \
-    --with-udevrulesdir=/etc/udev/rules.d \
+    --with-udevrulesdir=$SYSCONFDIR/udev/rules.d \
     --with-udevrulesprefix="60-" \
     --with-sysusersdir=/dev/null \
     --with-tmpfilesdir=/dev/null
   make
-  make install DESTDIR=$PKG
 
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a \
-    CHANGELOG.md CONTRIBUTING.md LICENSE MAINTAINERS.md README.md \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  make install DESTDIR=$PKG
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CHANGELOG.md CONTRIBUTING.md LICENSE MAINTAINERS.md README.md
 }

@@ -17,12 +17,11 @@ unpack () {
 build () {
   python3 setup.py install --root=$PKG
 
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   if [ "${DOCS:-no}" != "no" ]; then
     sphinx-build src/smartcard/doc $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html
     rm -rf $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html/{.buildinfo,.doctrees,objects.inv}
   fi
-  cp -aR \
-    ACKS ChangeLog LICENSE TODO README.md src/smartcard/Examples \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+            ACKS ChangeLog LICENSE TODO README.md src/smartcard/Examples
 }

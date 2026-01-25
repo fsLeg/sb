@@ -16,15 +16,9 @@ unpack () {
 
 build () {
   python3 -m build --wheel --no-isolation
+
   python3 -m installer --destdir "$PKG" dist/*.whl
-
-  mkdir -p $PKG/$_PREFIX/man
+  install -d $PKG/$_PREFIX/man
   cp -aR man $PKG/$_PREFIX/man/man1
-
-  mv $PKG/usr/bin $PKG/$_PREFIX
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a \
-    COPYING NEWS README.adoc \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION COPYING NEWS README.adoc
 }

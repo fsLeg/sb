@@ -27,23 +27,19 @@ build () {
   BUF_CACHE_DIR=$TMP/.buf-cache \
   dart run grinder protobuf
   dart -Dversion=$VERSION \
-      -Ddart-version=$(dart --version | cut -d' ' -f4) \
-      -Dprotocol-version=$EMBEDDED_PROTOCOL_VERSION \
-      -Dcompiler-version=$VERSION \
-      --snapshot=build/sass.snapshot-$ARCH \
-      bin/sass.dart
-  mkdir -p $PKG/$_PREFIX/bin $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+       -Ddart-version=$(dart --version | cut -d' ' -f4) \
+       -Dprotocol-version=$EMBEDDED_PROTOCOL_VERSION \
+       -Dcompiler-version=$VERSION \
+       --snapshot=build/sass.snapshot-$ARCH \
+       bin/sass.dart
 
-  cat <<EOF > $PKG/$_PREFIX/bin/sass
+  install -d $PKG/$_PREFIX/bin $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+  cat << EOF > $PKG/$_PREFIX/bin/sass
 #!/bin/bash
 exec $(which dart) /$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/sass.snapshot-$ARCH "\$@"
 EOF
-
   chmod +x $PKG/$_PREFIX/bin/sass
-  install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/ build/sass.snapshot-$ARCH
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a README.md AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM build/sass.snapshot-$ARCH
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION README.md AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE
 }
 

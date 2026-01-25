@@ -18,20 +18,22 @@ build () {
   ./configure \
     --prefix=$_PREFIX \
     --libdir=$_PREFIX/lib${LIBDIRSUFFIX} \
-    --sysconfdir=/etc \
-    --localstatedir=/var \
+    --sysconfdir=$SYSCONFDIR \
+    --localstatedir=$LOCALSTATEDIR \
     --mandir=$_PREFIX/man \
     --docdir=$_PREFIX/doc/$PRGNAM-$VERSION \
     --disable-static \
     --build=$ARCH-slackware-linux
   make
+
   make install DESTDIR=$PKG
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a AUTHORS CONTRIBUTING* ChangeLog NEWS README* \
-    doc/README* doc/sample.* doc/scripts/ $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-
-  mkdir -p $PKG/etc/{rc.d,ocserv}
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    AUTHORS CONTRIBUTING* ChangeLog NEWS README* doc/README* doc/sample.* doc/scripts/*
+  install -d $PKG/$SYSCONFDIR/{rc.d,ocserv}
   cat $CWD/rc.ocserv > $PKG/etc/rc.d/rc.ocserv.new
   cat $CWD/ocserv.conf > $PKG/etc/ocserv/ocserv.conf.new
+  sed -i "s|%PREFIX%|$_PREFIX|g
+          s|%SYSCONFDIR%|$LOCALSTATEDIR|g
+          s|%LOCALSTATEDIR%|$LOCALSTATEDIR|g" \
+          $PKG/etc/rc.d/rc.ocserv.new $PKG/etc/ocserv/ocserv.conf.new
 }

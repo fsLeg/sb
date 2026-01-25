@@ -15,10 +15,9 @@ unpack () {
 
 build () {
   cargo build --locked --release
-  make install DESTDIR=$PKG TARGET=release PREFIX=$_PREFIX/bin
 
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -aR \
-    LICENSE README.md examples/ \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  make install DESTDIR=$PKG TARGET=release PREFIX=$_PREFIX/bin
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+            LICENSE README.md examples/
 }

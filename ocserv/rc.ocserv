@@ -3,16 +3,16 @@
 # This script uses the occtl tool
 
 start_ocserv() {
-  if [ -S /var/run/occtl.socket ]; then
+  if [ -S %LOCALSTATEDIR%/run/occtl.socket ]; then
       echo "ocserv is already running"
       exit 0
   fi
   echo "Starting ocserv"
-  /usr/sbin/ocserv 2>/dev/null
+  %PREFIX%/sbin/ocserv 2>/dev/null
 }
 
 stop_ocserv() {
-  /usr/bin/occtl stop now
+  %PREFIX%/bin/occtl stop now
 }
 
 restart_ocserv() {
@@ -22,12 +22,12 @@ restart_ocserv() {
 }
 
 reload_ocserv() {
-  /usr/bin/occtl reload
+  %PREFIX%/bin/occtl reload
 }
 
 status_ocserv() {
-  if [ -S /var/run/occtl.socket ]; then
-    /usr/bin/occtl show status
+  if [ -S %LOCALSTATEDIR%/run/occtl.socket ]; then
+    %PREFIX%/bin/occtl show status
   else
     echo "ocserv is stopped"
     exit 1

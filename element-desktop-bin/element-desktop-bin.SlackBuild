@@ -13,14 +13,12 @@ CONFLICTS="element-desktop"
 
 unpack () {
   mkdir $PRGNAM-$VERSION
-  cd $PKG
-  ar p $CWD/${PRGNAM%-bin}_${VERSION}_${DEBARCH}.deb data.tar.xz | tar Jxv
+  ar xv --output $PRGNAM-$VERSION $CWD/${PRGNAM%-bin}_${VERSION}_${DEBARCH}.deb data.tar.xz
 }
 
 build () {
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a $PKG/usr/share/doc/${PRGNAM%-bin}/* $PKG/opt/Element/LICENSE* \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  tar xvf data.tar.xz -C $PKG
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    $PKG/usr/share/doc/${PRGNAM%-bin}/* $PKG/opt/Element/LICENSE*
   rm -rf $PKG/usr/share/doc
-  mv $PKG/usr/share $PKG/$_PREFIX/share
 }

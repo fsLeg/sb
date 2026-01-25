@@ -11,5 +11,5 @@ config() {
   # Otherwise, we leave the .new copy for the admin to consider...
 }
 
-config etc/profile.d/dart-sdk.csh.new
-config etc/profile.d/dart-sdk.sh.new
+config %SYSCONFDIR%/profile.d/dart-sdk.csh.new
+config %SYSCONFDIR%/profile.d/dart-sdk.sh.new

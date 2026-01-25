@@ -24,10 +24,11 @@ unpack () {
 }
 
 build () {
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  mv $PKG/opt/gen-dartdocs $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/doc
-  mkdir -p $PKG/etc/profile.d
-  install -Dm755 -t $PKG/etc/profile.d $CWD/dart-sdk.*sh.new
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR $PKG/opt/gen-dartdocs $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/doc
+  install -Dm755 -t $PKG/$SYSCONFDIR/profile.d $CWD/dart-sdk.*sh.new
   chmod +x $PKG/opt/dart-sdk/bin/resources{,/dartdoc}
   chmod +rx $PKG/opt/dart-sdk{,/bin,/bin/snapshots}
+  install -Dm644 $CWD/doinst.sh $PKG/install/doinst.sh
+  sed -i "s|%SYSCONFDIR%|$SYSCONFDIR|g" $PKG/install/doinst.sh
 }

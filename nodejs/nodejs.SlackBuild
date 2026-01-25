@@ -41,23 +41,14 @@ build () {
     --shared-brotli \
     --ninja \
     --dest-cpu=$PLATFORM
-
   make CFLAGS="$SLKCFLAGS" CXXFLAGS="$SLKCFLAGS" LDFLAGS="-Wl,--copy-dt-needed-entries"
+
   make install DESTDIR=$PKG
-
-  # add bash completion file for npm
-  mkdir -p $PKG/$_PREFIX/share/bash-completion/completions
-  ln -sf ../../../../lib$LIBDIRSUFFIX/node_modules/npm/lib/utils/completion.sh \
+  install -d $PKG/$_PREFIX/share/bash-completion/completions
+  ln -sf $_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/lib/utils/completion.sh \
          $PKG/$_PREFIX/share/bash-completion/completions/npm
-
-  # compress man pages, even though they're only used by 'npm help'
   compress_files $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man
-
-  # docs
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a LICENSE *.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-
-  # move doc/node, but keep a link to it
-  mv $PKG/$_PREFIX/doc/node $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  ln -sf $PRGNAM-$VERSION/node $PKG/$_PREFIX/doc/node
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LICENSE *.md
+  mv $PKG/$_PREFIX/doc/node/* $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  rmdir $PKG/$_PREFIX/doc/node
 }

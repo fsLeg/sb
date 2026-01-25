@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Element
-Exec=/usr/local/bin/element-desktop %U
+Exec=%PREFIX%/bin/element-desktop %U
 Terminal=false
 Type=Application
 Icon=element-desktop

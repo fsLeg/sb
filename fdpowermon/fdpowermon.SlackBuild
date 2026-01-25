@@ -16,15 +16,14 @@ unpack () {
 }
 
 build () {
-  mkdir -p $PKG/$_PREFIX/bin $PKG/etc/$PRGNAM $PKG/$_PREFIX/share/icons/oxygen/base/22x22/status
-  cp fdpowermon $PKG/$_PREFIX/bin/
-  cp theme.cfg $PKG/etc/$PRGNAM/
-  cp icons/*.png $PKG/$_PREFIX/share/icons/oxygen/base/22x22/status/
-
-  mkdir -p $PKG/$_PREFIX/man/man1
+  if [ ! "$_PREFIX" = "/usr" ]; then
+    sed -i "s|/etc|$_PREFIX/etc|g" fdpowermon
+  fi
+  install -Dm755 -t $PKG/$_PREFIX/bin fdpowermon
+  install -Dm644 -t $PKG/$SYSCONFDIR/$PRGNAM theme.cfg
+  install -Dm644 -t $PKG/$_PREFIX/share/icons/oxygen/base/22x22/status/ icons/*.png
+  install -d $PKG/$_PREFIX/man/man1
   pod2man < fdpowermon > $PKG/$_PREFIX/man/man1/fdpowermon.1
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/examples
-  cp -a debian/copyright debian/changelog README.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
-  cp -a theme.pl $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/examples/
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION debian/copyright debian/changelog README.md
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/examples theme.pl
 }

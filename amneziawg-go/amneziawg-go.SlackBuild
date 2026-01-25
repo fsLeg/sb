@@ -15,9 +15,7 @@ unpack () {
 
 build () {
   go build -v
-  install -Dm755 -t "$PKG/$_PREFIX/sbin" amneziawg-go
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a \
-    LICENSE README.md \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+
+  install -Dm755 -t $PKG/$_PREFIX/sbin amneziawg-go
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LICENSE README.md
 }

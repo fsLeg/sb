@@ -14,19 +14,12 @@ unpack () {
 
 build () {
   mkdir build
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_COMPILER=g++ \
-    -DCMAKE_C_COMPILER=gcc \
-    -DCMAKE_BUILD_TYPE=Release \
-    -B build/
+  cmake -B build/ \
+    -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+    -DCMAKE_BUILD_TYPE="Release"
   cmake --build build/
 
-  mkdir -p $PKG/$_PREFIX/bin
-  install -Dm755 build/dumptorrent $PKG/$_PREFIX/bin/
-  install -Dm755 build/scrapec $PKG/$_PREFIX/bin/
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a README.md $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -Dm755 -t $PKG/$_PREFIX/bin build/{dumptorrent,scrapec}
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION README.md
 }

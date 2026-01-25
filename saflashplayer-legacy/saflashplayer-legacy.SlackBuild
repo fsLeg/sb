@@ -17,10 +17,7 @@ unpack () {
 }
 
 build () {
-  mkdir -p $PKG/$_PREFIX/bin $PKG/$_PREFIX/share/applications
-  install flashplayer $PKG/$_PREFIX/bin/saflashplayer
-  cp -a $CWD/saflashplayer-legacy.desktop $PKG/$_PREFIX/share/applications/com.adobe.flashplayer.desktop
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -aR LGPL $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  install -Dm755 flashplayer $PKG/$_PREFIX/bin/saflashplayer
+  install -Dm644 $CWD/saflashplayer-legacy.desktop $PKG/$_PREFIX/share/applications/com.adobe.flashplayer.desktop
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LGPL
 }

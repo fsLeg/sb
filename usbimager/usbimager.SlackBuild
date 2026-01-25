@@ -22,13 +22,8 @@ build () {
 
   # make .desktop file compliant
   mv $PKG/$_PREFIX/share/applications/usbimager.desktop $PKG/$_PREFIX/share/applications/com.gitlab.bztsrc.$PRGNAM.desktop
-  sed -i '/Version=/d' $PKG/$_PREFIX/share/applications/com.gitlab.bztsrc.$PRGNAM.desktop
-  sed -i 's/Application;//' $PKG/$_PREFIX/share/applications/com.gitlab.bztsrc.$PRGNAM.desktop
+  sed -i '/Version=/d; s/Application;//' $PKG/$_PREFIX/share/applications/com.gitlab.bztsrc.$PRGNAM.desktop
 
   mv $PKG/$_PREFIX/share/man $PKG/$_PREFIX/
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a \
-    LICENSE README.md usbimager-manual.pdf \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LICENSE README.md usbimager-manual.pdf
 }

@@ -17,14 +17,11 @@ unpack () {
 
 build () {
   python3 -m build --wheel --no-isolation
+
   python3 -m installer --destdir "$PKG" dist/*.whl
-
-  mkdir -p $PKG/etc/udev/rules.d
-  cat $CWD/70-u2f.rules > $PKG/etc/udev/rules.d/70-u2f.rules
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -aR \
-    COPYING COPYING.MPLv2 COPYING.APLv2 NEWS README.adoc examples/\
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -Dm644 -t $PKG/$SYSCONFDIR/udev/rules.d $CWD/70-u2f.rules
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+            COPYING COPYING.MPLv2 COPYING.APLv2 NEWS README.adoc examples/
   chmod 644 $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/examples/server/poetry.lock
 }

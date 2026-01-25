@@ -34,27 +34,24 @@ build () {
   CGO_CPPFLAGS="$CGO_CFLAGS" \
   CGO_LDFLAGS="$LDFLAGS_SYS" \
   go build -v \
-    $TAGS \
-    -buildvcs=false \
-    -buildmode=pie \
-    -mod=readonly \
-    -modcacherw \
-    -ldflags "-compressdwarf=false \
-              -linkmode external \
-              -extldflags '${LDFLAGS}'"
+     $TAGS \
+     -buildvcs=false \
+     -buildmode=pie \
+     -mod=readonly \
+     -modcacherw \
+     -ldflags "-compressdwarf=false \
+               -linkmode external \
+               -extldflags '${LDFLAGS}'"
 
-  mkdir -p $PKG/$_PREFIX/bin \
-           $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
-           $PKG/$_PREFIX/share/bash-completion/completions \
-           $PKG/$_PREFIX/share/fish/vendor_completions.d \
-           $PKG/$_PREFIX/share/zsh/site-functions
-  ./hugo gen doc --dir $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -Dm755 -t $PKG/$_PREFIX/bin hugo
+  install -d $PKG/$_PREFIX/share/bash-completion/completions \
+             $PKG/$_PREFIX/share/fish/vendor_completions.d \
+             $PKG/$_PREFIX/share/zsh/site-functions
   ./hugo completion bash > $PKG/$_PREFIX/share/bash-completion/completions/$PRGNAM
   ./hugo completion fish > $PKG/$_PREFIX/share/fish/vendor_completions.d/$PRGNAM.fish
   ./hugo completion zsh > $PKG/$_PREFIX/share/zsh/site-functions/_$PRGNAM
-  install -Dm755 -t $PKG/$_PREFIX/bin hugo
-  cp -a \
-    CONTRIBUTING.md LICENSE README.md SECURITY.md \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  ./hugo gen doc --dir $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CONTRIBUTING.md LICENSE README.md SECURITY.md
 }
 

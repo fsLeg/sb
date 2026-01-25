@@ -24,21 +24,19 @@ build () {
   meson setup \
     --buildtype=release \
     --libdir=$_PREFIX/lib${LIBDIRSUFFIX} \
-    --localstatedir=/var \
+    --localstatedir=$LOCALSTATEDIR \
     --mandir=$_PREFIX/man \
     --prefix=$_PREFIX \
-    --sysconfdir=/etc \
+    --sysconfdir=$SYSCONFDIR \
     -Ddocs=$DOCS \
     build
   meson compile -C build
-  meson install --destdir=$PKG -C build
 
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  meson install --destdir=$PKG -C build
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CITATION.cff CODE_OF_CONDUCT.md CONTRIBUTING.md ChangeLog LICENSE README.md
   if [ "${DOCS}" == "true" ]; then
     mv $PKG/$_PREFIX/share/doc/vips $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html
     rmdir $PKG/$_PREFIX/share/doc
   fi
-  cp -a \
-    CITATION.cff CODE_OF_CONDUCT.md CONTRIBUTING.md ChangeLog LICENSE README.md \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
 }

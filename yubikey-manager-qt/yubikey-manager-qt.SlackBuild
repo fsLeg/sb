@@ -13,7 +13,7 @@ unpack () {
   tar xvf $CWD/$PRGNAM-$PRGNAM-$VERSION.tar.gz
   mv $PRGNAM-$PRGNAM-$VERSION $PRGNAM-$VERSION
 
-  # Apply a patch from PR#363 to make ykman-gui work again:
+  # Apply a patch from PR#363 to make ykman-gui work again
   # https://github.com/Yubico/yubikey-manager-qt/pull/363
   patch -p1 -d $PRGNAM-$VERSION < $CWD/363.patch
 }
@@ -21,19 +21,10 @@ unpack () {
 build () {
   qmake
   make
+
   make install INSTALL_ROOT=$PKG
-
-  mkdir -p $PKG/$_PREFIX/share/pixmaps
-  cp -a resources/icons/ykman.png $PKG/$_PREFIX/share/pixmaps
-  mkdir -p $PKG/$_PREFIX/share/metainfo/
-  cp -a resources/com.yubico.yubikey_manager.metainfo.xml $PKG/$_PREFIX/share/metainfo/
-  mkdir -p $PKG/$_PREFIX/share/applications
-  cp -a resources/ykman-gui.desktop $PKG/$_PREFIX/share/applications
-
-  mv $PKG/usr/bin $PKG/$_PREFIX
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a \
-    COPYING NEWS README \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -Dm644 -t $PKG/$_PREFIX/share/pixmaps resources/icons/ykman.png
+  install -Dm644 -t $PKG/$_PREFIX/share/metainfo resources/com.yubico.yubikey_manager.metainfo.xml
+  install -Dm644 -t $PKG/$_PREFIX/share/applications resources/ykman-gui.desktop
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION COPYING NEWS README
 }

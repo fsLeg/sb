@@ -7,10 +7,10 @@ DESCRIPTION="AmneziaWG Linux kernel module"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="c392b65bde0c559860e09f15117e7bd4b332287f46cae1f0dcc9298d7e6ba53a"
-SRCNAM=amneziawg-linux-kernel-module
-KERNEL=${KERNEL:-$(uname -r)}
-KERNELSRCDIR=${KERNELSRCDIR:-/lib/modules/$KERNEL/build}
-PKGVER=${VERSION}_$(echo $KERNEL | tr - _)
+SRCNAM="amneziawg-linux-kernel-module"
+KERNEL="${KERNEL:-$(uname -r)}"
+KERNELSRCDIR="${KERNELSRCDIR:-/lib/modules/$KERNEL/build}"
+PKGVER="${VERSION}_$(echo $KERNEL | tr - _)"
 
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
@@ -21,10 +21,9 @@ unpack () {
 build () {
   KERNELRELEASE=$KERNEL \
   make -C src
+
   install -Dm644 -t $PKG/lib/modules/$KERNEL/extra src/amneziawg.ko
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER $PKG/install
-  cp -a \
-    COPYING README.md \
-    $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER
-  sed "s|@KERNEL@|$KERNEL|" $CWD/doinst.sh > $PKG/install/doinst.sh
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER COPYING README.md
+  install -Dm644 -t $PKG/install $CWD/doinst.sh
+  sed -i "s|@KERNEL@|$KERNEL|" $PKG/install/doinst.sh
 }

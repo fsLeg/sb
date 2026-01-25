@@ -16,15 +16,14 @@ unpack () {
 build () {
   qmake
   make
+
   make install INSTALL_ROOT=$PKG
   rm -rf $PKG/usr/tests
-
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   if [ "${DOCS:-no}" != "no" ]; then
     make -C docs html
     cp -aR _build/html $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
   fi
-  cp -aR \
-    LICENSE README.md examples/ \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+            LICENSE README.md examples/
 }
