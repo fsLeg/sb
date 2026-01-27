@@ -19,5 +19,5 @@ unpack () {
 build () {
   install -Dm755 flashplayer $PKG/$_PREFIX/bin/saflashplayer
   install -Dm644 $CWD/saflashplayer-legacy.desktop $PKG/$_PREFIX/share/applications/com.adobe.flashplayer.desktop
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LGPL
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LGPL/*
 }

@@ -25,7 +25,7 @@ build () {
   python3 -m installer --destdir "$PKG" dist/*.whl
   # Add python3-keyring shell completions (requires python3-shtab)
   if $(python3 -c 'import importlib; exit(not importlib.util.find_spec("shtab"))'); then
-    python -m venv --system-site-packages completion-env
+    python3 -m venv --system-site-packages completion-env
     completion-env/bin/python -m installer dist/*.whl
     install -d $PKG/$_PREFIX/share/bash-completion/completions \
                $PKG/$_PREFIX/share/zsh/site-functions \

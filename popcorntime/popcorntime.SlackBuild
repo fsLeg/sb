@@ -44,7 +44,7 @@ build () {
   cp -aR build/Popcorn-Time/linux$BITS $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
   install -d $PKG/$_PREFIX/bin
   ln -s $_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/Popcorn-Time $PKG/$_PREFIX/bin/
-  install -Dm644 dist/linux/appimage/Popcorn-Time.desktop $PKG/$_PREFIX/share/applications/
+  install -Dm644 -t $PKG/$_PREFIX/share/applications dist/linux/appimage/Popcorn-Time.desktop
   for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256; do
     install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
     magick dist/linux/appimage/Popcorn-Time.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/Popcorn-Time.png

@@ -30,10 +30,10 @@ build () {
   install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
     AUTHORS CONTRIBUTING* ChangeLog NEWS README* doc/README* doc/sample.* doc/scripts/*
   install -d $PKG/$SYSCONFDIR/{rc.d,ocserv}
-  cat $CWD/rc.ocserv > $PKG/etc/rc.d/rc.ocserv.new
-  cat $CWD/ocserv.conf > $PKG/etc/ocserv/ocserv.conf.new
+  cat $CWD/rc.ocserv > $PKG/$SYSCONFDIR/rc.d/rc.ocserv.new
+  cat $CWD/ocserv.conf > $PKG/$SYSCONFDIR/ocserv/ocserv.conf.new
   sed -i "s|%PREFIX%|$_PREFIX|g
           s|%SYSCONFDIR%|$LOCALSTATEDIR|g
           s|%LOCALSTATEDIR%|$LOCALSTATEDIR|g" \
-          $PKG/etc/rc.d/rc.ocserv.new $PKG/etc/ocserv/ocserv.conf.new
+          $PKG/$SYSCONFDIR/rc.d/rc.ocserv.new $PKG/$SYSCONFDIR/ocserv/ocserv.conf.new
 }
