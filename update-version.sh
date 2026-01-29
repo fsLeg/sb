@@ -21,7 +21,7 @@ if [[ ! -d "$PRGNAM" ]]; then
   exit 1
 fi
 
-if [ -z "${ARCH}" ]; then
+if [[ -z "$ARCH" ]]; then
   case "$(uname -m)" in
     i?86) ARCH="i586" ;;
     arm*) ARCH="arm" ;;
@@ -29,19 +29,19 @@ if [ -z "${ARCH}" ]; then
   esac
 fi
 
-if [[ "${ARCH}" = i?86 ]]; then
+if [[ "$ARCH" == i?86 ]]; then
   DEBARCH="i386"
   PLATFORM="ia32"
   BITS="32"
-elif [ "${ARCH}" = "arm" ]; then
+elif [[ "$ARCH" == "arm" ]]; then
   DEBARCH="armhf"
   PLATFORM="arm"
   BITS="32"
-elif [ "${ARCH}" = "x86_64" ]; then
+elif [[ "$ARCH" == "x86_64" ]]; then
   DEBARCH="amd64"
   PLATFORM="x64"
   BITS="64"
-elif [ "${ARCH}" = "aarch64" ]; then
+elif [[ "$ARCH" == "aarch64" ]]; then
   DEBARCH="arm64"
   PLATFORM="arm64"
   BITS="64"
