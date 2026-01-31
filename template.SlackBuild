@@ -14,7 +14,7 @@ BUILD_REQUIRES="" # optional. list build-time dependencies
 OPTIONAL="" # optional. list of optional dependencies
 CONFLICTS="" # optional. list any packages this package would conflict with
 
-# There must not be any executable code outside of functions as the
+# There should not be any executable code outside of functions as the
 # SlackBuild is sourced by sb tool.
 
 unpack () {
