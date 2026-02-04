@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="hugo"
-VERSION="0.155.1"
+VERSION="0.155.2"
 BUILD="${BUILD:-1}"
 DESCRIPTION="static HTML and CSS website generator written in Go"
 HOMEPAGE="https://gohugo.io/"
 DOWNLOAD="https://github.com/gohugoio/hugo/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="50c007fc904561a58cb4f7575361a04a31d18219d04a57dd58cddd4b252eec8f"
+SHA256SUM="69803efca258dce295d8965800657b12c95d5e58d016be7131e39ae36bb97797"
 BUILD_REQUIRES="google-go-lang"
 OPTIONAL="dart-sass"
 
