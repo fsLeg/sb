@@ -97,9 +97,10 @@ export PKG_CONFIG_PATH="${_PREFIX}/lib${LIBDIRSUFFIX}/pkgconfig:${PKG_CONFIG_PAT
 export PKG_CONFIG_SYSTEM_INCLUDE_PATH="${PKG_CONFIG_SYSTEM_INCLUDE_PATH}:/usr/include:${_PREFIX}/include"
 
 # C and C++
-export CFLAGS="${SLKCFLAGS} -fuse-ld=$(echo /usr/bin/ld.?old | awk -F'\\.' '{print $NF}')"
+export CFLAGS="${SLKCFLAGS}"
 export CXXFLAGS="${CFLAGS}"
 export CCACHE_DIR="${TMP}/.ccache"
+export LDFLAGS="${LDFLAGS} -fuse-ld=$(for file in /usr/bin/ld.?old; do [[ -e "$file" ]] && awk -F'\\.' '{print $NF}' <<< "$file" || echo "bfd" && break; done)"
 
 # NodeJS
 export YARN_CACHE_FOLDER="${TMP}/.yarn-cache"
