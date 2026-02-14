@@ -147,6 +147,26 @@ compress_files () {
   done
 }
 
+check_gid () {
+  # Check if the group exists. If not, then bail.
+  # Usage: check_gid group gid
+  if [ -z "$(getent group "${1}")" ]; then
+    echo "You must have a '${1}' group to run this script."
+    echo "  # groupadd -g ${2} ${1}"
+    exit 1
+  fi
+}
+
+check_uid () {
+  # Check if the user exists. If not, then bail. Assumes UID=GID
+  # Usage: check_uid user uid
+  if [ -z "$(getent passwd "${1}")" ]; then
+    echo "You must have a '${1}' user to run this script."
+    echo "  # useradd -u ${2} -g ${2} -s /sbin/nologin -M ${1}"
+    exit 1
+  fi
+}
+
 # Source the SlackBuild and start building
 
 set -e

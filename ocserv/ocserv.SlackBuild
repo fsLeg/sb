@@ -11,6 +11,8 @@ REQUIRES="llhttp libev protobuf-c"
 BUILD_REQUIRES="ipcalc-ng rubygem-ronn"
 
 unpack () {
+  check_uid ocserv 382
+  check_gid ocserv 382
   tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
 }
 

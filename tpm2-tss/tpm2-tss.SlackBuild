@@ -9,13 +9,8 @@ DOWNLOAD="https://github.com/tpm2-software/tpm2-tss/releases/download/${VERSION}
 SHA256SUM="37f1580200ab78305d1fc872d89241aaee0c93cbe85bc559bf332737a60d3be8"
 
 unpack () {
-  # Check if the tss user and group exist. If not, then bail.
-  if [ -z "$(getent group tss)" -o -z "$(getent passwd tss)" ]; then
-    echo "  You must have a 'tss' user and group to run this script."
-    echo "    # groupadd -g 374 tss"
-    echo "    # useradd -g tss -u 374 -d /home/tss -M -s /bin/bash tss"
-    exit 1
-  fi
+  check_uid tss 374
+  check_gid tss 374
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
 }
 
