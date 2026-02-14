@@ -1,0 +1,60 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="3proxy"
+VERSION="0.9.5"
+BUILD="${BUILD:-1}"
+DESCRIPTION="tiny free proxy server"
+HOMEPAGE="https://3proxy.org/"
+DOWNLOAD="https://github.com/3proxy/3proxy/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="6f6da51d9bba93231e12acd707bb6cf86a1ab9491dc6dd0c79750cb3641541a3"
+
+unpack () {
+  check_gid proxy 396
+  check_uid proxy 396
+  tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
+}
+
+build () {
+  make -f Makefile.Linux
+
+  # install target has a lot of things hardcoded, so we'll install manually
+  # proxy conflicts with libproxy, so we rename it
+  install -dm550 -o proxy -g proxy $PKG/$LOCALSTATEDIR/lib/$PRGNAM/{,conf}
+  install -dm755 -o proxy -g proxy $PKG/$LOCALSTATEDIR/lib/$PRGNAM/{logs,count,libexec}
+  install -Dm755 -t $PKG/$_PREFIX/bin bin/{3proxy,ftppr,mycrypt,pop3p,socks,tcppm,udppm,tlspr}
+  install -m755 bin/proxy $PKG/$_PREFIX/bin/htproxy
+  install -m755 -o proxy -g proxy -t $PKG/$LOCALSTATEDIR/lib/$PRGNAM/libexec bin/*.ld.so
+  install -d $PKG/$SYSCONFDIR/$PRGNAM
+  sed "s|/bin|$_PREFIX/bin|
+       s|/usr/local/$PRGNAM|$LOCALSTATEDIR/lib/$PRGNAM|" \
+       scripts/3proxy.cfg.chroot > $PKG/$SYSCONFDIR/$PRGNAM/3proxy.cfg.new
+  chmod 0644 $PKG/$SYSCONFDIR/$PRGNAM/3proxy.cfg.new
+  install -Dm440 -o proxy -g proxy scripts/3proxy.cfg $PKG/$LOCALSTATEDIR/lib/$PRGNAM/conf/3proxy.cfg.new
+  touch $PKG/$LOCALSTATEDIR/lib/$PRGNAM/conf/{counters.new,bandlimiters.new,passwd.new}
+  chown proxy:proxy $PKG/$LOCALSTATEDIR/lib/$PRGNAM/conf/{counters.new,bandlimiters.new,passwd.new}
+  chmod 0440 $PKG/$LOCALSTATEDIR/lib/$PRGNAM/conf/{counters.new,bandlimiters.new,passwd.new}
+  sed "s|/etc|$SYSCONFDIR|g" scripts/add3proxyuser.sh > $PKG/$LOCALSTATEDIR/lib/$PRGNAM/conf/add3proxyuser.sh
+  chown proxy:proxy $PKG/$LOCALSTATEDIR/lib/$PRGNAM/conf/add3proxyuser.sh
+  chmod 0550 $PKG/$LOCALSTATEDIR/lib/$PRGNAM/conf/add3proxyuser.sh
+  ln -sf ../../${LOCALSTATEDIR#$_PREFIX}/lib/$PRGNAM/conf $PKG/$SYSCONFDIR/$PRGNAM/
+  install -d $PKG/$LOCALSTATEDIR/log/$PRGNAM
+  ln -sf ../../../${LOCALSTATEDIR#$_PREFIX}/lib/$PRGNAM/logs $PKG/$LOCALSTATEDIR/log/$PRGNAM/
+  install -Dm644 -t $PKG/$_PREFIX/man/man3 man/*.3
+  install -Dm644 -t $PKG/$_PREFIX/man/man8 man/*.8
+  mv $PKG/$_PREFIX/man/man8/proxy.8 $PKG/$_PREFIX/man/man8/htproxy.8
+  install -d $PKG/$LOCALSTATEDIR/run/$PRGNAM $PKG/$SYSCONFDIR/rc.d
+  sed "s|@PREFIX@|$_PREFIX|g
+       s|@SYSCONFDIR@|$SYSCONFDIR|g
+       s|@LOCALSTATEDIR@|$LOCALSTATEDIR|g" \
+       $CWD/rc.$PRGNAM > $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
+  chmod 0755 $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/ru
+  iconv -f koi8-r -t utf-8 -o $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/ru/example1.txt doc/ru/example1.txt
+  iconv -f koi8-r -t utf-8 -o $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/ru/iodbc.txt doc/ru/iodbc.txt
+  cp -anR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+            authors copying README doc/{html,ru}/ cfg/
+  install -d $PKG/install
+  sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g
+       s|@LOCALSTATEDIR@|${LOCALSTATEDIR#/}|g" \
+       $CWD/doinst.sh > $PKG/install/doinst.sh
+}
