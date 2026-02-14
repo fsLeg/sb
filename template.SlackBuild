@@ -1,7 +1,7 @@
 # Maintainer: Bob Dobbs <bob@dobbs.com>
 
 PRGNAM="appname"
-VERSION="${VERSION:-1.2.3}"
+VERSION="1.2.3"
 BUILD="${BUILD:-1}"
 DESCRIPTION="short blurb about the program, like the one from slack-desc"
 HOMEPAGE="https://example.org"
@@ -22,7 +22,7 @@ unpack () {
   # must be named $PRGNAM-$VERSION, i. e. appname-1.2.3. Usually this
   # does the trick:
   #
-  # tar xfv appname-1.2.3.tar.gz
+  # tar xfv $CWD/appname-1.2.3.tar.gz
   #
   # If there are any patches to apply or additional files to place or
   # move around before building, do that here. At this step you're in
