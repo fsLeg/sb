@@ -34,8 +34,8 @@ build () {
   install -d $PKG/$SYSCONFDIR/{rc.d,ocserv}
   cat $CWD/rc.ocserv > $PKG/$SYSCONFDIR/rc.d/rc.ocserv.new
   cat $CWD/ocserv.conf > $PKG/$SYSCONFDIR/ocserv/ocserv.conf.new
-  sed -i "s|%PREFIX%|$_PREFIX|g
-          s|%SYSCONFDIR%|$LOCALSTATEDIR|g
-          s|%LOCALSTATEDIR%|$LOCALSTATEDIR|g" \
+  sed -i "s|@PREFIX@|$_PREFIX|g
+          s|@SYSCONFDIR@|$LOCALSTATEDIR|g
+          s|@LOCALSTATEDIR@|$LOCALSTATEDIR|g" \
           $PKG/$SYSCONFDIR/rc.d/rc.ocserv.new $PKG/$SYSCONFDIR/ocserv/ocserv.conf.new
 }

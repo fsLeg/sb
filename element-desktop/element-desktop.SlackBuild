@@ -45,7 +45,7 @@ build () {
   install -d $PKG/$_PREFIX/{bin,lib$LIBDIRSUFFIX,share/applications}
   cp -aR dist/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
   install -Dm644 $CWD/element-desktop.desktop $PKG/$_PREFIX/share/applications/io.element.Element.desktop
-  sed -i "s|%PREFIX|$_PREFIX|" $PKG/$_PREFIX/share/applications/io.element.Element.desktop
+  sed -i "s|@PREFIX|$_PREFIX|" $PKG/$_PREFIX/share/applications/io.element.Element.desktop
   ln -s $_PREFIX/lib$LIBDIRSUFFIX/element-desktop/element-desktop $PKG/$_PREFIX/bin/
   for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256 512x512; do
     install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps

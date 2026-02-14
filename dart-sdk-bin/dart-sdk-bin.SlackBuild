@@ -30,5 +30,5 @@ build () {
   chmod +x $PKG/opt/dart-sdk/bin/resources{,/dartdoc}
   chmod +rx $PKG/opt/dart-sdk{,/bin,/bin/snapshots}
   install -Dm644 $CWD/doinst.sh $PKG/install/doinst.sh
-  sed -i "s|%SYSCONFDIR%|$SYSCONFDIR|g" $PKG/install/doinst.sh
+  sed -i "s|@SYSCONFDIR@|$SYSCONFDIR|g" $PKG/install/doinst.sh
 }
