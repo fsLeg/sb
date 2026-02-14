@@ -1,10 +1,12 @@
-#!/bin/sh
+#!/bin/bash
+
+PID="$(awk '/pidfile/ {print $2}' @SYSCONFDIR@/3proxy/3proxy.cfg)"
 
 case "$1" in
    start)
        echo Starting 3Proxy
 
-       /bin/mkdir -p @LOCALSTATEDIR@/run/3proxy
+       mkdir -p "$(dirname "$PID")"
        @PREFIX@/bin/3proxy @SYSCONFDIR@/3proxy/3proxy.cfg &
 
        RETVAL=$?
@@ -14,10 +16,10 @@ case "$1" in
 
    stop)
        echo Stopping 3Proxy
-       if [ -f @LOCALSTATEDIR@/run/3proxy/3proxy.pid ]; then
-           /bin/kill $(cat @LOCALSTATEDIR@/run/3proxy/3proxy.pid)
+       if [ -f "$PID" ]; then
+           kill "$(cat $PID)"
        else
-               /usr/bin/killall 3proxy
+           killall 3proxy
        fi
 
        RETVAL=$?
@@ -27,16 +29,15 @@ case "$1" in
 
    restart|reload)
        echo Reloading 3Proxy
-       if [ -f @LOCALSTATEDIR@/run/3proxy/3proxy.pid ]; then
-           /bin/kill -s USR1 $(cat @LOCALSTATEDIR@/run/3proxy/3proxy.pid)
+       if [ -f "$PID" ]; then
+           kill -s USR1 "$(cat $PID)"
        else
-               /usr/bin/killall -s USR1 3proxy
+           killall -s USR1 3proxy
        fi
        ;;
 
-
    *)
-       echo Usage: $0 "{start|stop|restart}"
+       echo "Usage: $0 {start|stop|restart}"
        exit 1
 esac
 exit 0
