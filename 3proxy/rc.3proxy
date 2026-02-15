@@ -1,17 +1,13 @@
 #!/bin/bash
 
-PID="$(awk '/pidfile/ {print $2}' @SYSCONFDIR@/3proxy/3proxy.cfg)"
+CFG="@SYSCONFDIR@/3proxy/3proxy.cfg"
+PID="$(awk '/pidfile/ {print $2}' "$CFG")"
 
 case "$1" in
    start)
        echo Starting 3Proxy
-
        mkdir -p "$(dirname "$PID")"
-       @PREFIX@/bin/3proxy @SYSCONFDIR@/3proxy/3proxy.cfg &
-
-       RETVAL=$?
-       echo
-       [ $RETVAL ]
+       @PREFIX@/bin/3proxy "$CFG" &
        ;;
 
    stop)
@@ -21,10 +17,6 @@ case "$1" in
        else
            killall 3proxy
        fi
-
-       RETVAL=$?
-       echo
-       [ $RETVAL ]
        ;;
 
    restart|reload)

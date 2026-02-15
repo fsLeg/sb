@@ -26,7 +26,9 @@ build () {
   install -m755 -o proxy -g proxy -t $PKG/$LOCALSTATEDIR/lib/$PRGNAM/libexec bin/*.ld.so
   install -d $PKG/$SYSCONFDIR/$PRGNAM
   sed "s|/bin|$_PREFIX/bin|
-       s|/usr/local/$PRGNAM|$LOCALSTATEDIR/lib/$PRGNAM|" \
+       s|/usr/local/$PRGNAM|$LOCALSTATEDIR/lib/$PRGNAM|
+       s|\#daemon|daemon|
+       /daemon/apidfile $LOCALSTATEDIR/run/$PRGNAM/$PRGNAM.pid" \
        scripts/3proxy.cfg.chroot > $PKG/$SYSCONFDIR/$PRGNAM/3proxy.cfg.new
   chmod 0644 $PKG/$SYSCONFDIR/$PRGNAM/3proxy.cfg.new
   install -Dm440 -o proxy -g proxy scripts/3proxy.cfg $PKG/$LOCALSTATEDIR/lib/$PRGNAM/conf/3proxy.cfg.new
