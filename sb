@@ -90,7 +90,12 @@ else
   LIBDIRSUFFIX=""
 fi
 
-PYVER=$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')
+SLACKVER="$(awk '{print $2}' /etc/slackware-version)"
+if [ "${SLACKVER: -1}" = "+" ]; then
+  SLACKVER="current"
+fi
+
+PYVER="$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
 
 # pkg-config
 export PKG_CONFIG_PATH="${_PREFIX}/lib${LIBDIRSUFFIX}/pkgconfig:${PKG_CONFIG_PATH}"
@@ -136,9 +141,9 @@ reset_permissions () {
 
 compress_files () {
   if [ -z "${1}" ]; then
-    DIR="$(pwd)"
+    local DIR="$(pwd)"
   else
-    DIR="${1}"
+    local DIR="${1}"
   fi
   find "${DIR}" -type f -exec gzip -9 {} \;
   for i in $(find "${DIR}" -type l); do
@@ -164,6 +169,26 @@ check_uid () {
     echo "You must have a '${1}' user to run this script."
     echo "  # useradd -u ${2} -g ${2} -s /sbin/nologin -M ${1}"
     exit 1
+  fi
+}
+
+get_submodules () {
+  if [ -n "${1}" ]; then
+    local DIR="${1}"
+  else
+    local DIR="$(pwd)"
+  fi
+
+  if [ -f "${DIR}/.gitmodules" ]; then
+    for SUBMODULE in $(git config -f "${DIR}/.gitmodules" --get-regexp '^submodule\..*\.path$' | awk '{print $2}'); do
+      BRANCH="$(git config -f "${DIR}/.gitmodules" --get "submodule.${SUBMODULE}.branch" || true)"
+      if [ -n "${BRANCH}" ]; then
+        BRANCH="-b ${BRANCH}"
+      fi
+      git -C "${DIR}" clone --depth 1 ${BRANCH} "$(git config -f "${DIR}/.gitmodules" --get "submodule.${SUBMODULE}.url")" "${SUBMODULE}"
+      unset -v BRANCH
+      get_submodules "${DIR}/${SUBMODULE}"
+    done
   fi
 }
 

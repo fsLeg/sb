@@ -66,6 +66,7 @@ The `sb` tool provides various variables and a few functions in hopes of being u
 - SYSCONFDIR - if $_PREFIX=/usr, then SYSCONFDIR=/etc, else SYSCONFDIR=$_PREFIX/etc
 - LOCALSTATEDIR - if $_PREFIX=/usr, then SYSCONFDIR=/var, else SYSCONFDIR=$_PREFIX/var
 - PYVER - major Python3 version (i. e. 3.9)
+- SLACKVER - Slackware version (numerical or "current")
 
 CFLAGS and the like are already exported, so you don't need to set them, unless you want to change them. For full list of variables see the source of sb. CFLAGS and CXXFLAGS are set to use gold/mold as the linker in Slackware-stable and -current respectively.
 
@@ -94,6 +95,7 @@ These must be set in a SlackBuild outside of functions, preferrably right after 
 - compress_files - recursively gzip every file within a current or provided directory.
 - check_gid - check if a group exists. Usage: `check_gid <group> <gid>`.
 - check_uid - check if a user exists. Usage: `check_uid <user> <uid>`. Assumes UID=GID.
+- get_submodules - recursively get git submodules using .gitmodules file. Takes a directory with .gitmodules file as an optional argument, works in a current directory otherwise. Skips directories with no .gitmodules file.
 
 # Rationale
 
