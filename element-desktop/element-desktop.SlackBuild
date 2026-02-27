@@ -2,17 +2,17 @@
 
 PRGNAM="element-desktop"
 WEBNAM="element-web"
-VERSION="1.12.10"
+VERSION="1.12.11"
 BUILD="${BUILD:-1}"
 DESCRIPTION="secure and independent communication via Matrix"
 HOMEPAGE="https://element.io/"
 DOWNLOAD="https://github.com/element-hq/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz \
           https://github.com/element-hq/${WEBNAM}/archive/v$VERSION/${WEBNAM}-$VERSION.tar.gz"
-SHA256SUM="2aa491d4601b0af20c36fff0133ea19a3585b16d9217d3ec9df9fe256d6167dd \
-           17f6253497879f70f9c23729a25d77f0259ec7a9a43a33eeaebc45686922912b"
+SHA256SUM="9b5f7462809ae53f7878cc7248ce75d518417abfe64f0548af8efc1b7eea53c1 \
+           a5a5b48d58314a85abf556126136fcb0bee93e37a8df985d63b3513f5f7529d4"
 DOWNLOAD_x86="UNSUPPORTED"
 REQUIRES="sqlcipher"
-BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin yarn"
+BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin pnpm yarn"
 CONFLICTS="element-desktop-bin"
 
 unpack () {
@@ -23,24 +23,19 @@ unpack () {
 
 build () {
   cd $WEBNAM-$VERSION
-  yarn install --frozen-lockfile \
-               --ignore-engines \
-               --no-fund \
-               --update-checksums
+  pnpm install --frozen-lockfile
   VERSION=$VERSION \
-    yarn build
+  NX_TUI=false \
+    pnpm run build
 
   cd ../$PRGNAM-$VERSION
   mkdir -p deploys
   mv ../$WEBNAM-$VERSION/webapp deploys/element-v$VERSION
-  yarn install --frozen-lockfile \
-               --ignore-engines \
-               --no-fund \
-               --update-checksums
-  yarn run fetch --noverify --cfgdir ""
+  pnpm install --frozen-lockfile
+  pnpm run fetch --noverify --cfgdir ""
   CRATE_CC_NO_DEFAULTS=1 \
-    yarn run build:native
-  yarn run build --publish never
+    pnpm run build:native
+  pnpm run build --publish never
 
   install -d $PKG/$_PREFIX/{bin,lib$LIBDIRSUFFIX,share/applications}
   cp -aR dist/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
