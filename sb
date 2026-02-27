@@ -108,9 +108,18 @@ export CCACHE_DIR="${TMP}/.ccache"
 export LDFLAGS="${LDFLAGS} -fuse-ld=$(for file in /usr/bin/ld.?old; do [[ -e "$file" ]] && awk -F'\\.' '{print $NF}' <<< "$file" || echo "bfd" && break; done)"
 
 # NodeJS
-export YARN_CACHE_FOLDER="${TMP}/.yarn-cache"
 export npm_config_cache="${TMP}/.npm-cache"
 export npm_config_nodedir="/usr"
+
+## Yarn
+export YARN_CACHE_FOLDER="${TMP}/.yarn-cache"
+
+## PNPM
+export XDG_CONFIG_HOME="${TMP}"
+mkdir -p "${XDG_CONFIG_HOME}/pnpm"
+cat << EOF > "${XDG_CONFIG_HOME}/pnpm/rc"
+store-dir="${XDG_CONFIG_HOME}/pnpm/store"
+EOF
 
 # Rust
 export RUSTFLAGS="-C target-cpu=native"
