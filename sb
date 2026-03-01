@@ -97,6 +97,10 @@ fi
 
 PYVER="$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
 
+# XDG directories
+export XDG_CONFIG_HOME="${TMP}/.config"
+export XDG_CONFIG_CACHE="${TMP}/.cache"
+
 # pkg-config
 export PKG_CONFIG_PATH="${_PREFIX}/lib${LIBDIRSUFFIX}/pkgconfig:${PKG_CONFIG_PATH}"
 export PKG_CONFIG_SYSTEM_INCLUDE_PATH="${PKG_CONFIG_SYSTEM_INCLUDE_PATH}:/usr/include:${_PREFIX}/include"
@@ -104,21 +108,21 @@ export PKG_CONFIG_SYSTEM_INCLUDE_PATH="${PKG_CONFIG_SYSTEM_INCLUDE_PATH}:/usr/in
 # C and C++
 export CFLAGS="${SLKCFLAGS}"
 export CXXFLAGS="${CFLAGS}"
-export CCACHE_DIR="${TMP}/.ccache"
+export CCACHE_DIR="${XDG_CONFIG_CACHE}/ccache"
 export LDFLAGS="${LDFLAGS} -fuse-ld=$(for file in /usr/bin/ld.?old; do [[ -e "$file" ]] && awk -F'\\.' '{print $NF}' <<< "$file" || echo "bfd" && break; done)"
 
 # NodeJS
-export npm_config_cache="${TMP}/.npm-cache"
+export npm_config_cache="${XDG_CONFIG_CACHE}/npm"
 export npm_config_nodedir="/usr"
+export COREPACK_HOME="${TMP}/.corepack"
 
 ## Yarn
-export YARN_CACHE_FOLDER="${TMP}/.yarn-cache"
+export YARN_CACHE_FOLDER="${XDG_CONFIG_CACHE}/yarn"
 
 ## PNPM
-export XDG_CONFIG_HOME="${TMP}"
 mkdir -p "${XDG_CONFIG_HOME}/pnpm"
 cat << EOF > "${XDG_CONFIG_HOME}/pnpm/rc"
-store-dir="${XDG_CONFIG_HOME}/pnpm/store"
+store-dir="${XDG_CONFIG_CACHE}/pnpm/store"
 EOF
 
 # Rust
@@ -133,10 +137,10 @@ export CGO_CFLAGS="${CFLAGS}"
 export CGO_CXXFLAGS="${CXXFLAGS}"
 export CGO_CPPFLAGS="${CXXFLAGS}"
 export GOPATH="${TMP}/.go"
-export GOCACHE="${TMP}/.go-cache"
+export GOCACHE="${XDG_CONFIG_CACHE}/go"
 
 # Dart
-export PUB_CACHE="${TMP}/.pub-cache"
+export PUB_CACHE="${XDG_CONFIG_CACHE}/dart"
 
 # Define useful functions
 reset_permissions () {
