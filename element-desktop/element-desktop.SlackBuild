@@ -12,13 +12,20 @@ SHA256SUM="9b5f7462809ae53f7878cc7248ce75d518417abfe64f0548af8efc1b7eea53c1 \
            a5a5b48d58314a85abf556126136fcb0bee93e37a8df985d63b3513f5f7529d4"
 DOWNLOAD_x86="UNSUPPORTED"
 REQUIRES="sqlcipher"
-BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin pnpm yarn"
+BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin"
 CONFLICTS="element-desktop-bin"
 
 unpack () {
   mkdir $PRGNAM-$VERSION
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz -C $PRGNAM-$VERSION
   tar xvf $CWD/$WEBNAM-$VERSION.tar.gz -C $PRGNAM-$VERSION
+
+  corepack install --global \
+    "pnpm@$(node -p "require('./$PRGNAM-$VERSION/$PRGNAM-$VERSION/package.json').packageManager.split('@')[1].split('+')[0]")" \
+    "yarn@^1"
+  mkdir -p $COREPACK_HOME/bin
+  corepack enable --install-directory $COREPACK_HOME/bin
+  export PATH="$COREPACK_HOME/bin:$PATH"
 }
 
 build () {
