@@ -1,14 +1,15 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ocserv"
-VERSION="1.4.0"
+VERSION="1.4.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="OpenConnect SSL VPN server"
 HOMEPAGE="https://ocserv.openconnect-vpn.net"
 DOWNLOAD="https://www.infradead.org/ocserv/download/${PRGNAM}-${VERSION}.tar.xz"
-SHA256SUM="10d97d4aaec4e6b376e9c56d30720dec5384d813e69bb759e86b20c08115b15a"
-REQUIRES="llhttp libev protobuf-c"
-BUILD_REQUIRES="ipcalc-ng rubygem-ronn"
+SHA256SUM="54a0e036421ef81556d5a573f13e123166e8fa9679e9a0877f5ef0c472128553"
+REQUIRES="libev"
+BUILD_REQUIRES="ipcalc-ng"
+OPTIONAL="GeoIP libmaxmind llhttp oath-toolkit protobuf-c rubygem-ronn"
 
 unpack () {
   check_uid ocserv 382
@@ -24,7 +25,6 @@ build () {
     --localstatedir=$LOCALSTATEDIR \
     --mandir=$_PREFIX/man \
     --docdir=$_PREFIX/doc/$PRGNAM-$VERSION \
-    --disable-static \
     --build=$ARCH-slackware-linux
   make
 
