@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="nodejs"
-VERSION="22.22.0"
+VERSION="22.22.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="JavaScript runtime"
 HOMEPAGE="https://nodejs.org/"
 DOWNLOAD="https://nodejs.org/dist/v${VERSION}/${PRGNAM%js}-v${VERSION}.tar.gz"
-SHA256SUM="5a4585d7f26bfb283267194b299243efea5ee6edd2fbf887825469b4ac94aece"
+SHA256SUM="20da57e24be78d0bd54175de1a23ab897bf7340c4ad9f32ff257b98ea9a825c5"
 CONFLICTS="nodejs18 nodejs22 nodejs24-bin"
 
 unpack () {
