@@ -1,30 +1,30 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
-PRGNAM="yubioath-desktop-bin"
-TARNAM="yubico-authenticator"
+PRGNAM="yubico-authenticator-bin"
+PRGNAME="${PRGNAM%-bin}"
 VERSION="7.3.2"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Yubico Authenticator for Desktop"
 HOMEPAGE="https://www.yubico.com/products/yubico-authenticator/"
-DOWNLOAD="https://developers.yubico.com/yubioath-flutter/Releases/${TARNAM}-${VERSION}-linux.tar.gz"
+DOWNLOAD="https://developers.yubico.com/yubioath-flutter/Releases/${PRGNAME}-${VERSION}-linux.tar.gz"
 SHA256SUM="586fae119bd05ccd35e2d6f733f52b0ea39038e7f49b464fcd52703af0895b15"
 DOWNLOAD_x86="UNSUPPORTED"
 REQUIRES="pcsc-lite ccid"
 
 unpack () {
-  tar xvf $CWD/$TARNAM-$VERSION-linux.tar.gz
-  mv $TARNAM-$VERSION-linux $PRGNAM-$VERSION
+  tar xvf $CWD/$PRGNAME-$VERSION-linux.tar.gz
+  mv $PRGNAME-$VERSION-linux $PRGNAM-$VERSION
 }
 
 build () {
-  install -d $PKG/opt/${PRGNAM%-bin}
-  cp -aR -t $PKG/opt/${PRGNAM%-bin} data/ helper/ lib/ linux_support/ authenticator
+  install -d $PKG/opt/${PRGNAME}
+  cp -aR -t $PKG/opt/${PRGNAME} data/ helper/ lib/ linux_support/ authenticator
   install -Dm644 -t $PKG/$_PREFIX/share/applications linux_support/com.yubico.yubioath.desktop
-  sed -i "s|@EXEC_PATH|/opt/${PRGNAM%-bin}|g" $PKG/$_PREFIX/share/applications/com.yubico.yubioath.desktop
+  sed -i "s|@EXEC_PATH|/opt/${PRGNAME}|g" $PKG/$_PREFIX/share/applications/com.yubico.yubioath.desktop
   install -d $PKG/$_PREFIX/bin
   cat << EOF > $PKG/$_PREFIX/bin/authenticator
 #!/bin/sh
-/opt/${PRGNAM%-bin}/authenticator $@
+/opt/${PRGNAME}/authenticator $@
 EOF
   chmod 755 $PKG/$_PREFIX/bin/authenticator
   install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION README.adoc
