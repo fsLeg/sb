@@ -1,0 +1,33 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="fooyin"
+VERSION="0.9.2"
+BUILD="${BUILD:-1}"
+DESCRIPTION="customisable music player"
+HOMEPAGE="https://fooyin.org/"
+DOWNLOAD="https://github.com/fooyin/fooyin/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="a3b0e880047790d169223983d4f9a26a2196499275d57321b15e9578dd716a94"
+REQUIRES="qt6"
+OPTIONAL="KDSingleApplication libebur128 libgme libopenmpt"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  get_submodules $PRGNAM-$VERSION
+}
+
+build () {
+  cmake -G Ninja \
+        -B build
+  cmake --build build
+
+  DESTDIR=$PKG \
+  cmake --install build \
+        --prefix $_PREFIX
+
+  rm -rf $PKG/$_PREFIX/{include,lib$LIBDIRSUFFIX/cmake}
+  rm -rf $PKG/$_PREFIX/lib$LIBDIRSUFFIX/*.a
+
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION CHANGELOG.md
+  mv $PKG/$_PREFIX/share/doc/fooyin/* $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  rm -rf $PKG/$_PREFIX/share/doc
+}
