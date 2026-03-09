@@ -13,6 +13,10 @@ OPTIONAL="KDSingleApplication libebur128 libgme libopenmpt"
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
   get_submodules $PRGNAM-$VERSION
+  # PR 725
+  sed -i '/#include <QContextMenuEvent>/a#include <QElapsedTimer>' $PRGNAM-$VERSION/src/plugins/vumeter/vumeterwidget.cpp
+  # PR 780
+  sed -i 's|.arg(alignment);|.arg(alignment.toInt());|' $PRGNAM-$VERSION/src/utils/starrating.cpp
 }
 
 build () {
