@@ -5,7 +5,7 @@ website.
 
 Hugo relies on Markdown files with front matter for metadata, and you
 can run Hugo from any directory. This works well for shared hosts and
-other systems where you don’t have a privileged account.
+other systems where you don't have a privileged account.
 
 Hugo renders a typical website of moderate size in a fraction of a
 second. A good rule of thumb is that each piece of content renders in
