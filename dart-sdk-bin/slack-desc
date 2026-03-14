@@ -14,6 +14,6 @@ dart-sdk-bin:
 dart-sdk-bin: The Dart SDK has the libraries and command-line tools that you need
 dart-sdk-bin: to develop Dart web, command-line, and server apps.
 dart-sdk-bin:
-dart-sdk-bin: Homepage: http://www.dartlang.org
+dart-sdk-bin: Homepage: https://dart.dev
 dart-sdk-bin:
 dart-sdk-bin:
