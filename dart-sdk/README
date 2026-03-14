@@ -1,0 +1,7 @@
+Dart is an application programming language that's easy to learn,
+easy to scale, and deployable everywhere.
+
+The Dart SDK has the libraries and command-line tools that you need
+to develop Dart web, command-line, and server apps.
+
+WARNING: Building dart-sdk requires 14+ Gb of space.

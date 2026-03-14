@@ -1,0 +1,69 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="dart-sdk"
+VERSION="3.11.2"
+BUILD="${BUILD:-1}"
+DESCRIPTION="SDK for application programming language"
+HOMEPAGE="https://dart.dev/"
+DOWNLOAD="git+https://github.com/dart-lang/sdk.git \
+          git+https://chromium.googlesource.com/chromium/tools/depot_tools.git \
+          https://storage.googleapis.com/dart-archive/channels/stable/release/$VERSION/api-docs/dartdocs-gen-api.zip"
+SHA256SUM="- \
+           - \
+           409539d372a68012250bb4d5d9c1954ad3b3063a6700d888e8e7d7916e4952f5"
+CONFLICTS="dart-sdk-bin"
+
+unpack () {
+  mv sdk $PRGNAM-$VERSION
+  pushd $PRGNAM-$VERSION
+    git -c advice.detachedHead=false checkout $VERSION
+    git -c advice.detachedHead=false -C ../depot_tools checkout $( \
+      git -C ../depot_tools rev-list -n 1 --before="$( \
+        git log -n 1 --pretty=format:%ci \
+      )" main \
+    )
+    export PATH+=":${TMP}/depot_tools" DEPOT_TOOLS_UPDATE="0"
+    cat << EOF > .gclient
+solutions = [
+  {
+    "name": "sdk",
+    "url": "file://$(pwd)",
+    "deps_file": "DEPS",
+    "managed": False,
+    "custom_deps": {},
+    "custom_vars": {
+      "download_emscripten": True,
+    },
+  },
+]
+EOF
+    gclient sync \
+            -D \
+            --nohooks \
+            --no-history \
+            --shallow \
+            --revision $(git rev-parse HEAD)
+    pushd sdk
+      ./tools/sdks/dart-sdk/bin/dart tools/generate_package_config.dart
+      ./tools/generate_sdk_version_file.py
+    popd
+  popd
+}
+
+build () {
+  pushd sdk
+    ./tools/build.py --mode release create_sdk
+  popd
+
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+             $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
+             $PKG/$_PREFIX/bin
+  cp -aR sdk/out/Release${PLATFORM@U}/$PRGNAM $PKG/$_PREFIX/lib$LIBDIRSUFFIX/
+  for PRG in dart dartaotruntime; do
+    ln -sf ../lib$LIBDIRSUFFIX/$PRGNAM/bin/$PRG $PKG/$_PREFIX/bin/
+  done
+  unzip -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION $CWD/dartdocs-gen-api.zip
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    AUTHORS CHANGELOG.md LICENSE OWNERS PATENT_GRANT README.md SECURITY.md
+  cp -aR docs $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+}
