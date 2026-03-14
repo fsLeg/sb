@@ -30,8 +30,8 @@ All metadata variables must have their values enclosed in quotes. No executable 
 - PRGNAM - program name.
 - VERSION - program version.
 - BUILD - package build number.
-- DOWNLOAD - must be set to URL(s) or "UNSUPPORTED" if the program doesn't support x86_64 platform.
-- SHA256SUM - only required if DOWNLOAD is _not_ set to "UNSUPPORTED", can be omitted otherwise.
+- DOWNLOAD - must be set to URL(s) or "UNSUPPORTED" if the program doesn't support x86_64 platform. A URL can be prepended with "git+" if it is a git repository to be cloned and suffixed with "#param=value&param2=value2" (i. e. `git+https://git.example.com/dev/project.git#branch=mistress`); currently, only "branch" URL parameter is supported, it sets a branch to clone.
+- SHA256SUM - only required if DOWNLOAD is _not_ set to "UNSUPPORTED", can be omitted otherwise. For URLs that are git repositories must be set to "-".
 
 ## Optional metadata
 
@@ -41,7 +41,7 @@ The following metadata can be omitted if empty.
 - HOMEPAGE - URL of the program's homepage.
 - DOWNLOAD_x86 - set to URL if there's a special tarball for i586 architecture; set to "UNSUPPORTED" if i586 architecture is explicitly not supported by the program.
 - SHA256_x86 - required if DOWNLOAD_x86 is set to URL.
-- REQUIRES - list of runtime dependencies, separate with spaces. Alternative dependencies can be specified using `|` symbol, i. e. REQUIRES="appname1|altappname1 appname2".
+- REQUIRES - list of runtime dependencies, separate with spaces. Alternative dependencies can be specified using "|" symbol, i. e. `REQUIRES="appname1|altappname1 appname2"`.
 - BUILD_REQUIRES - list of build-time dependencies. These are not required to actually run the program in question.
 - OPTIONAL - list of optional packages, either autodetected at build time or enabled through environment variables.
 - CONFLICTS - list of packages this package will conflict with, i. e. due to installing files to the same path.

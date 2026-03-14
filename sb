@@ -139,6 +139,9 @@ export CGO_CPPFLAGS="${CXXFLAGS}"
 export GOPATH="${TMP}/.go"
 export GOCACHE="${XDG_CONFIG_CACHE}/go"
 
+# Buf
+export BUF_CACHE_DIR="${XDG_CONFIG_CACHE}/buf"
+
 # Dart
 export PUB_CACHE="${XDG_CONFIG_CACHE}/dart"
 
@@ -215,6 +218,10 @@ source "${1}"
 cd "$(dirname ${1})"; CWD="$(pwd)"
 PKG="${TMP}/package-${PRGNAM}"
 
+rm -rf "${PKG}"
+mkdir -p "${TMP}" "${PKG}" "${OUTPUT}"
+rm -rf "${TMP}/${PRGNAM}-${VERSION}"
+
 if [ -n "${PRINT_PACKAGE_NAME}" ]; then
   echo "${PRGNAM}-$(test -n "${PKGVER}" && echo "${PKGVER}" || echo "${VERSION}")-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"
   exit 0
@@ -229,40 +236,69 @@ fi
 for URL in $(test "${DOWNLOAD}" != "UNSUPPORTED" && [[ ${ARCH} != i?86 ]] && echo "${DOWNLOAD}" || echo "") \
            $(test -n "${DOWNLOAD_x86}" && test "${DOWNLOAD_x86}" != "UNSUPPORTED" && [[ ${ARCH} == i?86 ]] && echo "${DOWNLOAD_x86}" || echo "")
 do
-  if [ ! -f "$(basename "${URL}")" ]; then
+  if [[ "${URL}" =~ ^git\+ ]]; then
+    declare -A PARAMS
+    IFS='&' read -ra PAIRS <<< "${URL#*#}"
+    for PAIR in "${PAIRS[@]}"; do
+        IFS='=' read -r KEY VALUE <<< "$PAIR"
+        PARAMS["$KEY"]="$VALUE"
+    done
+    if [[ -n ${PARAMS["branch"]} ]]; then
+      BRANCH="--branch ${PARAMS["branch"]}"
+    fi
+    URL="${URL%%#*}"
+    rm -rf "${TMP}/$(basename "${URL%.git}")"
+    git -C "${TMP}" clone ${BRANCH} -- "${URL#git+}"
+    unset PARAMS PAIRS KEY VALUE BRANCH
+  elif [ ! -f "$(basename "${URL}")" ]; then
     wget --tries=inf --retry-on-http-error=503 "${URL}"
   fi
 done
 
 # Check if sources are correct
-if [ "${DOWNLOAD}" != "UNSUPPORTED" ] && [[ "${ARCH}" != i?86 ]]; then
+if [[ "${DOWNLOAD}" != "UNSUPPORTED" && "${ARCH}" != i?86 ]]; then
   declare -a CHECKSUMS
   SHA256SUMS=(${SHA256SUM})
   TARBALLS=($(basename -a ${DOWNLOAD}))
   for i in $(seq 1 ${#TARBALLS[@]}); do
     i+=-1
-    CHECKSUMS+="${SHA256SUMS[${i}]}  ${TARBALLS[$i]}\n"
+    if [[ "${SHA256SUMS[${i}]}" =~ ^[a-f0-9]{64}$ ]]; then
+      CHECKSUMS+="${SHA256SUMS[${i}]}  ${TARBALLS[$i]}\n"
+    elif [[ "${SHA256SUMS[${i}]}" == "-" ]]; then
+      continue
+    else
+      echo "Invalid checksum: ${SHA256SUMS[${i}]}"
+      exit
+    fi
   done
-  sha256sum --check <(echo -e "${CHECKSUMS}")
+  if [[ ${#CHECKSUMS} -ge 1 ]]; then
+    sha256sum --check <(echo -e "${CHECKSUMS}")
+  fi
   unset CHECKSUMS SHA256SUMS TARBALLS
 fi
 
-if [ -n "${DOWNLOAD_x86}" ] && [ "${DOWNLOAD_x86}" != "UNSUPPORTED" ] && [[ "${ARCH}" == i?86 ]]; then
+if [[ -n "${DOWNLOAD_x86}" && "${DOWNLOAD_x86}" != "UNSUPPORTED" && "${ARCH}" == i?86 ]]; then
   declare -a CHECKSUMS_x86
   SHA256SUMS_x86=(${SHA256SUM_x86})
   TARBALLS_x86=($(basename -a ${DOWNLOAD_x86}))
   for i in $(seq 1 ${#TARBALLS_x86[@]}); do
     i+=-1
-    CHECKSUMS_x86+="${SHA256SUMS_x86[${i}]}  ${TARBALLS_x86[$i]}\n"
+    if [[ "${SHA256SUMS_x86[${i}]}" =~ ^[a-f0-9]{64}$ ]]; then
+      CHECKSUMS_x86+="${SHA256SUMS_x86[${i}]}  ${TARBALLS_x86[$i]}\n"
+    elif [[ "${SHA256SUMS_x86[${i}]}" == "-" ]]; then
+      continue
+    else
+      echo "Invalid checksum: ${SHA256SUMS_x86[${i}]}"
+      exit
+    fi
   done
-  sha256sum --check <(echo -e ${CHECKSUMS_x86})
+  if [[ ${#CHECKSUMS_x86} -ge 1 ]]; then
+    sha256sum --check <(echo -e ${CHECKSUMS_x86})
+  fi
   unset CHECKSUMS_x86 SHA256SUMS_x86 TARBALLS_x86
 fi
 
-rm -rf "${PKG}"
-mkdir -p "${TMP}" "${PKG}" "${OUTPUT}"
 cd "${TMP}"
-rm -rf "${PRGNAM}-${VERSION}"
 
 # Some sources are packed weird, so let the script handle unpacking
 # instead of trying to guess everything. This also allows for custom

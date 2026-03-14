@@ -57,21 +57,29 @@ source "$PRGNAM.SlackBuild"
 for URL in $([[ "$DOWNLOAD" != "UNSUPPORTED" ]] && echo "$DOWNLOAD" || echo "") \
            $([[ -n "$DOWNLOAD_x86" && "$DOWNLOAD_x86" != "UNSUPPORTED" ]] && echo "$DOWNLOAD_x86" || echo "")
 do
-  if [ ! -f "$(basename "$URL")" ]; then
+  if [[ ! "$URL" =~ ^git\+ && ! -f "$(basename "$URL")" ]]; then
     wget --tries=inf --retry-on-http-error=503 "$URL" || true
   fi
 done
 
 if [[ "$DOWNLOAD" != "UNSUPPORTED" ]]; then
-  for TARBALL in $(basename -a $DOWNLOAD); do
-    CHECKSUMS="$CHECKSUMS$(sha256sum "$TARBALL" | cut -d' ' -f1) "
+  for ITEM in $DOWNLOAD; do
+    if [[ "$ITEM" =~ ^git\+ ]]; then
+      CHECKSUMS+="- "
+    else
+      CHECKSUMS+="$(sha256sum "$(basename $ITEM)" | cut -d' ' -f1) "
+    fi
   done
   CHECKSUMS="$(echo "${CHECKSUMS% }" | tr ' ' '\n' | awk '{if(NR>1) printf " \\\\\\\n%11s%s", "", $0; else printf "%s", $0}')"
-  perl -0777 -pi -e 's|SHA256SUM="[0-9a-f\s\\]*"|SHA256SUM="'"$CHECKSUMS"'"|' "$PRGNAM.SlackBuild"
+  perl -0777 -pi -e 's|SHA256SUM="[-0-9a-f\s\\]*"|SHA256SUM="'"$CHECKSUMS"'"|' "$PRGNAM.SlackBuild"
 fi
 if [[ -n "$DOWNLOAD_x86" && "$DOWNLOAD_x86" != "UNSUPPORTED" ]]; then
-  for TARBALL in $(basename -a $DOWNLOAD_x86); do
-    CHECKSUMS32="$CHECKSUMS32$(sha256sum "$TARBALL" | cut -d' ' -f1) "
+  for ITEM in $DOWNLOAD_x86; do
+    if [[ "$ITEM" =~ ^git\+ ]]; then
+      CHECKSUMS32+="- "
+    else
+      CHECKSUMS32+="$(sha256sum "$TARBALL" | cut -d' ' -f1) "
+    fi
   done
   CHECKSUMS32="$(echo "${CHECKSUMS32% }" | tr ' ' '\n' | awk '{if(NR>1) printf " \\\\\\\n%15s%s", "", $0; else printf "%s", $0}')"
   perl -0777 -pi -e 's|SHA256SUM_x86="[0-9a-f\s\\]*"|SHA256SUM_x86="'"$CHECKSUMS32"'"|' "$PRGNAM.SlackBuild"
