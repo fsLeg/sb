@@ -55,7 +55,7 @@ The `sb` tool provides various variables and a few functions in hopes of being u
 
 ## Variables
 
-- TMP, CWD, PKG, ARCH, SLKCFLAGS, LIBDIRSUFFIX - same as on SBo
+- TMP, CWD, PKG, ARCH, SLKCFLAGS, LIBDIRSUFFIX - same as on SBo; TMP is /tmp/sb, can be changed through SB_TMP environment variable.
 - DEBARCH - architecture the way Debian names it (i386, amd64, armhf, arm64)
 - PLATFORM - platform identifier (ia32, x64, arm, arm64)
 - BITS - how many bits architecture has (32, 64)
@@ -78,6 +78,8 @@ These are picked from the environment when invoking `sb`.
 - SB_USE_REAL_ROOT - set to anything other than "N" (i. e. SB_USE_REAL_ROOT=Y) to supress a warning about not using `fakeroot` when running `sb` as root.
 - SB_IGNORE_ARCH - set to anything other than "N" (i. e. SB_IGNORE_ARCH=y) to suppress a warning when building on unsupported architectures.
 - SB_PREFIX - a prefix to use when creating a package, see _PREFIX above.
+- SB_TMP - a directory to do the building in; see TMP above.
+- SB_OUTPUT - a directory to put the resulting package in.
 - PRINT_PACKAGE_NAME - same as on SBo, set to anything to only print the name of the package that would be built and immediately exit.
 
 ### Script variables

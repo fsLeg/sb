@@ -45,10 +45,10 @@ else
 fi
 
 # Set the environment
-TAG="${TAG:-sb}"
-PKGTYPE="${PKGTYPE:-txz}"
-TMP="${TMP:-/tmp/sb}"
-OUTPUT="${OUTPUT:-/tmp}"
+TAG="sb"
+PKGTYPE="txz"
+TMP="${SB_TMP:-/tmp/sb}"
+OUTPUT="${SB_OUTPUT:-/tmp}"
 _PREFIX="${SB_PREFIX:-/usr/local}"
 
 if [[ "${_PREFIX}" == "/usr" ]]; then
@@ -67,7 +67,7 @@ if [[ -z "${ARCH}" ]]; then
   esac
 fi
 
-if [[ "${SB_IGNORE_ARCH:-N}" == "N" && "${ARCH}" == i?86 ]]; then
+if [[ "${SB_IGNORE_ARCH:-N}" == "N" && "${ARCH}" != "x86_64" ]]; then
   echo "You are using ${ARCH} architecture. This isn't supported. Are you sure you want to continue?"
   read -p "Y/[N] " SB_IGNORE_ARCH
   case "${SB_IGNORE_ARCH}" in
