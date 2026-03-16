@@ -9,15 +9,7 @@ HOMEPAGE="https://popcorn-time.site/"
 DOWNLOAD="https://sbo.t-rg.ws/${TARNAM}-${VERSION}.tar.gz"
 SHA256SUM="93ab145004b266adce2d0533c6997eeb68757c9533478623fb5ebd7df5293567"
 BUILD_REQUIRES="yarn"
-
-
-if [[ "$ARCH" == i?86 ]]; then
-  BITS="32"
-  NWVER="0.44.5"
-elif [ "$ARCH" = "x86_64" ]; then
-  BITS="64"
-  NWVER="0.86.0"
-fi
+NWVER="0.86.0"
 
 unpack () {
   tar xvf $CWD/$TARNAM-$VERSION.tar.gz

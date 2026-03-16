@@ -10,7 +10,6 @@ DOWNLOAD="https://github.com/element-hq/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-
           https://github.com/element-hq/${WEBNAM}/archive/v$VERSION/${WEBNAM}-$VERSION.tar.gz"
 SHA256SUM="3ea6fd6860403a6079ffeb8d3d69f356ead2be1338681b7a8a18b6112427974a \
            02f75052b5d3cfa121af233c6ca1f4bef7da24e80b6f28d288a736f077f41544"
-DOWNLOAD_x86="UNSUPPORTED"
 REQUIRES="sqlcipher"
 BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin"
 CONFLICTS="element-desktop-bin"

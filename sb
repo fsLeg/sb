@@ -1,12 +1,18 @@
 #!/bin/bash
 
+# TODO: make a mirror clone into $CWD for git URLs and then properly
+#       clone the sources in the SlackBuild. This will avoid repeated
+#       cloning if the sources were already mirrored previously. Also
+#       figure out how to check if the mirror is proper as you can't
+#       checksum a directory
+
 # Do checks first
 
 # Check for the SlackBuild
-if [ ! "${#@}" -eq 1 ]; then
+if [[ ! "${#@}" -eq 1 ]]; then
   echo "Usage: ${0} appname.SlackBuild"
   exit 1
-elif [ ! -f "${1}" ]; then
+elif [[ ! -f "${1}" ]]; then
   echo "${1} doesn't exist."
   exit 1
 fi
@@ -18,16 +24,16 @@ for LPATH in ${LD_LIBRARY_PATH//:/ }; do
   fi
 done
 
-if [ "$(awk '{print $2}' /proc/self/uid_map)" != 0 ]; then
+if [[ "$(awk '{print $2}' /proc/self/uid_map)" != 0 ]]; then
   ROOT_TYPE="unshare"
   echo "You're using unshare. This is not supported."
 fi
 
-if [ "${EUID}" = 0 ]; then
-  if [ -z "${ROOT_TYPE}" ] && [ "${USE_REAL_ROOT:-N}" = "N" ]; then
+if [[ "${EUID}" = 0 ]]; then
+  if [[ -z "${ROOT_TYPE}" && "${SB_USE_REAL_ROOT:-N}" == "N" ]]; then
     echo "You are using real root. This isn't recommended. Are you sure you want to continue?"
-    read -p "Y/[N] " USE_REAL_ROOT
-    case "${USE_REAL_ROOT}" in
+    read -p "Y/[N] " SB_USE_REAL_ROOT
+    case "${SB_USE_REAL_ROOT}" in
       "n"|"N"|"") exit 1 ;;
     esac
   fi
@@ -43,9 +49,9 @@ TAG="${TAG:-sb}"
 PKGTYPE="${PKGTYPE:-txz}"
 TMP="${TMP:-/tmp/sb}"
 OUTPUT="${OUTPUT:-/tmp}"
-_PREFIX="${_PREFIX:-/usr/local}"
+_PREFIX="${SB_PREFIX:-/usr/local}"
 
-if [ "${_PREFIX}" = "/usr" ]; then
+if [[ "${_PREFIX}" == "/usr" ]]; then
   SYSCONFDIR="/etc"
   LOCALSTATEDIR="/var"
 else
@@ -53,7 +59,7 @@ else
   LOCALSTATEDIR="${_PREFIX}/var"
 fi
 
-if [ -z "${ARCH}" ]; then
+if [[ -z "${ARCH}" ]]; then
   case "$(uname -m)" in
     i?86) ARCH="i586" ;;
     arm*) ARCH="arm" ;;
@@ -61,37 +67,53 @@ if [ -z "${ARCH}" ]; then
   esac
 fi
 
-if [[ "${ARCH}" = i?86 ]]; then
-  SLKCFLAGS="-O2 -march=${ARCH} -mtune=i686"
-  LIBDIRSUFFIX=""
-  DEBARCH="i386"
-  PLATFORM="ia32"
-  BITS="32"
-elif [ "${ARCH}" = "arm" ]; then
-  SLKCFLAGS="-O2 -march=armv5te"
-  LIBDIRSUFFIX=""
-  DEBARCH="armhf"
-  PLATFORM="arm"
-  BITS="32"
-elif [ "${ARCH}" = "x86_64" ]; then
-  SLKCFLAGS="-O2 -fPIC"
-  LIBDIRSUFFIX="64"
-  DEBARCH="amd64"
-  PLATFORM="x64"
-  BITS="64"
-elif [ "${ARCH}" = "aarch64" ]; then
-  SLKCFLAGS="-O2 -march=${ARCH}"
-  LIBDIRSUFFIX="64"
-  DEBARCH="arm64"
-  PLATFORM="arm64"
-  BITS="64"
-else
-  SLKCFLAGS="-O2 -march=${ARCH}"
-  LIBDIRSUFFIX=""
+if [[ "${SB_IGNORE_ARCH:-N}" == "N" && "${ARCH}" == i?86 ]]; then
+  echo "You are using ${ARCH} architecture. This isn't supported. Are you sure you want to continue?"
+  read -p "Y/[N] " SB_IGNORE_ARCH
+  case "${SB_IGNORE_ARCH}" in
+    "n"|"N"|"") exit 1 ;;
+  esac
 fi
 
+# Nothing but x86_64 is supported here anymore, but keep it for
+# possible compatibility
+case "${ARCH}" in
+  i?86)
+    SLKCFLAGS="-O2 -march=${ARCH} -mtune=i686"
+    LIBDIRSUFFIX=""
+    DEBARCH="i386"
+    PLATFORM="ia32"
+    BITS="32"
+    ;;
+  "arm")
+    SLKCFLAGS="-O2 -march=armv5te"
+    LIBDIRSUFFIX=""
+    DEBARCH="armhf"
+    PLATFORM="arm"
+    BITS="32"
+    ;;
+  "x86_64")
+    SLKCFLAGS="-O2 -fPIC"
+    LIBDIRSUFFIX="64"
+    DEBARCH="amd64"
+    PLATFORM="x64"
+    BITS="64"
+    ;;
+  "aarch64")
+    SLKCFLAGS="-O2 -march=${ARCH}"
+    LIBDIRSUFFIX="64"
+    DEBARCH="arm64"
+    PLATFORM="arm64"
+    BITS="64"
+    ;;
+  *)
+    SLKCFLAGS="-O2 -march=${ARCH}"
+    LIBDIRSUFFIX=""
+    ;;
+esac
+
 SLACKVER="$(awk '{print $2}' /etc/slackware-version)"
-if [ "${SLACKVER: -1}" = "+" ]; then
+if [[ "${SLACKVER: -1}" == "+" ]]; then
   SLACKVER="current"
 fi
 
@@ -189,16 +211,16 @@ check_uid () {
 }
 
 get_submodules () {
-  if [ -n "${1}" ]; then
+  if [[ -n "${1}" ]]; then
     local DIR="${1}"
   else
     local DIR="$(pwd)"
   fi
 
-  if [ -f "${DIR}/.gitmodules" ]; then
+  if [[ -f "${DIR}/.gitmodules" ]]; then
     for SUBMODULE in $(git config -f "${DIR}/.gitmodules" --get-regexp '^submodule\..*\.path$' | awk '{print $2}'); do
       BRANCH="$(git config -f "${DIR}/.gitmodules" --get "submodule.${SUBMODULE}.branch" || true)"
-      if [ -n "${BRANCH}" ]; then
+      if [[ -n "${BRANCH}" ]]; then
         BRANCH="-b ${BRANCH}"
       fi
       git -C "${DIR}" clone --depth 1 ${BRANCH} "$(git config -f "${DIR}/.gitmodules" --get "submodule.${SUBMODULE}.url")" "${SUBMODULE}"
@@ -222,20 +244,13 @@ rm -rf "${PKG}"
 mkdir -p "${TMP}" "${PKG}" "${OUTPUT}"
 rm -rf "${TMP}/${PRGNAM}-${VERSION}"
 
-if [ -n "${PRINT_PACKAGE_NAME}" ]; then
+if [[ -n "${PRINT_PACKAGE_NAME}" ]]; then
   echo "${PRGNAM}-$(test -n "${PKGVER}" && echo "${PKGVER}" || echo "${VERSION}")-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"
   exit 0
 fi
 
-if ([ "${DOWNLOAD_x86}" = "UNSUPPORTED" ] && [[ ${ARCH} == i?86 ]]) || ([ "${DOWNLOAD}" = "UNSUPPORTED" ] && [[ ${ARCH} == *64 ]]); then
-  echo "Architecture ${ARCH} is not supported."
-  exit 1
-fi
-
 # Retrieve the sources if they aren't present
-for URL in $(test "${DOWNLOAD}" != "UNSUPPORTED" && [[ ${ARCH} != i?86 ]] && echo "${DOWNLOAD}" || echo "") \
-           $(test -n "${DOWNLOAD_x86}" && test "${DOWNLOAD_x86}" != "UNSUPPORTED" && [[ ${ARCH} == i?86 ]] && echo "${DOWNLOAD_x86}" || echo "")
-do
+for URL in ${DOWNLOAD}; do
   if [[ "${URL}" =~ ^git\+ ]]; then
     declare -A PARAMS
     IFS='&' read -ra PAIRS <<< "${URL#*#}"
@@ -250,53 +265,30 @@ do
     rm -rf "${TMP}/$(basename "${URL%.git}")"
     git -C "${TMP}" clone ${BRANCH} -- "${URL#git+}"
     unset PARAMS PAIRS KEY VALUE BRANCH
-  elif [ ! -f "$(basename "${URL}")" ]; then
+  elif [[ ! -f "$(basename "${URL}")" ]]; then
     wget --tries=inf --retry-on-http-error=503 "${URL}"
   fi
 done
 
 # Check if sources are correct
-if [[ "${DOWNLOAD}" != "UNSUPPORTED" && "${ARCH}" != i?86 ]]; then
-  declare -a CHECKSUMS
-  SHA256SUMS=(${SHA256SUM})
-  TARBALLS=($(basename -a ${DOWNLOAD}))
-  for i in $(seq 1 ${#TARBALLS[@]}); do
-    i+=-1
-    if [[ "${SHA256SUMS[${i}]}" =~ ^[a-f0-9]{64}$ ]]; then
-      CHECKSUMS+="${SHA256SUMS[${i}]}  ${TARBALLS[$i]}\n"
-    elif [[ "${SHA256SUMS[${i}]}" == "-" ]]; then
-      continue
-    else
-      echo "Invalid checksum: ${SHA256SUMS[${i}]}"
-      exit
-    fi
-  done
-  if [[ ${#CHECKSUMS} -ge 1 ]]; then
-    sha256sum --check <(echo -e "${CHECKSUMS}")
+declare -a CHECKSUMS
+SHA256SUMS=(${SHA256SUM})
+TARBALLS=($(basename -a ${DOWNLOAD}))
+for i in $(seq 1 "${#TARBALLS[@]}"); do
+  i+=-1
+  if [[ "${SHA256SUMS[${i}]}" =~ ^[a-f0-9]{64}$ ]]; then
+    CHECKSUMS+="${SHA256SUMS[${i}]}  ${TARBALLS[$i]}\n"
+  elif [[ "${SHA256SUMS[${i}]}" == "-" ]]; then
+    continue
+  else
+    echo "Invalid checksum: ${SHA256SUMS[${i}]}"
+    exit
   fi
-  unset CHECKSUMS SHA256SUMS TARBALLS
+done
+if [[ "${#CHECKSUMS}" -gt 0 ]]; then
+  sha256sum --check <(echo -e "${CHECKSUMS}")
 fi
-
-if [[ -n "${DOWNLOAD_x86}" && "${DOWNLOAD_x86}" != "UNSUPPORTED" && "${ARCH}" == i?86 ]]; then
-  declare -a CHECKSUMS_x86
-  SHA256SUMS_x86=(${SHA256SUM_x86})
-  TARBALLS_x86=($(basename -a ${DOWNLOAD_x86}))
-  for i in $(seq 1 ${#TARBALLS_x86[@]}); do
-    i+=-1
-    if [[ "${SHA256SUMS_x86[${i}]}" =~ ^[a-f0-9]{64}$ ]]; then
-      CHECKSUMS_x86+="${SHA256SUMS_x86[${i}]}  ${TARBALLS_x86[$i]}\n"
-    elif [[ "${SHA256SUMS_x86[${i}]}" == "-" ]]; then
-      continue
-    else
-      echo "Invalid checksum: ${SHA256SUMS_x86[${i}]}"
-      exit
-    fi
-  done
-  if [[ ${#CHECKSUMS_x86} -ge 1 ]]; then
-    sha256sum --check <(echo -e ${CHECKSUMS_x86})
-  fi
-  unset CHECKSUMS_x86 SHA256SUMS_x86 TARBALLS_x86
-fi
+unset CHECKSUMS SHA256SUMS TARBALLS
 
 cd "${TMP}"
 
@@ -308,7 +300,7 @@ unpack
 # Specify full path in case directory was changed when unpacking
 cd "${TMP}/${PRGNAM}-${VERSION}"
 
-if [ -z "${SKIP_PERMS}" ]; then
+if [[ -z "${SKIP_PERMS}" ]]; then
   reset_permissions
 fi
 
@@ -317,9 +309,9 @@ build
 # Failsafe in case directory was changed during the build process
 cd "${TMP}/${PRGNAM}-${VERSION}"
 
-if [ ! "${_PREFIX}" = "/usr" ]; then
+if [[ ! "${_PREFIX}" == "/usr" ]]; then
   # Move stray directories to $_PREFIX
-  # $PKG$_PREFIX should exist at this point
+  # $PKG/$_PREFIX should exist at this point
   for DIR in $(echo "${PKG}"/usr/*); do
     case "$(echo "${DIR}" | rev | cut -d'/' -f1 | rev)" in
           "bin") mv "${PKG}/usr/bin"     "${PKG}${_PREFIX}";;
@@ -332,7 +324,7 @@ if [ ! "${_PREFIX}" = "/usr" ]; then
   done
 
   # Move Python stuff
-  if [ -d "${PKG}/usr/lib/python${PYVER}" ] || [ -d "${PKG}/usr/lib${LIBDIRSUFFIX}/python${PYVER}" ]; then
+  if [[ -d "${PKG}/usr/lib/python${PYVER}" || -d "${PKG}/usr/lib${LIBDIRSUFFIX}/python${PYVER}" ]]; then
     PYPATH="$(echo "${PKG}"/usr/lib*/python"${PYVER}"/site-packages)"
     PY_PREFIX="${PKG}${_PREFIX}/lib${LIBDIRSUFFIX}/python${PYVER}/site-packages"
     for PYPACK in $(find "${PYPATH}" -type d -mindepth 1 -maxdepth 1); do
@@ -347,7 +339,7 @@ if [ ! "${_PREFIX}" = "/usr" ]; then
   # Move Qt stuff
   QTVER="$(echo "${PKG}/usr/lib${LIBDIRSUFFIX}"/qt? | rev | cut -c1)"
   QTPATH="${PKG}/usr/lib${LIBDIRSUFFIX}/qt${QTVER}/qml"
-  if [ -d "${QTPATH}" ]; then
+  if [[ -d "${QTPATH}" ]]; then
     QT_PREFIX="${PKG}${_PREFIX}/lib${LIBDIRSUFFIX}/qt${QTVER}/qml"
     for QTMOD in $(find "${QTPATH}" -type f -name qmldir); do
       QTMOD="$(dirname "${QTMOD}")"
@@ -361,7 +353,7 @@ if [ ! "${_PREFIX}" = "/usr" ]; then
   fi
 
   # Link udev rules as their path is hardcoded into (e)udev
-  if [ -d "${PKG}${SYSCONFDIR}/udev/rules.d" ]; then
+  if [[ -d "${PKG}${SYSCONFDIR}/udev/rules.d" ]]; then
     RULESDIR="${PKG}/etc/udev/rules.d"
     RULES_PREFIX="${PKG}${SYSCONFDIR}/udev/rules.d"
     install -d "${RULESDIR}"
@@ -376,7 +368,7 @@ rm -f "${PKG}"/{,$_PREFIX/}lib"${LIBDIRSUFFIX}"/*.la
 
 # Strip binaries and libraries - this can be done with 'make install-strip'
 # in many source trees
-if [ -z "${SKIP_STRIP}" ]; then
+if [[ -z "${SKIP_STRIP}" ]]; then
   find "${PKG}" -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
     | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 fi
@@ -384,12 +376,12 @@ find ${PKG} -print0 | xargs -0 file | grep -e "executable" -e "shared object" | 
   | cut -f 1 -d : | xargs chmod a+x 2> /dev/null || true
 
 # Compress man pages
-if [ -d "${PKG}${_PREFIX}/man" ]; then
+if [[ -d "${PKG}${_PREFIX}/man" ]]; then
   compress_files "${PKG}${_PREFIX}/man"
 fi
 
 # Compress info pages and remove the package's dir file
-if [ -d "${PKG}${_PREFIX}/info" ]; then
+if [[ -d "${PKG}${_PREFIX}/info" ]]; then
   rm -f "${PKG}${_PREFIX}/info/dir"
   find "${PKG}${_PREFIX}/info" -type f -name "*.info*" -exec gzip -9 {} \;
 fi
@@ -410,7 +402,7 @@ cat "${CWD}/${PRGNAM}.SlackBuild" > "${PKG}${_PREFIX}/doc/${PRGNAM}-${VERSION}/$
 # Copy the slack-desc (and a custom doinst.sh and douninst.sh if necessary) into ./install
 mkdir -p "${PKG}/install"
 for FILE in slack-desc doinst.sh douninst.sh; do
-  if [ -f "${CWD}/${FILE}" ] && [ ! -f "${PKG}/install/${FILE}" ]; then
+  if [[ -f "${CWD}/${FILE}" && ! -f "${PKG}/install/${FILE}" ]]; then
     cat "${CWD}/${FILE}" > "${PKG}/install/${FILE}"
   fi
 done
