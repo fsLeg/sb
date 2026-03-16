@@ -13,7 +13,7 @@ The main principles that differ from the de facto standard set by SBo:
 
 The aforementioned differences are only in place in this repo. Nothing prevents users to use `sb` to build Slackware packages using SBo rules with minimal editing.
 
-To use `sb` put it somewhere on your PATH and simply execute
+To use `sb` put it somewhere in your PATH and simply execute
 
     sb path/to/appname.SlackBuild
 
@@ -59,7 +59,7 @@ The `sb` tool provides various variables and a few functions in hopes of being u
 - DEBARCH - architecture the way Debian names it (i386, amd64, armhf, arm64)
 - PLATFORM - platform identifier (ia32, x64, arm, arm64)
 - BITS - how many bits architecture has (32, 64)
-- _PREFIX - /usr/local, can be changed thourgh SB_PRERIX environment variable.
+- _PREFIX - /usr/local, can be changed through SB_PREFIX environment variable.
 - SYSCONFDIR - if $_PREFIX=/usr, then SYSCONFDIR=/etc, else SYSCONFDIR=$_PREFIX/etc
 - LOCALSTATEDIR - if $_PREFIX=/usr, then SYSCONFDIR=/var, else SYSCONFDIR=$_PREFIX/var
 - PYVER - major Python3 version (i. e. 3.9)
@@ -75,7 +75,7 @@ sb also uses some variables that fine-tune what it does.
 
 These are picked from the environment when invoking `sb`.
 
-- SB_USE_REAL_ROOT - set to anything other than "N" (i. e. SB_USE_REAL_ROOT=y) to supress a warning about not using `fakeroot` when running `sb` as root.
+- SB_USE_REAL_ROOT - set to anything other than "N" (i. e. SB_USE_REAL_ROOT=Y) to supress a warning about not using `fakeroot` when running `sb` as root.
 - SB_IGNORE_ARCH - set to anything other than "N" (i. e. SB_IGNORE_ARCH=y) to suppress a warning when building on unsupported architectures.
 - SB_PREFIX - a prefix to use when creating a package, see _PREFIX above.
 - PRINT_PACKAGE_NAME - same as on SBo, set to anything to only print the name of the package that would be built and immediately exit.
