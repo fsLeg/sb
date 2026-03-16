@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="Botan3"
-VERSION="3.10.0"
+VERSION="3.11.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="C++ crypto library"
 HOMEPAGE="https://botan.randombit.net/"
 DOWNLOAD="https://botan.randombit.net/releases/${PRGNAM%3}-${VERSION}.tar.xz"
-SHA256SUM="fde194236f6d5434f136ea0a0627f6cc9d26af8b96e9f1e1c7d8c82cd90f4f24"
+SHA256SUM="e8dd48556818da2c03a9a30932ad05db9e50b12fec90809301ecc64ea51bd11e"
 
 unpack () {
   tar xvf $CWD/${PRGNAM%3}-$VERSION.tar.xz
