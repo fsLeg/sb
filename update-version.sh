@@ -35,7 +35,10 @@ unset -v VERSION
 source "$PRGNAM.SlackBuild"
 
 for URL in $DOWNLOAD; do
-  if [[ ! "$URL" =~ ^git\+ && ! -f "$(basename "$URL")" ]]; then
+  if [[ ! "$URL" =~ ^git\+ ]]; then
+    if [[ -f "$(basename "$URL")" ]]; then
+      rm -fv "$(basename "$URL")"
+    fi
     wget --tries=inf --retry-on-http-error=503 "$URL" || true
   fi
 done
