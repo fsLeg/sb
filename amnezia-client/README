@@ -1,0 +1,22 @@
+AmneziaVPN is a multi-protocol, open-source VPN client that offers the
+option to set up your own server.
+
+Free open-source software to create a personal VPN on your server. Helps
+to access blocked content without revealing privacy even to VPN
+providers. Specify IP address, credentials for your server and Amnezia
+will configure it to connect via VPN automatically.
+
+Features:
+- Very easy to use - enter your IP address, SSH login, password and
+  Amnezia will automatically install VPN docker containers to your
+  server and connect to the VPN.
+- Classic VPN-protocols: OpenVPN, WireGuard and IKEv2 protocols.
+- Protocols with traffic Masking (Obfuscation): OpenVPN over Cloak
+  plugin, Shadowsocks (OpenVPN over Shadowsocks), AmneziaWG and XRay.
+- Split tunneling support - add any sites to the client to enable VPN
+  only for them or add Apps (only for Android and Desktop).
+- Windows, MacOS, Linux, Android, iOS releases.
+- Support for AmneziaWG protocol configuration on Keenetic beta
+  firmware.
+
+WARNING: this SlackBuild is for -current only!

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+SERVNAME="amnezia"
+SERVBIN="@PREFIX@/lib@LIBDIRSUFFIX@/amnezia-client/AmneziaVPN-service"
+DNS=("1.1.1.1" "1.0.0.1")
+
+function start() {
+  /usr/bin/daemon --name=$SERVNAME \
+                  --respawn \
+                  --delay=10 \
+                  -- $SERVBIN
+  # developers basically tell you to change DNS manually on Linux
+  mv /etc/resolv.conf /etc/resolv.conf.bak
+  for DN in ${DNS[@]}; do
+    echo "nameserver $DN" >> /etc/resolv.conf
+  done
+}
+
+function stop() {
+  /usr/bin/daemon --name=$SERVNAME --stop
+  mv /etc/resolv.conf.bak /etc/resolv.conf
+}
+
+function restart() {
+  /usr/bin/daemon --name=$SERVNAME --restart
+}
+
+function status() {
+  /usr/bin/daemon --name=$SERVNAME --verbose --running
+}
+
+function usage() {
+  echo "Usage: $0 [start|stop|restart|status]"
+}
+
+case "$1" in
+         "") start   ;;
+    "start") start   ;;
+     "stop") stop    ;;
+  "restart") restart ;;
+   "status") status  ;;
+          *) usage   ;;
+esac

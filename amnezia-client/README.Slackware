@@ -1,0 +1,19 @@
+To start AmneziaVPN daemon at boot and stop it properly at shutdown,
+make sure rc.local and rc.local_shutdown contain the following lines:
+
+  /etc/rc.d/rc.local
+  ==================
+  # Start AmneziaVPN-service
+  if [ -x @SYSCONFDIR@/rc.d/rc.amnezia ]; then
+    @SYSCONFDIR@/rc.d/rc.amnezia start
+  fi
+
+  /etc/rc.d/rc.local_shutdown
+  ===========================
+  # Stop AmneziaVPN-service
+  if [ -x @SYSCONFDIR@/rc.d/rc.amnezia ]; then
+    @SYSCONFDIR@/rc.d/rc.amnezia stop
+  fi
+
+Make sure to replace @SYSCONFDIR@ with a value appropriate for your
+_PREFIX, i. e. /etc or /usr/local/etc.
