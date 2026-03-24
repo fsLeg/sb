@@ -2,14 +2,14 @@
 
 PRGNAM="element-desktop"
 WEBNAM="element-web"
-VERSION="1.12.12"
+VERSION="1.12.13"
 BUILD="${BUILD:-1}"
 DESCRIPTION="secure and independent communication via Matrix"
 HOMEPAGE="https://element.io/"
 DOWNLOAD="https://github.com/element-hq/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz \
           https://github.com/element-hq/${WEBNAM}/archive/v$VERSION/${WEBNAM}-$VERSION.tar.gz"
-SHA256SUM="3ea6fd6860403a6079ffeb8d3d69f356ead2be1338681b7a8a18b6112427974a \
-           02f75052b5d3cfa121af233c6ca1f4bef7da24e80b6f28d288a736f077f41544"
+SHA256SUM="b1332a00955d463d80daf00e713f7f4c78dbd441a22fb8ff1fd9966357dbfb99 \
+           e0aae79866e60c00f085d8ee6d5cacf647bcd285e13b7b0bb27ab660b96a5846"
 REQUIRES="sqlcipher"
 BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin"
 CONFLICTS="element-desktop-bin"
@@ -31,11 +31,9 @@ unpack () {
 build () {
   cd $WEBNAM-$VERSION
   pnpm install --frozen-lockfile
-  pushd apps/web
-    VERSION=$VERSION \
-    NX_TUI=false \
-      pnpm run build
-  popd
+  VERSION=$VERSION \
+  NX_TUI=false \
+    pnpm -C apps/web run build
 
   cd ../$PRGNAM-$VERSION
   mkdir -p deploys
