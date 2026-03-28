@@ -8,6 +8,8 @@ starting from a blank slate or a preset layout.
 
 Optional dependencies (autodetected) are:
 - KDSingleApplication - will use the bundled version if not found
-- libebur128
-- libgme
-- libopenmpt
+- libebur128 - ReplayGain scanner plugin
+- libgme - GME audio input plugin
+- libopenmpt - OpenMPT audio input plugin
+- soundtouch - SoundTouch DSP plugin
+- soxr - SoX resampler DSP plugin
