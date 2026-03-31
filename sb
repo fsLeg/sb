@@ -239,13 +239,16 @@ source "${1}"
 
 cd "$(dirname ${1})"; CWD="$(pwd)"
 PKG="${TMP}/package-${PRGNAM}"
+if [[ -z "${PKGVER}" ]]; then
+  PKGVER="${VERSION}"
+fi
 
 rm -rf "${PKG}"
 mkdir -p "${TMP}" "${PKG}" "${OUTPUT}"
 rm -rf "${TMP}/${PRGNAM}-${VERSION}"
 
 if [[ -n "${PRINT_PACKAGE_NAME}" ]]; then
-  echo "${PRGNAM}-$(test -n "${PKGVER}" && echo "${PKGVER}" || echo "${VERSION}")-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"
+  echo "${PRGNAM}-${PKGVER}-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"
   exit 0
 fi
 
@@ -396,8 +399,8 @@ find "${PKG}" -name perllocal.pod \
   | xargs rm -f
 
 # Include the SlackBuild script in the documentation directory
-mkdir -p "${PKG}${_PREFIX}/doc/${PRGNAM}-${VERSION}"
-cat "${CWD}/${PRGNAM}.SlackBuild" > "${PKG}${_PREFIX}/doc/${PRGNAM}-${VERSION}/${PRGNAM}.SlackBuild"
+mkdir -p "${PKG}${_PREFIX}/doc/${PRGNAM}-${PKGVER}"
+cat "${CWD}/${PRGNAM}.SlackBuild" > "${PKG}${_PREFIX}/doc/${PRGNAM}-${PKGVER}/${PRGNAM}.SlackBuild"
 
 # Copy the slack-desc (and a custom doinst.sh and douninst.sh if necessary) into ./install
 mkdir -p "${PKG}/install"
@@ -412,6 +415,6 @@ done
 # your custom contents of doinst.sh runs, then add the -p switch to
 # the makepkg command below -- see makepkg(8) for details
 cd "${PKG}"
-/sbin/makepkg -l y -c n "${OUTPUT}/${PRGNAM}-$(test -n "${PKGVER}" && echo "${PKGVER}" || echo "${VERSION}")-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"
+/sbin/makepkg -l y -c n "${OUTPUT}/${PRGNAM}-${PKGVER}-${ARCH}-${BUILD}${TAG}.${PKGTYPE}"
 
 exit 0
