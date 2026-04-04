@@ -1,0 +1,43 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="deltachat-desktop"
+VERSION="2.48.0"
+BUILD="${BUILD:-1}"
+DESCRIPTION="decentralized private messenger"
+HOMEPAGE="https://delta.chat"
+DOWNLOAD="git+https://github.com/deltachat/${PRGNAM}.git"
+SHA256SUM="-"
+BUILD_REQUIRES="nodejs|nodejs22|nodejs24-bin"
+
+unpack () {
+  mv $PRGNAM $PRGNAM-$VERSION
+  git -C $PRGNAM-$VERSION -c advice.detachedHead=false checkout v$VERSION
+
+  corepack install --global pnpm
+  mkdir -p $COREPACK_HOME/bin
+  corepack enable --install-directory $COREPACK_HOME/bin
+  export PATH="$COREPACK_HOME/bin:$PATH"
+}
+
+build () {
+  pnpm install --frozen-lockfile
+  pushd packages/target-electron
+    pnpm pack:generate_config
+    pnpm build4production
+    pnpm pack:patch-node-modules
+    pnpm pack:linux:dir
+  popd
+
+  install -d $PKG/$_PREFIX/{bin,doc/$PRGNAM-$VERSION,lib$LIBDIRSUFFIX,share/applications}
+  cp -aR packages/target-electron/dist/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+  install -Dm644 $CWD/$PRGNAM.desktop $PKG/$_PREFIX/share/applications/chat.delta.DeltaChat.desktop
+  sed -i "s|@PREFIX@|$_PREFIX|" $PKG/$_PREFIX/share/applications/chat.delta.DeltaChat.desktop
+  ln -s $_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/$PRGNAM $PKG/$_PREFIX/bin/
+  for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256 512x512; do
+    install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
+    magick packages/target-electron/build/icon.png -resize $geometry \
+           $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
+  done
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+            CHANGELOG.md CONTRIBUTING.md LICENSE README.md docs/
+}

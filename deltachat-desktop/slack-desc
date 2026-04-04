@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                 |-----handy-ruler------------------------------------------------------|
+deltachat-desktop: deltachat-desktop (decentralized private messenger)
+deltachat-desktop:
+deltachat-desktop: Delta Chat Desktop is a decentralized private messenger with
+deltachat-desktop: chat-shared tools and games for Desktop.
+deltachat-desktop:
+deltachat-desktop: Homepage: https://delta.chat/
+deltachat-desktop:
+deltachat-desktop:
+deltachat-desktop:
+deltachat-desktop:
+deltachat-desktop:
