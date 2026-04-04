@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# TODO: make a mirror clone into $CWD for git URLs and then properly
-#       clone the sources in the SlackBuild. This will avoid repeated
-#       cloning if the sources were already mirrored previously. Also
-#       figure out how to check if the mirror is proper as you can't
-#       checksum a directory
+# TODO: figure out how to check if the git mirror is proper as you
+#       can't checksum a directory
 
 # Do checks first
 
@@ -265,8 +262,11 @@ for URL in ${DOWNLOAD}; do
       BRANCH="--branch ${PARAMS["branch"]}"
     fi
     URL="${URL%%#*}"
-    rm -rf "${TMP}/$(basename "${URL%.git}")"
-    git -C "${TMP}" clone ${BRANCH} -- "${URL#git+}"
+    if [[ -d "$(basename "${URL}")" ]]; then
+      git -C "$(basename "${URL}")" fetch --all
+    else
+      git clone --mirror ${BRANCH} -- "${URL#git+}"
+    fi
     unset PARAMS PAIRS KEY VALUE BRANCH
   elif [[ ! -f "$(basename "${URL}")" ]]; then
     wget --tries=inf --retry-on-http-error=503 "${URL}"

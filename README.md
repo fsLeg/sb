@@ -30,7 +30,7 @@ All metadata variables must have their values enclosed in quotes. No executable 
 - PRGNAM - program name.
 - VERSION - program version.
 - BUILD - package build number.
-- DOWNLOAD - must be set to URL(s). A URL can be prepended with "git+" if it is a git repository to be cloned and suffixed with "#param=value&param2=value2" (i. e. `git+https://git.example.com/dev/project.git#branch=mistress`); currently, only "branch" URL parameter is supported, it sets a branch to clone.
+- DOWNLOAD - must be set to URL(s). A URL can be prepended with "git+" if it is a git repository to be mirrored and suffixed with "#param=value&param2=value2" (i. e. `git+https://git.example.com/dev/project.git#branch=mistress`); currently, only "branch" URL parameter is supported, it sets a branch to mirror.
 - SHA256SUM - a list of sha256 checksums separated with spaces or escaped newlines. Order must match URLs in DOWNLOAD. For URLs that are git repositories must be set to "-".
 
 ## Optional metadata

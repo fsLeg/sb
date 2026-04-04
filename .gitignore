@@ -4,6 +4,8 @@
 *.deb
 *.rpm
 *.7z
+# git mirrors
+*.git
 # duplicates
 *.[1-9]
 # temporary files I might've forgotten to remove

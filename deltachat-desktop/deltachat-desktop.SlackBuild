@@ -10,7 +10,7 @@ SHA256SUM="-"
 BUILD_REQUIRES="nodejs|nodejs22|nodejs24-bin"
 
 unpack () {
-  mv $PRGNAM $PRGNAM-$VERSION
+  git clone $CWD/deltachat-desktop.git $PRGNAM-$VERSION
   git -C $PRGNAM-$VERSION -c advice.detachedHead=false checkout v$VERSION
 
   corepack install --global pnpm

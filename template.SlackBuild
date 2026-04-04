@@ -9,7 +9,7 @@ DOWNLOAD="https://example.org/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
 REQUIRES="" # optional. list runtime dependencies
 BUILD_REQUIRES="" # optional. list build-time dependencies
-OPTIONAL="" # optional. list of optional dependencies
+OPTIONAL="" # optional. list optional dependencies
 CONFLICTS="" # optional. list any packages this package would conflict with
 
 # There should not be any executable code outside of functions as the
@@ -21,6 +21,10 @@ unpack () {
   # does the trick:
   #
   # tar xfv $CWD/appname-1.2.3.tar.gz
+  #
+  # Or, for git repos:
+  #
+  # git clone $CWD/appname.git appname-1.2.3
   #
   # If there are any patches to apply or additional files to place or
   # move around before building, do that here. At this step you're in

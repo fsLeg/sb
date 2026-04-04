@@ -14,7 +14,8 @@ SHA256SUM="- \
 CONFLICTS="dart-sdk-bin"
 
 unpack () {
-  mv sdk $PRGNAM-$VERSION
+  git clone $CWD/sdk.git $PRGNAM-$VERSION
+  git clone $CWD/depot_tools.git
   pushd $PRGNAM-$VERSION
     git -c advice.detachedHead=false checkout $VERSION
     git -c advice.detachedHead=false -C ../depot_tools checkout $( \
