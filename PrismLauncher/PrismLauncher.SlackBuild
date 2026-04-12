@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="PrismLauncher"
-VERSION="11.0.0"
+VERSION="11.0.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Open Source Minecraft launcher"
 HOMEPAGE="https://prismlauncher.org/"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="1aae5f1f5b14b406d03d7cd13cc97dce2162218d94efdc6884bfe927a2bdc2e1"
+SHA256SUM="6a2467aab3c194de893c4d8cf781c026f693dc0671e05dbb6c166da62372cd01"
 REQUIRES="qt6 gamemode tomlplusplus cmark"
 BUILD_REQUIRES="cmake-opt jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
 OPTIONAL="scdoc glfw3 flite orca"
@@ -18,7 +18,7 @@ unpack () {
 
   # get dependencies for git sources
   if [ -z "$(ls -A $PRGNAM-$VERSION/libraries/libnbtplusplus)" ]; then
-    git -C $PRGNAM-$VERSION/libraries clone --depth 1 "$(git -C $PRGNAM-$VERSION config get -f .gitmodules submodule.libraries/libnbtplusplus.url)"
+    get_submodules $PRGNAM-$VERSION
   fi
 
   # fix building with newer Java
