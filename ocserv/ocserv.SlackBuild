@@ -1,36 +1,37 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ocserv"
-VERSION="1.4.1"
+VERSION="1.4.2"
 BUILD="${BUILD:-1}"
 DESCRIPTION="OpenConnect SSL VPN server"
 HOMEPAGE="https://ocserv.openconnect-vpn.net"
 DOWNLOAD="https://www.infradead.org/ocserv/download/${PRGNAM}-${VERSION}.tar.xz"
-SHA256SUM="54a0e036421ef81556d5a573f13e123166e8fa9679e9a0877f5ef0c472128553"
+SHA256SUM="e35d748a5244b10be3a92ad4df95a534c8280c43680eecaf3cb1b20d2a22b1a5"
 REQUIRES="libev"
-BUILD_REQUIRES="ipcalc-ng"
-OPTIONAL="GeoIP libmaxmind llhttp oath-toolkit protobuf-c rubygem-ronn"
+BUILD_REQUIRES="ipcalc-ng protobuf-c"
+OPTIONAL="GeoIP libmaxmind llhttp oath-toolkit rubygem-ronn"
 
 unpack () {
-  check_uid ocserv 382
   check_gid ocserv 382
+  check_uid ocserv 382
   tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
 }
 
 build () {
-  ./configure \
+  meson setup \
     --prefix=$_PREFIX \
     --libdir=$_PREFIX/lib${LIBDIRSUFFIX} \
     --sysconfdir=$SYSCONFDIR \
     --localstatedir=$LOCALSTATEDIR \
     --mandir=$_PREFIX/man \
-    --docdir=$_PREFIX/doc/$PRGNAM-$VERSION \
-    --build=$ARCH-slackware-linux
-  make
+    --buildtype=release \
+    -Dlibwrap=disabled \
+    build
+  meson compile -C build
 
-  make install DESTDIR=$PKG
+  meson install --destdir=$PKG -C build
   install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
-    AUTHORS CONTRIBUTING* ChangeLog NEWS README* doc/README* doc/sample.* doc/scripts/*
+    AUTHORS CONTRIBUTING* COPYING NEWS README* doc/README* doc/sample.* doc/scripts/*
   install -d $PKG/$SYSCONFDIR/{rc.d,ocserv}
   cat $CWD/rc.ocserv > $PKG/$SYSCONFDIR/rc.d/rc.ocserv.new
   cat $CWD/ocserv.conf > $PKG/$SYSCONFDIR/ocserv/ocserv.conf.new
