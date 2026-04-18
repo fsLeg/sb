@@ -1,0 +1,120 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="cdrtools"
+TARNAM="schily"
+VERSION="3.02"
+TARVER="2024-03-21"
+ZISOFSVER="1.0.8"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Highly portable CD/DVD/BluRay command line recording software"
+HOMEPAGE="https://codeberg.org/schilytools/schilytools"
+DOWNLOAD="https://codeberg.org/schilytools/schilytools/releases/download/${TARVER}/${TARNAM}-${TARVER}.tar.bz2
+          https://mirrors.slackware.com/slackware/slackware64-15.0/source/ap/${PRGNAM}/zisofs-tools-${ZISOFSVER}.tar.bz2"
+SHA256SUM="76db022e450c1791a00e69780b55d18a2e3fc39b5ff870996433f87312032024
+           ae4e53e4914934d41660248fb59d3c8761f1f1fd180d5ec993c17ddb3afd04f3"
+CONFLICTS="cdrkit"
+
+unpack () {
+  tar xfv $CWD/$TARNAM-$TARVER.tar.bz2
+  mv $TARNAM-$TARVER $PRGNAM-$VERSION
+  sed -i "s|share/lib/siconv|share/siconv|g" \
+         $PRGNAM-$VERSION/libsiconv/sic_nls.c \
+         $PRGNAM-$VERSION/libsiconv/tables/{Makefile,*.mk}
+
+  rm -rf $TMP/zisofs-tools-$ZISOFSVER
+  tar xfv $CWD/zisofs-tools-$ZISOFSVER.tar.bz2
+}
+
+build () {
+  # schilytools is compiled with smake, so MAKEFLAGS is mostly useless
+  unset MAKEFLAGS
+  CFLAGS+=" -Wno-error=implicit-int \
+            -Wno-error=implicit-function-declaration \
+            -Wno-old-style-definition"
+  COMPONENTS="libschily
+              libdeflt
+              libscg
+              libcdrdeflt
+              libedc
+              libfile
+              libfind
+              libhfs_iso
+              libmdigest
+              libparanoia
+              librscg
+              libscgcmd
+              libsiconv
+              btcflash
+              cdda2wav
+              cdrecord
+              mkisofs
+              mkisofs/diag
+              readcd
+              scgcheck
+              scgskeleton"
+  TOOLS="btcflash
+         cdda2wav
+         cdrecord
+         libsiconv/tables
+         mkisofs
+         mkisofs/diag
+         readcd
+         scgcheck
+         scgskeleton"
+
+  pushd psmake
+    ./MAKE-all
+    SMAKE=$(realpath smake)
+  popd
+
+  for COMPONENT in $COMPONENTS; do
+    pushd $COMPONENT
+      $SMAKE COPTX="-std=gnu89" \
+             LDOPTX="$LDFLAGS" \
+             INS_BASE=$_PREFIX \
+             $([ ! "$_PREFIX" == "/usr" ] && echo INS_RBASE=$_PREFIX) \
+             RUNPATH= \
+             DEFMANBASE=.
+    popd
+  done
+
+  for TOOL in $TOOLS; do
+    pushd $TOOL
+      $SMAKE INS_BASE=$_PREFIX \
+             $([ ! "$_PREFIX" == "/usr" ] && echo INS_RBASE=$_PREFIX) \
+             DEFMANBASE=. \
+             DEFINSGRP=root \
+             STRIPFLAGS=-s \
+             DESTDIR=$PKG \
+             install
+    popd
+  done
+
+  chmod u-s $PKG/$_PREFIX/bin/*
+  reset_permissions $PKG/$_PREFIX/man
+  mv $PKG/$SYSCONFDIR/default/cdrecord $PKG/$SYSCONFDIR/default/cdrecord.new
+  install -d $PKG/install
+  sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g" \
+    $CWD/doinst.sh > $PKG/install/doinst.sh
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CDDL.Schily.txt CONTRIBUTORS COPYING GPL-2.0.txt LGPL-2.1.txt Schily.Copyright \
+    README READMEs/README.{linux,mkisofs}
+  mv $PKG/$_PREFIX/share/doc/* $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  rmdir $PKG/$_PREFIX/share/doc
+  install -m644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/cdda2wav \
+    cdda2wav/{Changelog,FAQ,Frontends,HOWTOUSE,NEEDED,OtherProgs,THANKS,TODO}
+  install -m644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/mkisofs \
+    mkisofs/{COPYING*,ChangeLog*,RELEASE,TODO}
+  reset_permissions $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+
+  pushd ../zisofs-tools-$ZISOFSVER
+    reset_permissions
+    ./configure --prefix=$_PREFIX \
+                --build=$ARCH-slackware-linux
+    make
+    install -Dm755 -t $PKG/$_PREFIX/bin mkzftree
+    install -Dm644 -t $PKG/$_PREFIX/man/man1 mkzftree.1
+    install -Dm644 -t $PKG/$_PREFIX/doc/zisofs-tools-$ZISOFSVER \
+      CHANGES COPYING INSTALL README zisofs.magic
+  popd
+}

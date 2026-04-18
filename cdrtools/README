@@ -1,0 +1,15 @@
+cdrtools is a highly portable CD/DVD/BluRay command line recording
+software.
+
+cdrecord: A CD/DVD/BD recording program
+readcd:   A program to read CD/DVD/BD media with CD-clone features
+cdda2wav: The most evolved CD-audio extraction program with paranoia
+          support
+mkisofs:  A program to create hybrid ISO9660/Joliet/HFS filesystems
+          with optional Rock Ridge attributes
+isodebug: A program to print mkisofs debug information from media
+isodump:  A program to dump ISO-9660 media
+isoinfo:  A program to analyse/verify ISO/9660/Joliet/Rock-Ridge
+          Filesystems
+isovfy:   A program to verify the ISO-9660 structures
+mkzftree: A program to compress a file tree to make a compressed CD-ROM
