@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="dart-sdk"
-VERSION="3.11.3"
+VERSION="3.11.5"
 BUILD="${BUILD:-1}"
 DESCRIPTION="SDK for application programming language"
 HOMEPAGE="https://dart.dev/"
@@ -10,7 +10,7 @@ DOWNLOAD="git+https://github.com/dart-lang/sdk.git \
           https://storage.googleapis.com/dart-archive/channels/stable/release/$VERSION/api-docs/dartdocs-gen-api.zip"
 SHA256SUM="- \
            - \
-           72858bb3db79a21a39429345f246fdeda7151ba65487c62d9d66d6b96848a15b"
+           485a5523168bc0f808b6bed89cab830d91375ceef6a6f4385f7264a83e1a4d36"
 CONFLICTS="dart-sdk-bin"
 
 unpack () {
