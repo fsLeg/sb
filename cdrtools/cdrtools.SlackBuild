@@ -9,9 +9,9 @@ BUILD="${BUILD:-1}"
 DESCRIPTION="Highly portable CD/DVD/BluRay command line recording software"
 HOMEPAGE="https://codeberg.org/schilytools/schilytools"
 DOWNLOAD="https://codeberg.org/schilytools/schilytools/releases/download/${TARVER}/${TARNAM}-${TARVER}.tar.bz2
-          https://mirrors.slackware.com/slackware/slackware64-15.0/source/ap/${PRGNAM}/zisofs-tools-${ZISOFSVER}.tar.bz2"
+          https://git.kernel.org/pub/scm/fs/zisofs/zisofs-tools.git/snapshot/zisofs-tools-${ZISOFSVER}.tar.gz"
 SHA256SUM="76db022e450c1791a00e69780b55d18a2e3fc39b5ff870996433f87312032024
-           ae4e53e4914934d41660248fb59d3c8761f1f1fd180d5ec993c17ddb3afd04f3"
+           d166de7f2d703d56a0d5779fd3621bed32d3cd26b81b34ab507ff7fd66c54ea6"
 CONFLICTS="cdrkit"
 
 unpack () {
@@ -22,7 +22,7 @@ unpack () {
          $PRGNAM-$VERSION/libsiconv/tables/{Makefile,*.mk}
 
   rm -rf $TMP/zisofs-tools-$ZISOFSVER
-  tar xfv $CWD/zisofs-tools-$ZISOFSVER.tar.bz2
+  tar xfv $CWD/zisofs-tools-$ZISOFSVER.tar.gz
 }
 
 build () {
@@ -109,8 +109,6 @@ build () {
 
   pushd ../zisofs-tools-$ZISOFSVER
     reset_permissions
-    ./configure --prefix=$_PREFIX \
-                --build=$ARCH-slackware-linux
     make
     install -Dm755 -t $PKG/$_PREFIX/bin mkzftree
     install -Dm644 -t $PKG/$_PREFIX/man/man1 mkzftree.1
