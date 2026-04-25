@@ -19,5 +19,5 @@ preserve_perms() {
   config $NEW
 }
 
-preserve_perms etc/rc.d/rc.ocserv.new
-config etc/ocserv/ocserv.conf.new
+preserve_perms @SYSCONFDIR@/rc.d/rc.ocserv.new
+config @SYSCONFDIR@/ocserv/ocserv.conf.new
