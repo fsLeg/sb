@@ -1,0 +1,57 @@
+#!/bin/bash
+# /etc/rc.d/rc.ollama - Ollama service for Slackware
+# Created by Jerry B Nettrouer II  https://www.inpito.org/projects.php
+# Load configuration (if file exists):
+[ -f @SYSCONFDIR@/default/ollama ] && . @SYSCONFDIR@/default/ollama
+# Load CUDA toolkit locations if those exist:
+[ -f /etc/profile.d/cuda-13.2.sh ] && . /etc/profile.d/cuda-13.2.sh
+# Set the Process ID file
+PIDDIR="/run/ollama/"
+PIDFILE="/run/ollama/ollama.pid"
+# Set the log file
+LOGFILE="@LOCALSTATEDIR@/log/ollama.log"
+
+case "$1" in
+  start)
+    if [ -f "$PIDFILE" ] && kill -0 $(cat "$PIDFILE") 2>/dev/null; then
+      echo "Ollama already running."
+      exit 0
+    fi
+    echo "Starting Ollama... (models: $OLLAMA_MODELS, host: $OLLAMA_HOST)"
+    # Create the run directory
+    mkdir -p $PIDDIR
+    chown -R ollama:ollama $PIDDIR
+    # Use nohup + setsid for clean daemon behavior
+    su -s /bin/bash -l -c "source @SYSCONFDIR@/default/ollama; setsid nohup @PREFIX@/bin/ollama serve >> $LOGFILE 2>&1 & echo \$! > $PIDFILE" - ollama
+    echo "Started with PID $(cat "$PIDFILE")"
+    ;;
+  stop)
+    echo "Stopping Ollama..."
+    if [ -f "$PIDFILE" ]; then
+      kill $(cat "$PIDFILE") 2>/dev/null
+      rm -f "$PIDFILE"
+    else
+      pkill -f "ollama serve" 2>/dev/null
+    fi
+    ;;
+  restart)
+    $0 stop
+    sleep 1
+    $0 start
+    ;;
+  status)
+    if [ -f "$PIDFILE" ] && kill -0 $(cat "$PIDFILE") 2>/dev/null; then
+      echo "Ollama is running (PID $(cat "$PIDFILE"))."
+    elif pgrep -f "ollama serve" >/dev/null; then
+      echo "Ollama is running (but no PID file)."
+    else
+      echo "Ollama is not running."
+    fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+exit 0
+

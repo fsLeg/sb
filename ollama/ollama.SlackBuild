@@ -1,0 +1,70 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="ollama"
+VERSION="0.21.2"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Download and run large language models locally"
+HOMEPAGE="https://github.com/ollama/ollama"
+DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="660b6f51975b7d6516b2e63ce0b760acadc31a50eda81f3c211727d33e260aa3"
+BUILD_REQUIRES="google-go-lang"
+OPTIONAL="cudatoolkit_13 rocmtoolkit_7"
+
+unpack () {
+  check_gid ollama 393
+  check_uid ollama 393
+  tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
+
+  # disabling ggml-vulkan until we have vulkan-sdk >= 1.4
+  sed -i '/find_package(Vulkan)/d' $PRGNAM-$VERSION/CMakeLists.txt
+
+  # add "PARAMETER think" for Modelfile, PR14108
+  patch -p1 -d $PRGNAM-$VERSION -i $CWD/14108.patch
+}
+
+build () {
+  if [ ! -v CUDA ] && command -v nvcc &> /dev/null; then
+    CUDA="ON"
+  fi
+
+  cmake -B build \
+        -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
+        -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+        -DCMAKE_INSTALL_PREFIX="$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM" \
+        -DMAN_INSTALL_DIR="$_PREFIX/man" \
+        -DCMAKE_BUILD_TYPE="Release"
+  cmake --build build
+
+  go build -v \
+           -buildmode=pie \
+           -trimpath \
+           -mod=readonly \
+           -modcacherw \
+           -ldflags "-linkmode external \
+                     -X=github.com/ollama/ollama/version.Version=$VERSION \
+                     -X=github.com/ollama/ollama/server.mode=release \
+                     -extldflags '${LDFLAGS}'" \
+           -o build \
+           .
+
+  DESTDIR=$PKG cmake --install build --component CPU
+  [ "${CUDA:-OFF}" = "ON" ] && DESTDIR=$PKG cmake --install build --component CUDA
+  [ "${ROCM:-OFF}" = "ON" ] && DESTDIR=$PKG cmake --install build --component HIP
+  install -Dm755 -t $PKG/$_PREFIX/lib${LIBDIRSUFFIX}/$PRGNAM/bin build/$PRGNAM
+  install -d $PKG/$_PREFIX/bin
+  ln -s ../lib${LIBDIRSUFFIX}/$PRGNAM/bin/$PRGNAM $PKG/$_PREFIX/bin/
+  install -Dm755 $CWD/rc.$PRGNAM $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
+  install -Dm644 $CWD/$PRGNAM.default $PKG/$SYSCONFDIR/default/$PRGNAM.new
+  sed -i "s|@PREFIX@|$_PREFIX|g
+          s|@SYSCONFDIR@|$SYSCONFDIR|g
+          s|@LOCALSTATEDIR@|$LOCALSTATEDIR|g" \
+          $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new \
+          $PKG/$SYSCONFDIR/default/$PRGNAM.new
+
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CONTRIBUTING.md LICENSE README.md SECURITY.md docs/
+  install -d $PKG/install
+  sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g" \
+       $CWD/doinst.sh > $PKG/install/doinst.sh
+}

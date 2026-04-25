@@ -1,0 +1,17 @@
+Ollama (Download and run large language models locally)
+
+Ollama is an application which lets you run large language models
+offline.
+
+A list of models are available on ollama.com/library.
+
+Optional dependencies like CUDA or ROCm will be automatically detected
+during compilation of ollama libraries, if present.
+
+To skip installing CUDA accelerators, use CUDA=OFF.
+
+To skip installing HIP accelerators, ROCM=OFF.
+
+Optional dependencies:
+- cudatoolkit_13 - for CUDA accelerators
+- rocmtoolkit_7 - for HIP accelerators

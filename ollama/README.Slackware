@@ -1,0 +1,35 @@
+By default, ollama uses user "ollama", group "ollama" and a directory
+$LOCALSTATEDIR/lib/ollama. To make sure everything works, do these
+steps after installing the package (adjust $LOCALSTATEDIR according to
+your $_PREFIX).
+
+1. Create group and user "ollama":
+  groupadd -g 393 -r ollama
+  useradd -r -u 393 -g ollama -d $LOCALSTATEDIR/lib/ollama -s /sbin/nologin -c "Ollama service account" ollama
+
+2. Create the models directory and set permissions:
+  mkdir -p $LOCALSTATEDIR/lib/ollama/models
+  chown -R ollama:ollama $LOCALSTATEDIR/lib/ollama
+  chmod 750 $LOCALSTATEDIR/lib/ollama
+
+3. Create the log file:
+  touch $LOCALSTATEDIR/log/ollama.log
+  chown ollama:ollama $LOCALSTATEDIR/log/ollama.log
+
+To start ollama at boot and stop it properly at shutdown, make sure
+rc.local and rc.local_shutdown contain the following lines
+(adjust $SYSCONFDIR according to your $_PREFIX):
+
+  /etc/rc.d/rc.local
+  ==================
+  # Start ollama
+  if [ -x $SYSCONFDIR/rc.d/rc.ollama ]; then
+    $SYSCONFDIR/rc.d/rc.ollama start
+  fi
+
+  /etc/rc.d/rc.local_shutdown
+  ===========================
+  # Stop ollama
+  if [ -x $SYSCONFDIR/rc.d/rc.ollama ]; then
+    $SYSCONFDIR/rc.d/rc.ollama stop
+  fi
