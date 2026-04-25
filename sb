@@ -207,7 +207,7 @@ check_uid () {
   # Usage: check_uid user uid
   if [ -z "$(getent passwd "${1}")" ]; then
     echo "You must have a '${1}' user to run this script."
-    echo "  # useradd -u ${2} -g ${2} -s /sbin/nologin -M ${1}"
+    echo "  # useradd -r -u ${2} -g ${2} -s /sbin/nologin -M ${1}"
     exit 1
   fi
 }
