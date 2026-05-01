@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="element-desktop-bin"
-VERSION="1.12.15"
+VERSION="1.12.17"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Secure and independent communication via Matrix"
 HOMEPAGE="https://element.io/"
 DOWNLOAD="https://packages.element.io/debian/pool/main/e/${PRGNAM%-bin}/${PRGNAM%-bin}_${VERSION}_${DEBARCH}.deb"
-SHA256SUM="0ba54b821cbda4bbab6e0dd618116b4a8042702a53fbdc0806139428272f63a0"
+SHA256SUM="f312993478af8118a3637c3e795dcb4b48881525071126a7f716061586fa0159"
 REQUIRES="sqlcipher"
 CONFLICTS="element-desktop"
 
