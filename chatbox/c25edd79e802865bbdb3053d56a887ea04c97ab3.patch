@@ -1,0 +1,214 @@
+From c25edd79e802865bbdb3053d56a887ea04c97ab3 Mon Sep 17 00:00:00 2001
+From: Zeng Xian <themezeng@gmail.com>
+Date: Sat, 4 Apr 2026 10:10:39 +0800
+Subject: [PATCH] feat: add translate button for raw error messages (#715)
+
+* feat: add translate button for raw error messages
+
+When the user's language is not English, show a translate button next to the
+copy button in error detail area. Uses the existing Google/Microsoft translation
+service with 7-day cache. Click to translate, click again to show original.
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+
+* fix: expand error detail when clicking translate button
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+
+* refactor: extract ErrorActionButtons, remove dead Collapse
+
+- Extract duplicated translate+copy button row into ErrorActionButtons component
+- Remove dead self-closing <Collapse /> that rendered nothing
+- Remove unused Collapse import
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+
+* fix: reset translation on error change, copy displayed text
+
+Address PR review feedback:
+- Reset translatedText when errorMessage changes (e.g. after retry)
+- Copy button now copies the currently displayed text (translated or original)
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+
+---------
+
+Co-authored-by: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+(cherry picked from commit c3af532d6dd91b49cd6ba7f5a564353d03cc864f)
+---
+ .../components/chat/MessageErrTips.tsx        | 118 +++++++++++++-----
+ 1 file changed, 87 insertions(+), 31 deletions(-)
+
+diff --git a/src/renderer/components/chat/MessageErrTips.tsx b/src/renderer/components/chat/MessageErrTips.tsx
+index 6b2436d07..9d240219e 100644
+--- a/src/renderer/components/chat/MessageErrTips.tsx
++++ b/src/renderer/components/chat/MessageErrTips.tsx
+@@ -1,12 +1,12 @@
+-import { ActionIcon, Collapse, Flex, Text, Tooltip } from '@mantine/core'
++import { ActionIcon, Flex, Loader, Text, Tooltip } from '@mantine/core'
+ import { Link } from '@mui/material'
+ import { aiProviderNameHash } from '@shared/models'
+ import { ChatboxAIAPIError } from '@shared/models/errors'
+ import type { Message } from '@shared/types'
+ import { ModelProviderEnum } from '@shared/types/provider'
+-import { IconCheck, IconChevronDown, IconChevronUp, IconCopy, IconReload } from '@tabler/icons-react'
++import { IconCheck, IconChevronDown, IconChevronUp, IconCopy, IconLanguage, IconReload } from '@tabler/icons-react'
+ import type React from 'react'
+-import { useState } from 'react'
++import { useCallback, useEffect, useState } from 'react'
+ import { Trans, useTranslation } from 'react-i18next'
+ import { trackJkClickEvent } from '@/analytics/jk'
+ import { JK_EVENTS, JK_PAGE_NAMES } from '@/analytics/jk-events'
+@@ -14,9 +14,10 @@ import { useCopied } from '@/hooks/useCopied'
+ import { navigateToSettings } from '@/modals/Settings'
+ import { trackingEvent } from '@/packages/event'
+ import { buildChatboxUrl } from '@/packages/remote'
++import { translateTexts } from '@/packages/translation'
+ import platform from '@/platform'
+ import * as settingActions from '@/stores/settingActions'
+-import { useSettingsStore } from '@/stores/settingsStore'
++import { useLanguage, useSettingsStore } from '@/stores/settingsStore'
+ import LinkTargetBlank from '../common/Link'
+ 
+ const MAX_CHARS = 200
+@@ -96,11 +97,42 @@ export function isContextLengthError(errorText: string | null | undefined): bool
+   return false
+ }
+ 
++function ErrorActionButtons(props: {
++  showTranslateButton: boolean
++  translatedText: string | null
++  isTranslating: boolean
++  copied: boolean
++  onTranslate: (e: React.MouseEvent) => void
++  onCopy: (e: React.MouseEvent) => void
++  t: (key: string) => string
++}) {
++  const { showTranslateButton, translatedText, isTranslating, copied, onTranslate, onCopy, t } = props
++  return (
++    <Flex justify="flex-end" mt="xs" gap={4}>
++      {showTranslateButton && (
++        <Tooltip label={translatedText ? t('Show original') : t('Translate')} withArrow openDelay={1000}>
++          <ActionIcon variant="subtle" size="sm" color="red" disabled={isTranslating} onClick={onTranslate}>
++            {isTranslating ? <Loader size={14} color="red" /> : <IconLanguage size={14} />}
++          </ActionIcon>
++        </Tooltip>
++      )}
++      <Tooltip label={t('Copy')} withArrow openDelay={1000}>
++        <ActionIcon variant="subtle" size="sm" color="red" onClick={onCopy}>
++          {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
++        </ActionIcon>
++      </Tooltip>
++    </Flex>
++  )
++}
++
+ export default function MessageErrTips(props: { msg: Message; onRetry?: () => void; isBubbleLayout?: boolean }) {
+   const { msg, onRetry, isBubbleLayout } = props
+   const { t } = useTranslation()
+   const [expanded, setExpanded] = useState(false)
+   const licenseKey = useSettingsStore((state) => state.licenseKey)
++  const language = useLanguage()
++  const [translatedText, setTranslatedText] = useState<string | null>(null)
++  const [isTranslating, setIsTranslating] = useState(false)
+ 
+   const errorMessage = msg.errorExtra?.responseBody
+     ? (() => {
+@@ -118,8 +150,31 @@ export default function MessageErrTips(props: { msg: Message; onRetry?: () => vo
+       })()
+     : msg.error || ''
+ 
+-  const { copied, copy } = useCopied(errorMessage)
++  // Reset translation when the underlying error changes (e.g. after retry)
++  useEffect(() => {
++    setTranslatedText(null)
++  }, [errorMessage])
++
++  const displayedErrorMessage = translatedText ?? errorMessage
++  const { copied, copy } = useCopied(displayedErrorMessage)
+   const isTruncated = shouldTruncate(errorMessage)
++  const showTranslateButton = language !== 'en' && errorMessage.length > 0
++
++  const handleTranslate = useCallback(async () => {
++    if (translatedText) {
++      setTranslatedText(null)
++      return
++    }
++    setIsTranslating(true)
++    try {
++      const [result] = await translateTexts([errorMessage], language, { sourceLang: 'en' })
++      setTranslatedText(result ?? null)
++    } catch {
++      // ignore
++    } finally {
++      setIsTranslating(false)
++    }
++  }, [errorMessage, language, translatedText])
+ 
+   if (!msg.error) {
+     return null
+@@ -374,37 +429,38 @@ export default function MessageErrTips(props: { msg: Message; onRetry?: () => vo
+                   {expanded ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
+                 </ActionIcon>
+                 <div className="flex-1 min-w-0 whitespace-pre-wrap break-all">
+-                  {expanded ? errorMessage : getTruncatedText(errorMessage)}
++                  {expanded ? displayedErrorMessage : getTruncatedText(displayedErrorMessage)}
+                 </div>
+               </Flex>
+-              <Collapse in={expanded}>
+-                <Flex justify="flex-end" mt="xs">
+-                  <Tooltip label={t('Copy')} withArrow openDelay={1000}>
+-                    <ActionIcon
+-                      variant="subtle"
+-                      size="sm"
+-                      color="red"
+-                      onClick={(e) => {
+-                        e.stopPropagation()
+-                        copy()
+-                      }}
+-                    >
+-                      {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
+-                    </ActionIcon>
+-                  </Tooltip>
+-                </Flex>
+-              </Collapse>
++              <ErrorActionButtons
++                showTranslateButton={showTranslateButton}
++                translatedText={translatedText}
++                isTranslating={isTranslating}
++                copied={copied}
++                onTranslate={(e) => {
++                  e.stopPropagation()
++                  if (!expanded) setExpanded(true)
++                  handleTranslate()
++                }}
++                onCopy={(e) => {
++                  e.stopPropagation()
++                  copy()
++                }}
++                t={t}
++              />
+             </div>
+           ) : (
+             <div className="text-sm p-2 rounded-md bg-red-50 dark:bg-red-900/20 overflow-hidden">
+-              <div className="whitespace-pre-wrap break-all">{errorMessage}</div>
+-              <Flex justify="flex-end" mt="xs">
+-                <Tooltip label={t('Copy')} withArrow openDelay={1000}>
+-                  <ActionIcon variant="subtle" size="sm" color="red" onClick={() => copy()}>
+-                    {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
+-                  </ActionIcon>
+-                </Tooltip>
+-              </Flex>
++              <div className="whitespace-pre-wrap break-all">{displayedErrorMessage}</div>
++              <ErrorActionButtons
++                showTranslateButton={showTranslateButton}
++                translatedText={translatedText}
++                isTranslating={isTranslating}
++                copied={copied}
++                onTranslate={handleTranslate}
++                onCopy={copy}
++                t={t}
++              />
+             </div>
+           )}
+         </>

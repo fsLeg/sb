@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Chatbox
+Exec=@PREFIX@/bin/chatbox %U
+Terminal=false
+Type=Application
+Icon=chatbox
+Comment=Powerful AI Client
+Keywords=ai,chat
+Categories=Utility;

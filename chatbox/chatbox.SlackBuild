@@ -1,0 +1,48 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="chatbox"
+VERSION="1.20.1"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Powerful AI Client"
+HOMEPAGE="https://chatboxai.app/"
+DOWNLOAD="https://github.com/chatboxai/chatbox/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="c5fa9b30d51b2fc07d89b9f8ec49b15c1521cc5664c5a3fdb105d2ae9031ef43"
+BUILD_REQUIRES="nodejs|nodejs22"
+
+unpack () {
+  tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
+
+  corepack install --global \
+    "$(node -p "require('./$PRGNAM-$VERSION/package.json').packageManager.split('+')[0]")"
+  mkdir -p $COREPACK_HOME/bin
+  corepack enable --install-directory $COREPACK_HOME/bin
+  export PATH="$COREPACK_HOME/bin:$PATH"
+
+  # remove unsupported provider
+  sed -i '/github-copilot/d' $PRGNAM-$VERSION/src/shared/providers/index.ts
+
+  # revert incomplete changes
+  patch -Rp1 -d $PRGNAM-$VERSION -i $CWD/c25edd79e802865bbdb3053d56a887ea04c97ab3.patch
+  patch -Rp1 -d $PRGNAM-$VERSION -i $CWD/ef97136a6277a05ca7090b1e707a312e265cdca9.patch
+
+  # fix electron fetching
+  sed -i '/UPDATE_CHANNEL/d' $PRGNAM-$VERSION/electron-builder.yml
+}
+
+build () {
+  pnpm install --no-frozen-lockfile
+  pnpm run build
+  pnpm exec electron-builder build --publish never --config electron-builder.yml  --linux dir
+
+  install -d $PKG/$_PREFIX/{bin,doc/$PRGNAM-$VERSION,lib$LIBDIRSUFFIX,share/applications}
+  cp -aR release/build/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+  ln -s $_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/xyz.chatboxapp.ce $PKG/$_PREFIX/bin/$PRGNAM
+  install -Dm644 $CWD/$PRGNAM.desktop $PKG/$_PREFIX/share/applications/xyz.chatboxapp.ce.desktop
+  sed -i "s|@PREFIX@|$_PREFIX|" $PKG/$_PREFIX/share/applications/xyz.chatboxapp.ce.desktop
+  for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256 512x512; do
+    install -Dm644 release/build/linux-unpacked/resources/assets/icons/$geometry.png \
+      $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
+  done
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+            LICENSE README.md doc/FAQ.md docs/
+}
