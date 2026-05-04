@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ollama"
-VERSION="0.22.1"
+VERSION="0.23.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Download and run large language models locally"
 HOMEPAGE="https://github.com/ollama/ollama"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="b6dd1c89b0a63f2689f357c5463e4d417e68fbe7e7f79d73c09926ef698b719a"
+SHA256SUM="725184aaf3978e3cc3cebc04a466fca88c81badcb4a55f1e58ef52af2fe721fb"
 BUILD_REQUIRES="google-go-lang"
 OPTIONAL="cudatoolkit_13 rocmtoolkit_7"
 
@@ -55,11 +55,13 @@ build () {
   ln -s ../lib${LIBDIRSUFFIX}/$PRGNAM/bin/$PRGNAM $PKG/$_PREFIX/bin/
   install -Dm755 $CWD/rc.$PRGNAM $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
   install -Dm644 $CWD/$PRGNAM.default $PKG/$SYSCONFDIR/default/$PRGNAM.new
+  install -Dm644 $CWD/$PRGNAM.logrotate $PKG/$SYSCONFDIR/logrotate.d/$PRGNAM.new
   sed -i "s|@PREFIX@|$_PREFIX|g
           s|@SYSCONFDIR@|$SYSCONFDIR|g
           s|@LOCALSTATEDIR@|$LOCALSTATEDIR|g" \
-          $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new \
-          $PKG/$SYSCONFDIR/default/$PRGNAM.new
+      $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new \
+      $PKG/$SYSCONFDIR/default/$PRGNAM.new \
+      $PKG/$SYSCONFDIR/logrotate.d/$PRGNAM.new
 
   install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
