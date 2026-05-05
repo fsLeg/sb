@@ -21,3 +21,4 @@ preserve_perms() {
 
 preserve_perms @SYSCONFDIR@/rc.d/rc.ollama.new
 config @SYSCONFDIR@/default/ollama.new
+config @SYSCONFDIR@/logrotate.d/ollama.new
