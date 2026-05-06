@@ -1,0 +1,70 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="google-go-lang"
+VERSION="1.26.2"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Google's Go Language kit with gc tool chain"
+HOMEPAGE="https://go.dev"
+DOWNLOAD="https://go.dev/dl/go${VERSION}.src.tar.gz
+          https://go.dev/dl/go1.25.9.src.tar.gz
+          https://go.dev/dl/go1.23.12.src.tar.gz
+          https://go.dev/dl/go1.21.13.src.tar.gz
+          https://go.dev/dl/go1.19.13.src.tar.gz"
+SHA256SUM="2e91ebb6947a96e9436fb2b3926a8802efe63a6d375dffec4f82aa9dbd6fd43b
+           0ec9ef8ebcea097aac37decae9f09a7218b451cd96be7d6ed513d8e4bcf909cf
+           e1cce9379a24e895714a412c7ddd157d2614d9edbe83a84449b6e1840b4f1226
+           71fb31606a1de48d129d591e8717a63e0c5565ffba09a24ea9f899a13214c34d
+           ccf36b53fb0024a017353c3ddb22c1f00bc7a8073c6aac79042da24ee34434d3"
+GO_BOOTSTRAP=("1.19.13"
+              "1.21.13"
+              "1.23.12"
+              "1.25.9")
+
+unpack () {
+  tar xvf $CWD/go${VERSION}.src.tar.gz
+  mv go $PRGNAM-$VERSION
+  mkdir -p $PRGNAM-$VERSION/bootstrap
+  for GO_VER in ${GO_BOOTSTRAP[@]}; do
+    tar xvf $CWD/go$GO_VER.src.tar.gz -C $PRGNAM-$VERSION/bootstrap
+    mv $PRGNAM-$VERSION/bootstrap/go $PRGNAM-$VERSION/bootstrap/go$GO_VER
+  done
+  GOROOT_FINAL=$_PREFIX/lib$LIBDIRSUFFIX/go$VERSION/go
+}
+
+build () {
+  unset GOROOT
+  i=0
+  for GO_VER in ${GO_BOOTSTRAP[@]}; do
+    if [[ "$i" -eq 0 ]]; then
+      export GOROOT_BOOTSTRAP=/usr
+    else
+      GO_BVER=${GO_BOOTSTRAP[$(($i-1))]}
+      export GOROOT_BOOTSTRAP=$(realpath bootstrap/go$GO_BVER)
+    fi
+    pushd bootstrap/go$GO_VER/src
+      bash make.bash -v
+    popd
+    i=$((++i))
+  done
+  pushd src
+    GOROOT_BOOTSTRAP=$(realpath ../bootstrap/go${GO_BOOTSTRAP[-1]}) \
+      bash make.bash -v
+  popd
+
+  install -d $PKG/$GOROOT_FINAL \
+             $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+             $PKG/install
+  cp -aR -t $PKG/$GOROOT_FINAL \
+    api/ bin/ lib/ misc/ pkg/ src/ test/ go.env
+  find $PKG/$GOROOT_FINAL/src -type d -name "testdata" -exec rm -rf {} +
+  find $PKG/$GOROOT_FINAL/src -type f -name "*_test.go" -exec rm -rf {} +
+  install -Dm755 $CWD/go.sh $PKG/$SYSCONFDIR/profile.d/go.sh.new
+  install -Dm755 $CWD/go.csh $PKG/$SYSCONFDIR/profile.d/go.csh.new
+  sed -i "s|@GOROOT_FINAL@|$GOROOT_FINAL|g" \
+      $PKG/$SYSCONFDIR/profile.d/go.{csh,sh}.new
+
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CONTRIBUTING.md LICENSE PATENTS README.md SECURITY.md VERSION doc/
+  sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g" \
+       $CWD/doinst.sh > $PKG/install/doinst.sh
+}
