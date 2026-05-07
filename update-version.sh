@@ -50,7 +50,7 @@ for ITEM in $DOWNLOAD; do
     CHECKSUMS+="$(sha256sum "$(basename $ITEM)" | cut -d' ' -f1) "
   fi
 done
-CHECKSUMS="$(echo "${CHECKSUMS% }" | tr ' ' '\n' | awk '{if(NR>1) printf " \\\\\\\n%11s%s", "", $0; else printf "%s", $0}')"
+CHECKSUMS="$(echo "${CHECKSUMS% }" | tr ' ' '\n' | awk '{if(NR>1) printf "\n%11s%s", "", $0; else printf "%s", $0}')"
 perl -0777 -pi -e 's|SHA256SUM="[-0-9a-f\s\\]*"|SHA256SUM="'"$CHECKSUMS"'"|' "$PRGNAM.SlackBuild"
 
 if [[ -z "$NOBUILD" ]]; then
