@@ -6,14 +6,14 @@
 # customary to leave one space after the ':' except on otherwise blank lines.
 
               |-----handy-ruler------------------------------------------------------|
-google-go-lang: google-go-lang (Google's Go Language kit with gc tool chain)
+google-go-lang: google-go-lang (Core compiler tools for the Go programming language)
 google-go-lang:
-google-go-lang: The Go programming language is an open source project to make
-google-go-lang: programmers more productive. Go is expressive, concise, clean, and
-google-go-lang: efficient. Its concurrency mechanisms make it easy to write programs
-google-go-lang: that get the most out of multicore and networked machines, while its
-google-go-lang: novel type system enables flexible and modular program construction.
+google-go-lang: Go is a high-level, general-purpose programming language that is
+google-go-lang: statically typed and compiled. It is known for the simplicity of its
+google-go-lang: syntax and the efficiency of development that it enables through the
+google-go-lang: inclusion of a large standard library supplying many needs for common
+google-go-lang: projects.
 google-go-lang:
-google-go-lang:
+google-go-lang: Homepage: https://go.dev
 google-go-lang:
 google-go-lang:

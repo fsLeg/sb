@@ -3,7 +3,7 @@
 PRGNAM="google-go-lang"
 VERSION="1.26.2"
 BUILD="${BUILD:-1}"
-DESCRIPTION="Google's Go Language kit with gc tool chain"
+DESCRIPTION="Core compiler tools for the Go programming language"
 HOMEPAGE="https://go.dev"
 DOWNLOAD="https://go.dev/dl/go${VERSION}.src.tar.gz
           https://go.dev/dl/go1.25.9.src.tar.gz
@@ -21,34 +21,53 @@ GO_BOOTSTRAP=("1.19.13"
               "1.25.9")
 
 unpack () {
-  tar xvf $CWD/go${VERSION}.src.tar.gz
+  tar xvf $CWD/go$VERSION.src.tar.gz
   mv go $PRGNAM-$VERSION
   mkdir -p $PRGNAM-$VERSION/bootstrap
-  for GO_VER in ${GO_BOOTSTRAP[@]}; do
-    tar xvf $CWD/go$GO_VER.src.tar.gz -C $PRGNAM-$VERSION/bootstrap
-    mv $PRGNAM-$VERSION/bootstrap/go $PRGNAM-$VERSION/bootstrap/go$GO_VER
-  done
   GOROOT_FINAL=$_PREFIX/lib$LIBDIRSUFFIX/go$VERSION/go
+
+  # https://go.dev/doc/install/source#go14
+  GO_CUR_VER=$(go version | cut -d' ' -f3 | cut -d. -f2)
+  if [[ "$GO_CUR_VER" -ge 17 && "$GO_CUR_VER" -lt 20 ]]; then
+    GO_BOOTSTRAP=(${GO_BOOTSTRAP[@]:1})
+  elif [[ "$GO_CUR_VER" -ge 20 && "$GO_CUR_VER" -lt 22 ]]; then
+    GO_BOOTSTRAP=(${GO_BOOTSTRAP[@]:2})
+  elif [[ "$GO_CUR_VER" -ge 22 && "$GO_CUR_VER" -lt 24 ]]; then
+    GO_BOOTSTRAP=(${GO_BOOTSTRAP[@]:3})
+  elif [[ "$GO_CUR_VER" -ge 24 ]]; then
+    unset GO_BOOTSTRAP
+  fi
+
+  if [[ -v GO_BOOTSTRAP[@] ]]; then
+    for GO_VER in ${GO_BOOTSTRAP[@]}; do
+      tar xvf $CWD/go$GO_VER.src.tar.gz -C $PRGNAM-$VERSION/bootstrap
+      mv $PRGNAM-$VERSION/bootstrap/go $PRGNAM-$VERSION/bootstrap/go$GO_VER
+    done
+  fi
 }
 
 build () {
-  unset GOROOT
-  i=0
-  for GO_VER in ${GO_BOOTSTRAP[@]}; do
-    if [[ "$i" -eq 0 ]]; then
-      export GOROOT_BOOTSTRAP=/usr
-    else
-      GO_BVER=${GO_BOOTSTRAP[$(($i-1))]}
-      export GOROOT_BOOTSTRAP=$(realpath bootstrap/go$GO_BVER)
-    fi
-    pushd bootstrap/go$GO_VER/src
-      bash make.bash -v
-    popd
-    i=$((++i))
-  done
+  if [[ -v GO_BOOTSTRAP[@] ]]; then
+    i=0
+    for GO_VER in ${GO_BOOTSTRAP[@]}; do
+      if [[ ! -v GOROOT ]]; then
+        if [[ "$i" -eq 0 ]]; then
+          export GOROOT_BOOTSTRAP=/usr
+        else
+          GO_BVER=${GO_BOOTSTRAP[$(($i-1))]}
+          export GOROOT_BOOTSTRAP=$(realpath bootstrap/go$GO_BVER)
+        fi
+      fi
+      pushd bootstrap/go$GO_VER/src
+        bash make.bash
+      popd
+      unset GOROOT GOROOT_BOOTSTRAP GO_BVER
+      i=$((++i))
+    done
+    export GOROOT_BOOTSTRAP=$(realpath bootstrap/go${GO_BOOTSTRAP[-1]})
+  fi
   pushd src
-    GOROOT_BOOTSTRAP=$(realpath ../bootstrap/go${GO_BOOTSTRAP[-1]}) \
-      bash make.bash -v
+    bash make.bash
   popd
 
   install -d $PKG/$GOROOT_FINAL \
