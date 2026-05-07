@@ -54,14 +54,13 @@ build () {
         if [[ "$i" -eq 0 ]]; then
           export GOROOT_BOOTSTRAP=/usr
         else
-          GO_BVER=${GO_BOOTSTRAP[$(($i-1))]}
-          export GOROOT_BOOTSTRAP=$(realpath bootstrap/go$GO_BVER)
+          export GOROOT_BOOTSTRAP=$(realpath bootstrap/go${GO_BOOTSTRAP[$(($i-1))]})
         fi
       fi
       pushd bootstrap/go$GO_VER/src
         bash make.bash
       popd
-      unset GOROOT GOROOT_BOOTSTRAP GO_BVER
+      unset GOROOT GOROOT_BOOTSTRAP
       i=$((++i))
     done
     export GOROOT_BOOTSTRAP=$(realpath bootstrap/go${GO_BOOTSTRAP[-1]})
