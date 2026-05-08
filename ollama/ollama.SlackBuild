@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ollama"
-VERSION="0.23.1"
+VERSION="0.23.2"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Download and run large language models locally"
 HOMEPAGE="https://github.com/ollama/ollama"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="043052c38558d6e7e57dc5bfcbb8f6f5ca18c4f4afbd3c28494b11c2e21c77bb"
+SHA256SUM="de1c3620c95855b11abfa04833dfdbf3d0be40a19e58a73ac2b2d5736cbdb52a"
 BUILD_REQUIRES="google-go-lang"
 OPTIONAL="cudatoolkit_13 rocmtoolkit_7"
 
@@ -14,6 +14,10 @@ unpack () {
   check_gid ollama 393
   check_uid ollama 393
   tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
+
+  if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
+    CUDA="ON"
+  fi
 
   # disabling ggml-vulkan until we have vulkan-sdk >= 1.4
   sed -i '/find_package(Vulkan)/d' $PRGNAM-$VERSION/CMakeLists.txt
@@ -23,10 +27,6 @@ unpack () {
 }
 
 build () {
-  if [ ! -v CUDA ] && command -v nvcc &> /dev/null; then
-    CUDA="ON"
-  fi
-
   cmake -B build \
         -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
         -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
@@ -47,8 +47,8 @@ build () {
            .
 
   DESTDIR=$PKG cmake --install build --component CPU
-  [ "${CUDA:-OFF}" = "ON" ] && DESTDIR=$PKG cmake --install build --component CUDA
-  [ "${ROCM:-OFF}" = "ON" ] && DESTDIR=$PKG cmake --install build --component HIP
+  [[ "${CUDA:-OFF}" = "ON" ]] && DESTDIR=$PKG cmake --install build --component CUDA
+  [[ "${ROCM:-OFF}" = "ON" ]] && DESTDIR=$PKG cmake --install build --component HIP
   install -Dm755 -t $PKG/$_PREFIX/lib${LIBDIRSUFFIX}/$PRGNAM/bin build/$PRGNAM
   install -d $PKG/$_PREFIX/bin
   ln -s ../lib${LIBDIRSUFFIX}/$PRGNAM/bin/$PRGNAM $PKG/$_PREFIX/bin/
