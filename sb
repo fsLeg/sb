@@ -158,6 +158,7 @@ export CGO_CPPFLAGS="${CXXFLAGS}"
 export GOPATH="${TMP}/.go"
 export GOCACHE="${XDG_CONFIG_CACHE}/go"
 export GOTMPDIR="${TMP}/.go"
+mkdir -p "${GOTMPDIR}"
 
 # Buf
 export BUF_CACHE_DIR="${XDG_CONFIG_CACHE}/buf"
