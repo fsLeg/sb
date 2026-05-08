@@ -1,0 +1,33 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="gendesk"
+VERSION="1.0.10"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Generate .desktop files by specifying minimum information"
+HOMEPAGE="https://gendesk.roboticoverlords.org/"
+DOWNLOAD="https://github.com/xyproto/${PRGNAM}/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.xz"
+SHA256SUM="315cc9c348aef85eedff39c774b03a8ac5341246ac3bb5036566ff7ae7d8dae8"
+BUILD_REQUIRES="google-go-lang"
+
+unpack () {
+  tar xfv $CWD/$PRGNAM-$VERSION.tar.xz
+}
+
+build () {
+  go build -v \
+           -mod=vendor \
+           -buildmode=pie \
+           -modcacherw \
+           -trimpath \
+           -ldflags "-s \
+                     -w \
+                     -linkmode=external \
+                     -extldflags '${LDFLAGS}'"
+
+  install -Dm755 -t $PKG/$_PREFIX/bin $PRGNAM
+  install -Dm644 -t $PKG/$_PREFIX/man/man1 $PRGNAM.1.gz
+  install -Dm644 -t $PKG/$_PREFIX/share/pixmaps $PRGNAM.png
+
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CHANGELOG.md LICENSE README.md
+}
