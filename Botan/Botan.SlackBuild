@@ -1,6 +1,6 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
-PRGNAM="Botan3"
+PRGNAM="Botan"
 VERSION="3.12.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="C++ crypto library"
@@ -9,8 +9,7 @@ DOWNLOAD="https://botan.randombit.net/releases/${PRGNAM%3}-${VERSION}.tar.xz"
 SHA256SUM="5370f98dc15f8c222ee1ce52cd61c8756a53be0dc57cc4c1b0714d5a09ad74fb"
 
 unpack () {
-  tar xvf $CWD/${PRGNAM%3}-$VERSION.tar.xz
-  mv ${PRGNAM%3}-$VERSION $PRGNAM-$VERSION
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
 }
 
 build () {
@@ -26,12 +25,10 @@ build () {
     --with-lzma \
     --with-boost \
     --with-sqlite3 \
-    --with-commoncrypto \
-    --program-suffix=3
+    --with-commoncrypto
   make
 
   make install DESTDIR=$PKG
-  mv $PKG/$_PREFIX/man/man1/botan.1 $PKG/$_PREFIX/man/man1/botan3.1
-  mv $PKG/$_PREFIX/doc/$(echo $PRGNAM | sed 's/^B/\L&/;s/3$//')-$VERSION $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  mv $PKG/$_PREFIX/doc/${PRGNAM@L}-$VERSION $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   install -m644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION license.txt readme.rst
 }
