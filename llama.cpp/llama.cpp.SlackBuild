@@ -1,0 +1,58 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="llama.cpp"
+VERSION="b9097"
+BUILD="${BUILD:-1}"
+DESCRIPTION="LLM inference in C/C++"
+HOMEPAGE="https://github.com/ggml-org/llama.cpp"
+DOWNLOAD="https://github.com/ggml-org/llama.cpp/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="32be97ec886e68f84a07f8f44ec040037834d7d9560fb32a8ee7f354ec6d9829"
+OPTIONAL="cudatoolkit_13 OpenBLAS rocmtoolkit_7"
+
+unpack () {
+  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+
+  if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
+    CUDA="yes"
+  fi
+
+  if [[ ! -v HIP ]] && command -v hipconfig &> /dev/null; then
+    HIP="yes"
+  fi
+
+  if [[ ! -v OPENBLAS ]] && pkg-config --exists openblas; then
+    OPENBLAS="yes"
+  fi
+
+  if [[ ! -v VULKAN && $(pkg-config --modversion vulkan | cut -d. -f2) -ge 4 ]]; then
+    VULKAN="yes"
+  fi
+}
+
+build () {
+  cmake -B build \
+        -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+        -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+        -DCMAKE_INSTALL_PREFIX="$_PREFIX" \
+        $([[ "$CUDA" == "yes" ]] && echo "-DGGML_CUDA=ON") \
+        $([[ "$HIP" == "yes" ]] && echo "-DGGML_HIP=ON") \
+        $([[ "$OPENBLAS" == "yes" ]] && echo "-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS") \
+        $([[ "$VULKAN" == "yes" ]] && echo "-DGGML_VULKAN=ON") \
+        -DLLAMA_BUILD_TESTS=OFF \
+        -DGGML_BUILD_EXAMPLES=OFF \
+        -DGGML_BUILD_TESTS=OFF \
+        -DGGML_LTO=ON \
+        -DBUILD_SHARED_LIBS=ON \
+        -DLLAMA_BUILD_NUMBER="${VERSION#b}" \
+        -Wno-dev
+  cmake --build build \
+        --config Release
+
+  DESTDIR=$PKG \
+  cmake --install build \
+        --prefix $_PREFIX
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  mv $PKG/$_PREFIX/bin/convert_hf_to_gguf.py $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    AGENTS.md AUTHORS CODEOWNERS CONTRIBUTING.md LICENSE README.md SECURITY.md docs/
+}

@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+         |-----handy-ruler------------------------------------------------------|
+llama.cpp: llama.cpp (LLM inference in C/C++)
+llama.cpp:
+llama.cpp: llama.cpp is an open-source C/C++ library designed to run large
+llama.cpp: language models (LLMs) efficiently with minimal setup. Its main goal
+llama.cpp: is to enable high-performance LLM inference across a wide range of
+llama.cpp: hardware, both locally and in the cloud. It has no external
+llama.cpp: dependencies and supports various architectures including Apple
+llama.cpp: silicon, x86, and RISC-V, along with GPU backends like CUDA, AMD HIP,
+llama.cpp: Vulkan, and SYCL. A key feature is integer quantization (from 1.5-bit
+llama.cpp: to 8-bit), which reduces memory usage and speeds up inference, and it
+llama.cpp: also allows CPU+GPU hybrid processing for models not fitting in VRAM.
