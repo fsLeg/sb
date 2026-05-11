@@ -19,8 +19,14 @@ unpack () {
     CUDA="ON"
   fi
 
-  # disabling ggml-vulkan until we have vulkan-sdk >= 1.4
-  sed -i '/find_package(Vulkan)/d' $PRGNAM-$VERSION/CMakeLists.txt
+  if [[ ! -v ROCM ]] && command -v hipconfig &> /dev/null; then
+    ROCM="ON"
+  fi
+
+  if [[ $(pkg-config --modversion vulkan | cut -d. -f2) -lt 4 ]]; then
+    # disabling ggml-vulkan until we have vulkan-sdk >= 1.4
+    sed -i '/find_package(Vulkan)/d' $PRGNAM-$VERSION/CMakeLists.txt
+  fi
 
   # add "PARAMETER think" for Modelfile, PR14108
   patch -p1 -d $PRGNAM-$VERSION -i $CWD/14108.patch
