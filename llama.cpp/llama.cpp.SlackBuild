@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="llama.cpp"
-VERSION="b9102"
+VERSION="b9133"
 BUILD="${BUILD:-1}"
 DESCRIPTION="LLM inference in C/C++"
 HOMEPAGE="https://llama-cpp.com/"
 DOWNLOAD="https://github.com/ggml-org/llama.cpp/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="82d124ed5868975bb0875d229c97e0fb16f029f5412245a81219c97e4b5852a7"
+SHA256SUM="b03dc80efcb3c6999a71fc4c5ddb1054f6392a469c5ffcb374b9a525a01ce32e"
 OPTIONAL="cudatoolkit_13 OpenBLAS rocmtoolkit_7"
 
 unpack () {
