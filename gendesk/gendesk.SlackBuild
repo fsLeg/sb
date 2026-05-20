@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="gendesk"
-VERSION="1.0.10"
+VERSION="1.0.13"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Generate .desktop files by specifying minimum information"
 HOMEPAGE="https://gendesk.roboticoverlords.org/"
 DOWNLOAD="https://github.com/xyproto/${PRGNAM}/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.xz"
-SHA256SUM="315cc9c348aef85eedff39c774b03a8ac5341246ac3bb5036566ff7ae7d8dae8"
+SHA256SUM="e7f7b24da03f3f2b01aa554faa8f2bbc44c0dc76d9d0a6dd4b6786c0f149a0c9"
 BUILD_REQUIRES="google-go-lang"
 
 unpack () {
