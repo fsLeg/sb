@@ -23,7 +23,9 @@ unpack () {
     ROCM="ON"
   fi
 
-  if [[ $(pkg-config --modversion vulkan | cut -d. -f2) -lt 4 ]]; then
+  if [[ ! -v VULKAN && "$(pkg-config --modversion vulkan | cut -d. -f2)" -ge 4 ]]; then
+    VULKAN="ON"
+  else
     # disabling ggml-vulkan until we have vulkan-sdk >= 1.4
     sed -i '/find_package(Vulkan)/d' $PRGNAM-$VERSION/CMakeLists.txt
   fi
@@ -55,6 +57,7 @@ build () {
   DESTDIR=$PKG cmake --install build --component CPU
   [[ "${CUDA:-OFF}" = "ON" ]] && DESTDIR=$PKG cmake --install build --component CUDA
   [[ "${ROCM:-OFF}" = "ON" ]] && DESTDIR=$PKG cmake --install build --component HIP
+  [[ "${VULKAN:-OFF}" = "ON" ]] && DESTDIR=$PKG cmake --install build --component Vulkan
   install -Dm755 -t $PKG/$_PREFIX/lib${LIBDIRSUFFIX}/$PRGNAM/bin build/$PRGNAM
   install -d $PKG/$_PREFIX/bin
   ln -s ../lib${LIBDIRSUFFIX}/$PRGNAM/bin/$PRGNAM $PKG/$_PREFIX/bin/

@@ -10,7 +10,10 @@ during compilation of ollama libraries, if present.
 
 To skip installing CUDA accelerators, use CUDA=OFF.
 
-To skip installing HIP accelerators, ROCM=OFF.
+To skip installing HIP accelerators, use ROCM=OFF.
+
+If you have vulkan-sdk>=1.4, Vulkan accelerators will be built. To skip
+installing them, use VULKAN=OFF
 
 Optional dependencies:
 - cudatoolkit_13 - for CUDA accelerators
