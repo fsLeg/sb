@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="llama.cpp"
-VERSION="b9191"
+VERSION="b9294"
 BUILD="${BUILD:-1}"
 DESCRIPTION="LLM inference in C/C++"
 HOMEPAGE="https://llama-cpp.com/"
 DOWNLOAD="https://github.com/ggml-org/llama.cpp/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="4af3f78d599cf4b2a37ec1169d6c283465e794bfa9353819e85e08f1ad323710"
+SHA256SUM="9ea26e05f8c70e2db4bd85ca18c679881c45e484f2f6d40cf6e94dfe020ab960"
 OPTIONAL="cudatoolkit_13 OpenBLAS rocmtoolkit_7"
 
 unpack () {
@@ -52,7 +52,6 @@ build () {
   cmake --install build \
         --prefix $_PREFIX
   install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  mv $PKG/$_PREFIX/bin/convert_hf_to_gguf.py $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
   cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
     AGENTS.md AUTHORS CODEOWNERS CONTRIBUTING.md LICENSE README.md SECURITY.md docs/
 }
