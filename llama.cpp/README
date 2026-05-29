@@ -28,3 +28,5 @@ Optional dependencies (autodetected):
 - cudatoolkit_13 - for CUDA accelerators, use CUDA=no to disable
 - rocmtoolkit_7 - for HIP accelerators, use HIP=no to disable
 - OpenBLAS - for BLAS accelerators, use OPENBLAS=no to disable
+- nodejs - if it's present, WebUI will be built, otherwise it will be
+  downloaded; use WEBUI=no to disable completely

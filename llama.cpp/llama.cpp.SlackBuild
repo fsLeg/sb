@@ -1,13 +1,13 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="llama.cpp"
-VERSION="b9294"
+VERSION="b9412"
 BUILD="${BUILD:-1}"
 DESCRIPTION="LLM inference in C/C++"
 HOMEPAGE="https://llama-cpp.com/"
 DOWNLOAD="https://github.com/ggml-org/llama.cpp/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="9ea26e05f8c70e2db4bd85ca18c679881c45e484f2f6d40cf6e94dfe020ab960"
-OPTIONAL="cudatoolkit_13 OpenBLAS rocmtoolkit_7"
+SHA256SUM="97f34d7ebc0d4cbb3bc82777615852c0399c49b358b70cfcb6148e8071b86566"
+OPTIONAL="cudatoolkit_13 nodejs|nodejs22|nodejs24-bin OpenBLAS rocmtoolkit_7"
 
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
@@ -27,6 +27,10 @@ unpack () {
   if [[ ! -v VULKAN && $(pkg-config --modversion vulkan | cut -d. -f2) -ge 4 ]]; then
     VULKAN="yes"
   fi
+
+  if [[ ! -v WEBUI ]] && command -v node &> /dev/null; then
+    WEBUI="yes"
+  fi
 }
 
 build () {
@@ -38,6 +42,7 @@ build () {
         $([[ "$HIP" == "yes" ]] && echo "-DGGML_HIP=ON") \
         $([[ "$OPENBLAS" == "yes" ]] && echo "-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS") \
         $([[ "$VULKAN" == "yes" ]] && echo "-DGGML_VULKAN=ON") \
+        $([[ "$WEBUI" != "yes" ]] && echo "-DLLAMA_BUILD_UI=OFF -DLLAMA_USE_PREBUILT_UI=OFF") \
         -DLLAMA_BUILD_TESTS=OFF \
         -DGGML_BUILD_EXAMPLES=OFF \
         -DGGML_BUILD_TESTS=OFF \
