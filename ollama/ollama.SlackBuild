@@ -24,24 +24,21 @@ unpack () {
   patch -p1 -d $PRGNAM-$VERSION -i $CWD/14108.patch
 
   # https://build.opensuse.org/projects/openSUSE:Factory/packages/ollama/files/ollama.spec?expand=1
-  sed -i "s|\(\${CMAKE_BINARY_DIR}\)/lib/ollama|\1/lib$LIBDIRSUFFIX/ollama|g
-          s|\(\${CMAKE_INSTALL_PREFIX}\)/lib/ollama|\1/lib$LIBDIRSUFFIX/ollama|g" \
+  sed -i "s|\(\${CMAKE_BINARY_DIR}\)/lib/ollama|\1/lib$LIBDIRSUFFIX/ollama|
+          s|\(\${CMAKE_INSTALL_PREFIX}\)/lib/ollama|\1/lib$LIBDIRSUFFIX/ollama|" \
       $PRGNAM-$VERSION/CMakeLists.txt
 
   # https://data.gpo.zugaina.org/guru/sci-ml/ollama/ollama-0.21.2.ebuild
   # grep -Rl -e 'lib/ollama' -e '"..", "lib"'  --include '*.go'
-  sed -i "s|\"..\", \"lib\"|\"..\", \"lib$LIBDIRSUFFIX\"|g
-          s|\"lib/ollama\"|\"lib$LIBDIRSUFFIX/ollama\"|g" \
+  sed -i "s|\"..\", \"lib\"|\"..\", \"lib$LIBDIRSUFFIX\"|
+          s|\"lib/ollama\"|\"lib$LIBDIRSUFFIX/ollama\"|" \
       $PRGNAM-$VERSION/ml/backend/ggml/ggml/src/ggml.go \
       $PRGNAM-$VERSION/ml/path.go
 }
 
 build () {
   cmake -B build \
-        -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-        -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
         -DCMAKE_INSTALL_PREFIX="$_PREFIX" \
-        -DCMAKE_BUILD_TYPE="Release" \
         -DGGML_BACKEND_DL="yes" \
         -DGGML_BACKEND_DIR="$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM"
   cmake --build build
@@ -59,6 +56,8 @@ build () {
 
   DESTDIR=$PKG cmake --install build
   install -Dm755 -t $PKG/$_PREFIX/bin build/$PRGNAM
+  # remove copies of system libraries
+  find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM ! -name "libggml*" -mindepth 1 -exec rm {} +
   install -Dm755 $CWD/rc.$PRGNAM $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
   install -Dm644 $CWD/$PRGNAM.default $PKG/$SYSCONFDIR/default/$PRGNAM.new
   install -Dm644 $CWD/$PRGNAM.logrotate $PKG/$SYSCONFDIR/logrotate.d/$PRGNAM.new
