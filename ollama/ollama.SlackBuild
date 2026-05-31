@@ -15,17 +15,7 @@ unpack () {
   check_uid ollama 393
   tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
 
-  if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
-    CUDA="ON"
-  fi
-
-  if [[ ! -v ROCM ]] && command -v hipconfig &> /dev/null; then
-    ROCM="ON"
-  fi
-
-  if [[ ! -v VULKAN && "$(pkg-config --modversion vulkan | cut -d. -f2)" -ge 4 ]]; then
-    VULKAN="ON"
-  else
+  if ! pkg-config --atleast-version=1.4 vulkan; then
     # disabling ggml-vulkan until we have vulkan-sdk >= 1.4
     sed -i '/find_package(Vulkan)/d' $PRGNAM-$VERSION/CMakeLists.txt
   fi
@@ -39,7 +29,9 @@ build () {
         -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
         -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
         -DCMAKE_INSTALL_PREFIX="$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM" \
-        -DCMAKE_BUILD_TYPE="Release"
+        -DCMAKE_BUILD_TYPE="Release" \
+        -DGGML_BACKEND_DL="yes" \
+        -DGGML_BACKEND_DIR="$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/lib/$PRGNAM"
   cmake --build build
 
   go build -v \
@@ -51,13 +43,9 @@ build () {
                      -X=github.com/ollama/ollama/version.Version=$VERSION \
                      -X=github.com/ollama/ollama/server.mode=release \
                      -extldflags '${LDFLAGS}'" \
-           -o build \
-           .
+           -o build
 
-  DESTDIR=$PKG cmake --install build --component CPU
-  [[ "${CUDA:-OFF}" = "ON" ]] && DESTDIR=$PKG cmake --install build --component CUDA
-  [[ "${ROCM:-OFF}" = "ON" ]] && DESTDIR=$PKG cmake --install build --component HIP
-  [[ "${VULKAN:-OFF}" = "ON" ]] && DESTDIR=$PKG cmake --install build --component Vulkan
+  DESTDIR=$PKG cmake --install build
   install -Dm755 -t $PKG/$_PREFIX/lib${LIBDIRSUFFIX}/$PRGNAM/bin build/$PRGNAM
   install -d $PKG/$_PREFIX/bin
   ln -s ../lib${LIBDIRSUFFIX}/$PRGNAM/bin/$PRGNAM $PKG/$_PREFIX/bin/
