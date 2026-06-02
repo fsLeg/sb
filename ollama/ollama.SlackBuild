@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ollama"
-VERSION="0.24.0"
+VERSION="0.30.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Download and run large language models locally"
 HOMEPAGE="https://github.com/ollama/ollama"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="a97e4a545cb08ed0343f97dc964be49f707b8404f1c2e29ec1338ec96b556eb2"
+SHA256SUM="08ca87f68816fd6e3489dd2784216515f0c7cf5b6863f35fea855602c450550e"
 BUILD_REQUIRES="cmake-opt google-go-lang"
 OPTIONAL="cudatoolkit_13 rocmtoolkit_7"
 
@@ -15,49 +15,53 @@ unpack () {
   check_uid ollama 393
   tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
 
-  if ! pkg-config --atleast-version=1.4 vulkan; then
-    # disabling ggml-vulkan until we have vulkan-sdk >= 1.4
-    sed -i '/find_package(Vulkan)/d' $PRGNAM-$VERSION/CMakeLists.txt
+  if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
+    CUDA="ON"
   fi
+
+  if [[ ! -v ROCM ]] && command -v hipconfig &> /dev/null; then
+    ROCM="ON"
+  fi
+
+  if [[ ! -v VULKAN ]] && pkg-config --atleast-version=1.4 vulkan; then
+    VULKAN="ON"
+  fi
+
+  [[ "$CUDA"   == "ON" ]] && BACKENDS+="cuda_v13;"
+  [[ "$ROCM"   == "ON" ]] && BACKENDS+="rocm_v7_2;"
+  [[ "$VULKAN" == "ON" ]] && BACKENDS+="vulkan;"
+
+  # don't copy system libraries
+  # https://gitlab.archlinux.org/archlinux/packaging/packages/ollama/-/blob/main/PKGBUILD?ref_type=heads
+  sed -i 's/PRE_INCLUDE_REGEXES.*/PRE_INCLUDE_REGEXES = ""/g' $PRGNAM-$VERSION/llama/server/CMakeLists.txt
+
+  # fix hardcoded path
+  # https://data.gpo.zugaina.org/guru/sci-ml/ollama/ollama-0.21.2.ebuild
+  # grep -Rl -e 'lib/ollama' -e '"..", "lib"'  --include '*.go'
+  sed -i "s|\"..\", \"lib\"|\"..\", \"lib$LIBDIRSUFFIX\"|g
+          s|\"lib/ollama\"|\"lib$LIBDIRSUFFIX/ollama\"|g" \
+      $PRGNAM-$VERSION/llm/llama_binary.go \
+      $PRGNAM-$VERSION/ml/path.go
 
   # add "PARAMETER think" for Modelfile, PR14108
   patch -p1 -d $PRGNAM-$VERSION -i $CWD/14108.patch
-
-  # https://build.opensuse.org/projects/openSUSE:Factory/packages/ollama/files/ollama.spec?expand=1
-  sed -i "s|\(\${CMAKE_BINARY_DIR}\)/lib/ollama|\1/lib$LIBDIRSUFFIX/ollama|
-          s|\(\${CMAKE_INSTALL_PREFIX}\)/lib/ollama|\1/lib$LIBDIRSUFFIX/ollama|" \
-      $PRGNAM-$VERSION/CMakeLists.txt
-
-  # https://data.gpo.zugaina.org/guru/sci-ml/ollama/ollama-0.21.2.ebuild
-  # grep -Rl -e 'lib/ollama' -e '"..", "lib"'  --include '*.go'
-  sed -i "s|\"..\", \"lib\"|\"..\", \"lib$LIBDIRSUFFIX\"|
-          s|\"lib/ollama\"|\"lib$LIBDIRSUFFIX/ollama\"|" \
-      $PRGNAM-$VERSION/ml/backend/ggml/ggml/src/ggml.go \
-      $PRGNAM-$VERSION/ml/path.go
 }
 
 build () {
   cmake -B build \
-        -DCMAKE_INSTALL_PREFIX="$_PREFIX" \
-        -DGGML_BACKEND_DL="yes" \
-        -DGGML_BACKEND_DIR="$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM"
+        -DOLLAMA_LIB_DIR="lib$LIBDIRSUFFIX/$PRGNAM" \
+        $([[ -n "$BACKENDS" ]] && echo "-DOLLAMA_LLAMA_BACKENDS=${BACKENDS%;}")
   cmake --build build
 
-  go build -v \
-           -buildmode=pie \
-           -trimpath \
-           -mod=readonly \
-           -modcacherw \
-           -ldflags "-linkmode external \
-                     -X=github.com/ollama/ollama/version.Version=$VERSION \
-                     -X=github.com/ollama/ollama/server.mode=release \
-                     -extldflags '${LDFLAGS}'" \
-           -o build
-
-  DESTDIR=$PKG cmake --install build
-  install -Dm755 -t $PKG/$_PREFIX/bin build/$PRGNAM
-  # remove copies of system libraries
-  find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM ! -name "libggml*" -mindepth 1 -exec rm {} +
+  DESTDIR=$PKG \
+    cmake --install build \
+          --prefix "$_PREFIX"
+  for LIB in $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/libggml-cpu-*.so; do
+    if patchelf --print-rpath $LIB | grep -q $TMP; then
+      patchelf --set-rpath '$ORIGIN' $LIB
+    fi
+  done
+  install -Dm755 -t $PKG/$_PREFIX/bin $PRGNAM
   install -Dm755 $CWD/rc.$PRGNAM $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
   install -Dm644 $CWD/$PRGNAM.default $PKG/$SYSCONFDIR/default/$PRGNAM.new
   install -Dm644 $CWD/$PRGNAM.logrotate $PKG/$SYSCONFDIR/logrotate.d/$PRGNAM.new
