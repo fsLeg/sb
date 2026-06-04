@@ -13,7 +13,10 @@ To disable CUDA accelerators, use CUDA=OFF.
 To disable HIP accelerators, use ROCM=OFF.
 
 If you have vulkan-sdk>=1.4, Vulkan accelerators will be built. To
-disable them, use VULKAN=OFF
+disable them, use VULKAN=OFF.
+
+To use a different version of llama.cpp, use LLAMACPP=<version>, i.e.
+LLAMACPP=b9503.
 
 Optional dependencies:
 - cudatoolkit_13 - for CUDA accelerators

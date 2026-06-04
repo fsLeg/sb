@@ -31,6 +31,8 @@ unpack () {
   [[ "$ROCM"   == "ON" ]] && BACKENDS+="rocm_v7_2;"
   [[ "$VULKAN" == "ON" ]] && BACKENDS+="vulkan;"
 
+  [[ -v LLAMACPP ]] && echo "$LLAMACPP" > $PRGNAM-$VERSION/LLAMA_CPP_VERSION
+
   # don't copy system libraries
   # https://gitlab.archlinux.org/archlinux/packaging/packages/ollama/-/blob/main/PKGBUILD?ref_type=heads
   sed -i 's/PRE_INCLUDE_REGEXES.*/PRE_INCLUDE_REGEXES = ""/g' $PRGNAM-$VERSION/llama/server/CMakeLists.txt
