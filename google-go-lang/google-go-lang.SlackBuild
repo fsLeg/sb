@@ -76,13 +76,10 @@ build () {
     api/ bin/ lib/ misc/ pkg/ src/ test/ go.env
   find $PKG/$GOROOT_FINAL/src -type d -name "testdata" -exec rm -rf {} +
   find $PKG/$GOROOT_FINAL/src -type f -name "*_test.go" -exec rm -rf {} +
-  install -Dm755 $CWD/go.sh $PKG/$SYSCONFDIR/profile.d/go.sh.new
-  install -Dm755 $CWD/go.csh $PKG/$SYSCONFDIR/profile.d/go.csh.new
+  install -Dm755 -t $PKG/$SYSCONFDIR/profile.d $CWD/go.{,c}sh
   sed -i "s|@GOROOT_FINAL@|$GOROOT_FINAL|g" \
-      $PKG/$SYSCONFDIR/profile.d/go.{csh,sh}.new
+      $PKG/$SYSCONFDIR/profile.d/go.{,c}sh
 
   cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
     CONTRIBUTING.md LICENSE PATENTS README.md SECURITY.md VERSION doc/
-  sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g" \
-       $CWD/doinst.sh > $PKG/install/doinst.sh
 }
