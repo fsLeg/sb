@@ -134,6 +134,8 @@ export LDFLAGS="${LDFLAGS} -fuse-ld=$(for file in /usr/bin/ld.?old; do [[ -e "$f
 export npm_config_cache="${XDG_CONFIG_CACHE}/npm"
 export npm_config_nodedir="/usr"
 export COREPACK_HOME="${TMP}/.corepack"
+export TMPDIR="${TMP}/.tmp"
+export TMP_DIR="${TMPDIR}"
 
 ## Yarn
 export YARN_CACHE_FOLDER="${XDG_CONFIG_CACHE}/yarn"
