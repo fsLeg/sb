@@ -1,13 +1,13 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="llama.cpp"
-VERSION="b9412"
+VERSION="b9550"
 BUILD="${BUILD:-1}"
 DESCRIPTION="LLM inference in C/C++"
 HOMEPAGE="https://llama-cpp.com/"
 DOWNLOAD="https://github.com/ggml-org/llama.cpp/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="97f34d7ebc0d4cbb3bc82777615852c0399c49b358b70cfcb6148e8071b86566"
 OPTIONAL="cudatoolkit_13 nodejs|nodejs22|nodejs24-bin OpenBLAS rocmtoolkit_7"
+SHA256SUM="22f2f94bcaa310295dba5a4102cedb6568e0cc0c04ad5b10072baf76b61e7fe6"
 
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
@@ -24,7 +24,7 @@ unpack () {
     OPENBLAS="yes"
   fi
 
-  if [[ ! -v VULKAN && $(pkg-config --modversion vulkan | cut -d. -f2) -ge 4 ]]; then
+  if [[ ! -v VULKAN ]] && pkg-config --atleast-version=1.4 vulkan; then
     VULKAN="yes"
   fi
 
