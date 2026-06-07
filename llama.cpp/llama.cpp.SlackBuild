@@ -6,8 +6,8 @@ BUILD="${BUILD:-1}"
 DESCRIPTION="LLM inference in C/C++"
 HOMEPAGE="https://llama-cpp.com/"
 DOWNLOAD="https://github.com/ggml-org/llama.cpp/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-OPTIONAL="cudatoolkit_13 nodejs|nodejs22|nodejs24-bin OpenBLAS rocmtoolkit_7"
 SHA256SUM="22f2f94bcaa310295dba5a4102cedb6568e0cc0c04ad5b10072baf76b61e7fe6"
+OPTIONAL="cudatoolkit_13 nodejs|nodejs22|nodejs24-bin OpenBLAS openvino rocmtoolkit_7"
 
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
@@ -28,6 +28,10 @@ unpack () {
     VULKAN="yes"
   fi
 
+  if [[ ! -v OPENVINO ]] && pkg-config --exists openvino; then
+    OPENVINO="yes"
+  fi
+
   if [[ ! -v WEBUI ]] && command -v node &> /dev/null; then
     WEBUI="yes"
   fi
@@ -42,6 +46,7 @@ build () {
         $([[ "$HIP" == "yes" ]] && echo "-DGGML_HIP=ON") \
         $([[ "$OPENBLAS" == "yes" ]] && echo "-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS") \
         $([[ "$VULKAN" == "yes" ]] && echo "-DGGML_VULKAN=ON") \
+        $([[ "$OPENVINO" == "yes" ]] && echo "-DGGML_OPENVINO=ON") \
         $([[ "$WEBUI" != "yes" ]] && echo "-DLLAMA_BUILD_UI=OFF -DLLAMA_USE_PREBUILT_UI=OFF") \
         -DLLAMA_BUILD_TESTS=OFF \
         -DGGML_BUILD_EXAMPLES=OFF \
