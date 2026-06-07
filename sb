@@ -120,6 +120,11 @@ PYVER="$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
 export XDG_CONFIG_HOME="${TMP}/.config"
 export XDG_CONFIG_CACHE="${TMP}/.cache"
 
+# Temporary directory
+export TMPDIR="${TMP}/.tmp"
+export TMP_DIR="${TMPDIR}"
+mkdir -p "${TMPDIR}"
+
 # pkg-config
 export PKG_CONFIG_PATH="${_PREFIX}/lib${LIBDIRSUFFIX}/pkgconfig:${PKG_CONFIG_PATH}"
 export PKG_CONFIG_SYSTEM_INCLUDE_PATH="${PKG_CONFIG_SYSTEM_INCLUDE_PATH}:/usr/include:${_PREFIX}/include"
@@ -134,8 +139,6 @@ export LDFLAGS="${LDFLAGS} -fuse-ld=$(for file in /usr/bin/ld.?old; do [[ -e "$f
 export npm_config_cache="${XDG_CONFIG_CACHE}/npm"
 export npm_config_nodedir="/usr"
 export COREPACK_HOME="${TMP}/.corepack"
-export TMPDIR="${TMP}/.tmp"
-export TMP_DIR="${TMPDIR}"
 
 ## Yarn
 export YARN_CACHE_FOLDER="${XDG_CONFIG_CACHE}/yarn"
