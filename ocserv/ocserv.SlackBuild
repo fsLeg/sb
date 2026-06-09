@@ -7,8 +7,8 @@ DESCRIPTION="OpenConnect SSL VPN server"
 HOMEPAGE="https://ocserv.openconnect-vpn.net"
 DOWNLOAD="https://www.infradead.org/ocserv/download/${PRGNAM}-${VERSION}.tar.xz"
 SHA256SUM="42ced08958b9576ab134fcb7bdc7f8df5e13214fd147855f99021fedcf0eedbe"
-REQUIRES="libev"
-BUILD_REQUIRES="ipcalc-ng protobuf-c"
+REQUIRES="libev protobuf-c"
+BUILD_REQUIRES="ipcalc-ng"
 OPTIONAL="GeoIP libmaxmind llhttp oath-toolkit rubygem-ronn"
 
 unpack () {
