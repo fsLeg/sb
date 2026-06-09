@@ -2,12 +2,12 @@
 
 PRGNAM="element-desktop"
 WEBNAM="element-web"
-VERSION="1.12.20"
+VERSION="1.12.21"
 BUILD="${BUILD:-1}"
 DESCRIPTION="secure and independent communication via Matrix"
 HOMEPAGE="https://element.io/"
 DOWNLOAD="https://github.com/element-hq/$WEBNAM/archive/v$VERSION/$WEBNAM-$VERSION.tar.gz"
-SHA256SUM="1099c880840c7dcb1cf9719ee3c5f51fc9eee97b52613621fdd3d9a3419745e5"
+SHA256SUM="bbf87817f7f60ee034e58acba1f937954137f0fbc4527885ae38851f3757512c"
 REQUIRES="sqlcipher"
 BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin"
 CONFLICTS="element-desktop-bin"
@@ -17,8 +17,7 @@ unpack () {
   mv $WEBNAM-$VERSION $PRGNAM-$VERSION
 
   corepack install --global \
-    "$(node -p "require('./$PRGNAM-$VERSION/package.json').packageManager.split('+')[0]")" \
-    "$(node -p "require('./$PRGNAM-$VERSION/apps/desktop/package.json').packageManager.split('+')[0]")" \
+    $(node -p "p=require('./$PRGNAM-$VERSION/package.json').devEngines.packageManager;p.name+'@'+p.version.split('+')[0]") \
     "yarn@^1"
   mkdir -p $COREPACK_HOME/bin
   corepack enable --install-directory $COREPACK_HOME/bin
