@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="amnezia-client"
-VERSION="4.8.15.4"
+VERSION="4.8.18.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Amnezia VPN client for desktop"
 HOMEPAGE="https://amnezia.org"
 DOWNLOAD="https://github.com/amnezia-vpn/amnezia-client/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="02760cb859106999a345581509af51c192ebd26bb91b98b1b57a358384c37a3d"
+SHA256SUM="b96b82970896b1549d4493979c3f933ac8f52259107111d29bf25c467b389d29"
 
 unpack () {
   if [ ! "$SLACKVER" = "current" ]; then
