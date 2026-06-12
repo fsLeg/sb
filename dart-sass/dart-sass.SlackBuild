@@ -1,17 +1,17 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="dart-sass"
-VERSION="1.100.0"
+VERSION="1.101.0"
 EMBEDDED_PROTOCOL_VERSION="3.2.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Dart implementation of Sass"
 HOMEPAGE="https://sass-lang.com/dart-sass"
 DOWNLOAD="https://github.com/sass/dart-sass/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz \
           https://github.com/sass/sass/archive/embedded-protocol-${EMBEDDED_PROTOCOL_VERSION}/sass-embedded-protocol-${EMBEDDED_PROTOCOL_VERSION}.tar.gz"
-SHA256SUM="d4f1fa35b6911c4a3fcb9bb8723e4ed6724c2aea71813dfce49ce65aed20b57d
+SHA256SUM="2af48b186eb895f5e70a2fd29e001b0dcb98d51382dd95117ad1be68f600788f
            4e1f81684bc1666f03e52ddc790d0c2c22d99a5313fa2efe1dde4a5b5733c186"
-REQUIRES="dart-sdk"
-BUILD_REQUIRES="buf"
+BUILD_REQUIRES="buf dart-sdk"
+SKIP_STRIP="1"
 
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
@@ -24,21 +24,17 @@ build () {
   dart --disable-analytics
   dart pub get
   UPDATE_SASS_PROTOCOL=false \
-  dart run grinder protobuf
-  dart -Dversion=$VERSION \
+    dart run grinder protobuf
+  dart compile exe \
+       -Dversion=$VERSION \
        -Ddart-version=$(dart --version | cut -d' ' -f4) \
        -Dprotocol-version=$EMBEDDED_PROTOCOL_VERSION \
        -Dcompiler-version=$VERSION \
-       --snapshot=build/sass.snapshot-$ARCH \
+       -o sass \
        bin/sass.dart
 
-  install -d $PKG/$_PREFIX/bin $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
-  cat << EOF > $PKG/$_PREFIX/bin/sass
-#!/bin/bash
-exec $(which dart) /$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/sass.snapshot-$ARCH "\$@"
-EOF
-  chmod +x $PKG/$_PREFIX/bin/sass
-  install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM build/sass.snapshot-$ARCH
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION README.md AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE
+  install -Dm755 -t $PKG/$_PREFIX/bin sass
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    README.md AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE
 }
 
