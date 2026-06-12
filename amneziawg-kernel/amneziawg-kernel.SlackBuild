@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="amneziawg-kernel"
-VERSION="1.0.20260329-2"
+VERSION="1.0.20260611"
 BUILD="${BUILD:-2}"
 DESCRIPTION="AmneziaWG Linux kernel module"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="db833b4bd2a464a43248f4603186b3d0d58c781ba49989a5b515451dcd3d8833"
+SHA256SUM="e062ecc9f1d89eeafa9f56a29473372a1d796ee061eaa8c7b61eeb51c38b80d6"
 SRCNAM="amneziawg-linux-kernel-module"
 KERNEL="${KERNEL:-$(uname -r)}"
 KERNELSRCDIR="${KERNELSRCDIR:-/lib/modules/$KERNEL/build}"
