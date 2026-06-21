@@ -9,7 +9,6 @@ DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module/archive/v
 SHA256SUM="e062ecc9f1d89eeafa9f56a29473372a1d796ee061eaa8c7b61eeb51c38b80d6"
 SRCNAM="amneziawg-linux-kernel-module"
 KERNEL="${KERNEL:-$(uname -r)}"
-KERNELSRCDIR="${KERNELSRCDIR:-/lib/modules/$KERNEL/build}"
 PKGVER="${VERSION//-/.}_${KERNEL//-/_}"
 
 unpack () {
@@ -51,7 +50,6 @@ build () {
       $PKG/install/douninst.sh
   else
     KERNELRELEASE=$KERNEL \
-    DESTDIR=$PKG \
       make -C src
     install -Dm644 -t $PKG/lib/modules/$KERNEL/kernel/net src/amneziawg.ko
     install -Dm644 -t $PKG/install $CWD/doinst.sh
