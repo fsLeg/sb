@@ -22,10 +22,12 @@ unpack () {
 
   if [[ "${USE_DKMS@L}" == "yes" ]]; then
     # Set version in dkms.conf and Makefile
-    sed -i "s/^PACKAGE_VERSION=.*/PACKAGE_VERSION=\"$VERSION\"/" \
+    sed -i "s/^PACKAGE_NAME=.*/PACKAGE_NAME=\"$PRGNAM\"/
+            s/^PACKAGE_VERSION=.*/PACKAGE_VERSION=\"$VERSION\"/" \
       $PRGNAM-$VERSION/src/dkms.conf
     sed -i "s/^WIREGUARD_VERSION = .*/WIREGUARD_VERSION = $VERSION/" \
       $PRGNAM-$VERSION/src/Makefile
+    source $PRGNAM-$VERSION/src/dkms.conf
 
     # With DKMS the package is no longer tied to kernel version
     PKGVER=${VERSION//-/.}
@@ -42,7 +44,9 @@ build () {
       make -C src dkms-install
     install -Dm644 $CWD/dkms.doinst.sh $PKG/install/doinst.sh
     install -Dm644 $CWD/dkms.douninst.sh $PKG/install/douninst.sh
-    sed -i "s|@VERSION@|$VERSION|g" \
+    sed -i "s|@VERSION@|$VERSION|g
+            s|@BUILT_MODULE_NAME@|$BUILT_MODULE_NAME|g
+            s|@DEST_MODULE_LOCATION@|${DEST_MODULE_LOCATION#/}|g" \
       $PKG/install/doinst.sh \
       $PKG/install/douninst.sh
   else
