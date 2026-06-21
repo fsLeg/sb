@@ -2,7 +2,7 @@
 
 PRGNAM="amneziawg-kernel"
 VERSION="1.0.20260611"
-BUILD="${BUILD:-2}"
+BUILD="${BUILD:-1}"
 DESCRIPTION="AmneziaWG Linux kernel module"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
@@ -15,18 +15,46 @@ PKGVER="${VERSION//-/.}_${KERNEL//-/_}"
 unpack () {
   tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
   mv $SRCNAM-$VERSION $PRGNAM-$VERSION
-  ln -s $(readlink -f $KERNELSRCDIR) $PRGNAM-$VERSION/src/kernel
 
-  # fix building on 5.15.204
+  if [[ ! -v USE_DKMS ]] && command -v dkms &> /dev/null; then
+    USE_DKMS=yes
+  fi
+
+  if [[ "${USE_DKMS@L}" == "yes" ]]; then
+    # Set version in dkms.conf and Makefile
+    sed -i "s/^PACKAGE_VERSION=.*/PACKAGE_VERSION=\"$VERSION\"/" \
+      $PRGNAM-$VERSION/src/dkms.conf
+    sed -i "s/^WIREGUARD_VERSION = .*/WIREGUARD_VERSION = $VERSION/" \
+      $PRGNAM-$VERSION/src/Makefile
+
+    # With DKMS the package is no longer tied to kernel version
+    PKGVER=${VERSION//-/.}
+  fi
+
+  # fix building on 5.15.204+
   patch -p1 -d $PRGNAM-$VERSION -i $CWD/5.15.204.patch
 }
 
 build () {
-  KERNELRELEASE=$KERNEL \
-  make -C src
+  if [[ "${USE_DKMS@L}" == "yes" ]]; then
+    KERNELRELEASE=$KERNEL \
+    DESTDIR=$PKG \
+      make -C src dkms-install
+    install -Dm644 $CWD/dkms.doinst.sh $PKG/install/doinst.sh
+    install -Dm644 $CWD/dkms.douninst.sh $PKG/install/douninst.sh
+    sed -i "s|@VERSION@|$VERSION|g" \
+      $PKG/install/doinst.sh \
+      $PKG/install/douninst.sh
+  else
+    KERNELRELEASE=$KERNEL \
+    DESTDIR=$PKG \
+      make -C src
+    install -Dm644 -t $PKG/lib/modules/$KERNEL/kernel/net src/amneziawg.ko
+    install -Dm644 -t $PKG/install $CWD/doinst.sh
+    sed -i "s|@KERNEL@|$KERNEL|" $PKG/install/doinst.sh
+    cp -a $PKG/install/doinst.sh $PKG/install/douninst.sh
+  fi
 
-  install -Dm644 -t $PKG/lib/modules/$KERNEL/extra src/amneziawg.ko
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER COPYING README.md
-  install -Dm644 -t $PKG/install $CWD/doinst.sh
-  sed -i "s|@KERNEL@|$KERNEL|" $PKG/install/doinst.sh
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER \
+    COPYING README.md
 }
