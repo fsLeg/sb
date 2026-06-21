@@ -116,6 +116,10 @@ fi
 
 PYVER="$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
 
+if ! echo $PATH | grep -q sbin; then
+  export PATH="/usr/local/sbin:/usr/sbin:/sbin:${PATH}"
+fi
+
 # XDG directories
 export XDG_CONFIG_HOME="${TMP}/.config"
 export XDG_CONFIG_CACHE="${TMP}/.cache"
