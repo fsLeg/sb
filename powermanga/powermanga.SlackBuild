@@ -13,8 +13,9 @@ unpack () {
   tar xvf $CWD/$TARNAM-$VERSION.tar.gz
   mv $TARNAM-$VERSION $PRGNAM-$VERSION
 
-  # make scoredir respect prefix
-  sed -ri "s|^scoredir = (.*)\$|scoredir = $LOCALSTATEDIR/games/$PRGNAM|" \
+  # make scoredir respect prefix and fix hi-score permissions
+  sed -ri "s|^scoredir = (.*)\$|scoredir = $LOCALSTATEDIR/games/$PRGNAM|
+           s|chmod 644|chmod 664|" \
     $PRGNAM-$VERSION/src/Makefile.am
 }
 
@@ -22,13 +23,14 @@ build () {
   ./bootstrap
   ./configure --prefix=$_PREFIX \
               --localstatedir=$LOCALSTATEDIR \
-              --mandir=$_PREFIX/man
+              --mandir=$_PREFIX/man \
+              --build=$ARCH-slackware-linux
   make
 
   DESTDIR=$PKG make install
-  install -Dm644 powermanga.desktop \
-    $PKG/$_PREFIX/share/applications/fr.tlk.linux.Powermanga.desktop
-  install -Dm644 -t $PKG/$_PREFIX/share/pixmaps powermanga.xpm
+  install -Dm644 $PRGNAM.desktop \
+    $PKG/$_PREFIX/share/applications/fr.tlk.linux.$TARNAM.desktop
+  install -Dm644 -t $PKG/$_PREFIX/share/pixmaps $PRGNAM.xpm
 
   install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
