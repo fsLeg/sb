@@ -1,0 +1,36 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="powermanga"
+TARNAM="${PRGNAM@u}"
+VERSION="0.93.1"
+BUILD="${BUILD:-1}"
+DESCRIPTION="arcade 2D shoot-them-up game"
+HOMEPAGE="https://linux.tlk.fr/games/Powermanga/"
+DOWNLOAD="https://github.com/brunonymous/${TARNAM}/archive/${VERSION}/${TARNAM}-${VERSION}.tar.gz"
+SHA256SUM="010987a3cb27a1f9388a212f637977692284b5616952efa1efae09d2464e9249"
+
+unpack () {
+  tar xvf $CWD/$TARNAM-$VERSION.tar.gz
+  mv $TARNAM-$VERSION $PRGNAM-$VERSION
+
+  # make scoredir respect prefix
+  sed -ri "s|^scoredir = (.*)\$|scoredir = $LOCALSTATEDIR/games/$PRGNAM|" \
+    $PRGNAM-$VERSION/src/Makefile.am
+}
+
+build () {
+  ./bootstrap
+  ./configure --prefix=$_PREFIX \
+              --localstatedir=$LOCALSTATEDIR \
+              --mandir=$_PREFIX/man
+  make
+
+  DESTDIR=$PKG make install
+  install -Dm644 powermanga.desktop \
+    $PKG/$_PREFIX/share/applications/fr.tlk.linux.Powermanga.desktop
+  install -Dm644 -t $PKG/$_PREFIX/share/pixmaps powermanga.xpm
+
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    AUTHORS CHANGES COPYING README html/
+}
