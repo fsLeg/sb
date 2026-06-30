@@ -61,6 +61,10 @@ build () {
   DESTDIR=$PKG \
   cmake --install build \
         --prefix $_PREFIX
+
+  # workaround for not picking up own libraries
+  patchelf --set-rpath "\$ORIGIN/../lib$LIBDIRSUFFIX" $PKG/$_PREFIX/bin/*
+
   install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
     AGENTS.md AUTHORS CODEOWNERS CONTRIBUTING.md LICENSE README.md SECURITY.md docs/
