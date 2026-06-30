@@ -63,6 +63,11 @@ build () {
       patchelf --set-rpath '$ORIGIN' $LIB
     fi
   done
+
+  # workaround for nested libraries
+  find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM -type f -mindepth 2 -exec mv {} $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/ \;
+  find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM -type d -mindepth 1 -exec rmdir {} \+
+
   install -Dm755 -t $PKG/$_PREFIX/bin $PRGNAM
   install -Dm755 $CWD/rc.$PRGNAM $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
   install -Dm644 $CWD/$PRGNAM.default $PKG/$SYSCONFDIR/default/$PRGNAM.new
