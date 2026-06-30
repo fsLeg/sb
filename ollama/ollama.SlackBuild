@@ -52,20 +52,22 @@ unpack () {
 build () {
   cmake -B build \
         -DOLLAMA_LIB_DIR="lib$LIBDIRSUFFIX/$PRGNAM" \
+        -DOLLAMA_VERSION="$VERSION" \
         $([[ -n "$BACKENDS" ]] && echo "-DOLLAMA_LLAMA_BACKENDS=${BACKENDS%;}")
   cmake --build build
 
   DESTDIR=$PKG \
     cmake --install build \
           --prefix "$_PREFIX"
-  for LIB in $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/libggml-cpu-*.so; do
+
+  # workarounds for not finding libraries
+  for LIB in $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/{libggml-cpu-*.so,llama-*}; do
     if patchelf --print-rpath $LIB | grep -q $TMP; then
       patchelf --set-rpath '$ORIGIN' $LIB
     fi
   done
-
-  # workaround for nested libraries
-  find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM -type f -mindepth 2 -exec mv {} $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/ \;
+  find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM -type f -mindepth 2 \
+    -exec mv {} $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/ \;
   find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM -type d -mindepth 1 -exec rmdir {} \+
 
   install -Dm755 -t $PKG/$_PREFIX/bin $PRGNAM
