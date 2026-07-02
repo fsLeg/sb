@@ -27,6 +27,20 @@ unpack () {
     VULKAN="ON"
   fi
 
+  # At the moment MLX only supports MacOS despite being available for
+  # other platforms. It's to the point that it's hardcoded to not work
+  # on a non-MacOS.
+  # https://github.com/ollama/ollama/issues/16265#issuecomment-4520099249
+  # https://github.com/ollama/ollama/issues/16056#issuecomment-4412131363
+  MLX="OFF"
+  if [[ ! -v MLX ]] && pkg-config --exists openblas \
+                    && pkg-config --exists cudnn \
+                    && pkg-config --exists nccl; then
+    MLX="ON"
+    export CUDNN_INCLUDE_PATH="/usr/include/cudnn"
+    export CUDNN_LIBRARY_PATH="/usr/lib64/cudnn"
+  fi
+
   [[ "$CUDA"   == "ON" ]] && BACKENDS+="cuda_v13;"
   [[ "$ROCM"   == "ON" ]] && BACKENDS+="rocm_v7_2;"
   [[ "$VULKAN" == "ON" ]] && BACKENDS+="vulkan;"
@@ -35,7 +49,9 @@ unpack () {
 
   # don't copy system libraries
   # https://gitlab.archlinux.org/archlinux/packaging/packages/ollama/-/blob/main/PKGBUILD?ref_type=heads
-  sed -i 's/PRE_INCLUDE_REGEXES.*/PRE_INCLUDE_REGEXES = ""/g' $PRGNAM-$VERSION/llama/server/CMakeLists.txt
+  sed -i 's/PRE_INCLUDE_REGEXES.*/PRE_INCLUDE_REGEXES = ""/g' \
+    $PRGNAM-$VERSION/llama/server/CMakeLists.txt \
+    $PRGNAM-$VERSION/cmake/mlx/CMakeLists.txt
 
   # fix hardcoded path
   # https://data.gpo.zugaina.org/guru/sci-ml/ollama/ollama-0.21.2.ebuild
@@ -44,6 +60,8 @@ unpack () {
           s|\"lib/ollama\"|\"lib$LIBDIRSUFFIX/ollama\"|g" \
       $PRGNAM-$VERSION/llm/llama_binary.go \
       $PRGNAM-$VERSION/ml/path.go
+  sed -i '/"CUDA_PATH"/d; /"CUDA_HOME"/d' \
+      $PRGNAM-$VERSION/x/mlxrunner/client.go
 
   # add "PARAMETER think" for Modelfile, PR14108
   patch -p1 -d $PRGNAM-$VERSION -i $CWD/14108.patch
@@ -53,23 +71,38 @@ build () {
   cmake -B build \
         -DOLLAMA_LIB_DIR="lib$LIBDIRSUFFIX/$PRGNAM" \
         -DOLLAMA_VERSION="$VERSION" \
-        $([[ -n "$BACKENDS" ]] && echo "-DOLLAMA_LLAMA_BACKENDS=${BACKENDS%;}")
+        $([[ -n "$BACKENDS" ]] && echo "-DOLLAMA_LLAMA_BACKENDS=${BACKENDS%;}") \
+        $([[ "$MLX" == "ON" ]] && echo "-DOLLAMA_MLX_BACKENDS=cuda_v13" )
   cmake --build build
 
   DESTDIR=$PKG \
     cmake --install build \
           --prefix "$_PREFIX"
 
+  ODIR="$PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM"
   # workarounds for not finding libraries
-  for LIB in $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/{libggml-cpu-*.so,llama-*}; do
+  for LIB in $ODIR/{libggml-cpu-*.so,llama-*}; do
     if patchelf --print-rpath $LIB | grep -q $TMP; then
       patchelf --set-rpath '$ORIGIN' $LIB
     fi
   done
-  find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM -type f -mindepth 2 \
-    -exec mv {} $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/ \;
-  find $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM -type d -mindepth 1 -exec rmdir {} \+
+  for BACKEND in cuda_v13 rocm_v7_2 vulkan; do
+    if [[ -d "$ODIR/$BACKEND" ]]; then
+      mv $ODIR/$BACKEND/*.so $ODIR/
+      rmdir $ODIR/$BACKEND
+    fi
+  done
 
+  # Don't bundle libraries and headers for MLX engine
+  if [[ "$MLX" == "ON" ]]; then
+    rm -f $ODIR/mlx_cuda_v13/lib{cudart,cublas,cublasLt,nvrtc,nvrtc-builtins,cufft,cudnn}.so*
+    rm -rf $ODIR/mlx_cuda_v13/include/cccl
+    find $ODIR/mlx_cuda_v13/include -mindepth 1 -maxdepth 1 ! -name "libmlx*" -type f \
+      -exec rm -f {} \+
+    find $PKG/$_PREFIX/lib$LIBDIRSUFFIX -mindepth 1 -maxdepth 1 ! -name ollama \
+      -exec rm -rf {} \+
+  fi
+  
   install -Dm755 -t $PKG/$_PREFIX/bin $PRGNAM
   install -Dm755 $CWD/rc.$PRGNAM $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
   install -Dm644 $CWD/$PRGNAM.default $PKG/$SYSCONFDIR/default/$PRGNAM.new
