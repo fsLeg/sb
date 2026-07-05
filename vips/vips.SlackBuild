@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="vips"
-VERSION="8.18.3"
+VERSION="8.18.4"
 BUILD="${BUILD:-1}"
 DESCRIPTION="fast image processing library with low memory needs"
 HOMEPAGE="https://www.libvips.org/"
 DOWNLOAD="https://github.com/libvips/libvips/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.xz"
-SHA256SUM="f41285b61bfb495605494f074ca341f7791a1d406e2f157dcea606ef1ae1b146"
+SHA256SUM="2677bad6c422617fd1172d359c16af34e736965d042c214203a87187d26ff037"
 OPTIONAL="libspng highway matio libjxl libheif gi-docgen"
 
 unpack () {
