@@ -1,24 +1,24 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="google-go-lang"
-VERSION="1.26.4"
+VERSION="1.26.5"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Core compiler tools for the Go programming language"
 HOMEPAGE="https://go.dev"
 DOWNLOAD="https://go.dev/dl/go${VERSION}.src.tar.gz
-          https://go.dev/dl/go1.25.11.src.tar.gz
+          https://go.dev/dl/go1.25.12.src.tar.gz
           https://go.dev/dl/go1.23.12.src.tar.gz
           https://go.dev/dl/go1.21.13.src.tar.gz
           https://go.dev/dl/go1.19.13.src.tar.gz"
-SHA256SUM="4f668a32fbfc1132e6a881fb968c2f1dada631492a339211735fbb255a42602d
-           7b4e5b079b3c9bc420373ca68621a296b4d13c10735d4acac4171928d70f5480
+SHA256SUM="495be4bc87176ac567392e5b4116abd98466d33d7b49d41e764ccc6976b2dc42
+           f90dcee4bd023fa376374ea0a5a6ebe553537b39c426ffd8c689469b45519932
            e1cce9379a24e895714a412c7ddd157d2614d9edbe83a84449b6e1840b4f1226
            71fb31606a1de48d129d591e8717a63e0c5565ffba09a24ea9f899a13214c34d
            ccf36b53fb0024a017353c3ddb22c1f00bc7a8073c6aac79042da24ee34434d3"
 GO_BOOTSTRAP=("1.19.13"
               "1.21.13"
               "1.23.12"
-              "1.25.11")
+              "1.25.12")
 
 unpack () {
   tar xvf $CWD/go$VERSION.src.tar.gz
