@@ -1,0 +1,35 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="pyside6"
+TARNAM="${PRGNAM%6}-setup"
+VERSION="6.8.3"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Python bindings for Qt6"
+HOMEPAGE="https://wiki.qt.io/Qt_for_Python"
+DOWNLOAD="https://github.com/PySide/pyside-setup/archive/${VERSION}/${TARNAM}-${VERSION}.tar.gz"
+SHA256SUM="055b467903327e947b60ddefd2e9e66f6b7558b92a0728c4596e0dc8ce5dd695"
+REQUIRES="mypy python3-numpy qt6"
+BUILD_REQUIRES="python3-build python3-packaging-opt python3-setuptools-opt python3-wheel"
+
+unpack () {
+  tar xfv $CWD/$TARNAM-$VERSION.tar.gz
+  mv $TARNAM-$VERSION $PRGNAM-$VERSION
+
+  if [ "${LLVM_OPT:-ON}" = "ON" ]; then
+    export PATH="/opt/llvm-opt/bin:$PATH"
+    if [ -z "$LD_LIBRARY_PATH" ]; then
+      export LD_LIBRARY_PATH="/opt/llvm-opt/lib$LIBDIRSUFFIX"
+    else
+      export LD_LIBRARY_PATH="/opt/llvm-opt/lib$LIBDIRSUFFIX:$LD_LIBRARY_PATH"
+    fi
+  fi
+  export PYTHONPATH="/opt/python$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')/site-packages"
+}
+
+build () {
+  python3 setup.py install --root=$PKG
+
+  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    README.* LICENSES/ doc/changelogs/
+}

@@ -1,0 +1,9 @@
+Qt for Python provides the official set of Python bindings and a binding
+generator for bringing the benefits of cross-platform development to
+your Python project.
+
+This script builds PySide6, shiboken6, shiboken6-generator and
+pyside-tools.
+
+For compatibility reasons you should use the same LLVM version you used
+to build qt6. If you didn't use llvm-opt, set LLVM_OPT=OFF.
