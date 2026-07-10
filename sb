@@ -328,60 +328,6 @@ build
 # Failsafe in case directory was changed during the build process
 cd "${TMP}/${PRGNAM}-${VERSION}"
 
-if [[ ! "${_PREFIX}" == "/usr" ]]; then
-  # Move stray directories to $_PREFIX
-  # $PKG/$_PREFIX should exist at this point
-  for DIR in $(echo "${PKG}"/usr/*); do
-    case "$(echo "${DIR}" | rev | cut -d'/' -f1 | rev)" in
-          "bin") mv "${PKG}/usr/bin"     "${PKG}${_PREFIX}";;
-          "doc") mv "${PKG}/usr/doc"     "${PKG}${_PREFIX}";;
-      "include") mv "${PKG}/usr/include" "${PKG}${_PREFIX}";;
-          "man") mv "${PKG}/usr/man"     "${PKG}${_PREFIX}";;
-         "sbin") mv "${PKG}/usr/sbin"    "${PKG}${_PREFIX}";;
-        "share") mv "${PKG}/usr/share"   "${PKG}${_PREFIX}";;
-    esac
-  done
-
-  # Move Python stuff
-  if [[ -d "${PKG}/usr/lib/python${PYVER}" || -d "${PKG}/usr/lib${LIBDIRSUFFIX}/python${PYVER}" ]]; then
-    PYPATH="$(echo "${PKG}"/usr/lib*/python"${PYVER}"/site-packages)"
-    PY_PREFIX="${PKG}${_PREFIX}/lib${LIBDIRSUFFIX}/python${PYVER}/site-packages"
-    for PYPACK in $(find "${PYPATH}" -type d -mindepth 1 -maxdepth 1); do
-      PYPACK_DIR="$(basename "${PYPACK}")"
-      install -d "${PY_PREFIX}"
-      mv "${PYPACK}" "${PY_PREFIX}"
-      install -d "$(dirname "${PYPACK}")"
-      ln -sf "${_PREFIX}/lib$LIBDIRSUFFIX/python$PYVER/site-packages/${PYPACK_DIR}" "${PYPATH}"
-    done
-  fi
-
-  # Move Qt stuff
-  QTVER="$(echo "${PKG}/usr/lib${LIBDIRSUFFIX}"/qt? | rev | cut -c1)"
-  QTPATH="${PKG}/usr/lib${LIBDIRSUFFIX}/qt${QTVER}/qml"
-  if [[ -d "${QTPATH}" ]]; then
-    QT_PREFIX="${PKG}${_PREFIX}/lib${LIBDIRSUFFIX}/qt${QTVER}/qml"
-    for QTMOD in $(find "${QTPATH}" -type f -name qmldir); do
-      QTMOD="$(dirname "${QTMOD}")"
-      QTMOD_DIR="${QTMOD#${QTPATH}/}"
-      QTMOD_BASE_DIR="$(dirname "${QTMOD_DIR}")"
-      install -d "${QT_PREFIX}/${QTMOD_BASE_DIR}"
-      mv "${QTPATH}/${QTMOD_DIR}" "${QT_PREFIX}/${QTMOD_BASE_DIR}"
-      install -d "${QTPATH}/${QTMOD_BASE_DIR}"
-      ln -sf "${_PREFIX}/lib${LIBDIRSUFFIX}/qt${QTVER}/qml/${QTMOD_DIR}" "${QTPATH}/${QTMOD_BASE_DIR}"
-    done
-  fi
-
-  # Link udev rules as their path is hardcoded into (e)udev
-  if [[ -d "${PKG}${SYSCONFDIR}/udev/rules.d" ]]; then
-    RULESDIR="${PKG}/etc/udev/rules.d"
-    RULES_PREFIX="${PKG}${SYSCONFDIR}/udev/rules.d"
-    install -d "${RULESDIR}"
-    for RULE in "${RULES_PREFIX}"/*.rules; do
-      ln -sf "${RULE#${PKG}}" "${RULESDIR}"
-    done
-  fi
-fi
-
 # Don't ship .la files:
 rm -f "${PKG}"/{,$_PREFIX/}lib"${LIBDIRSUFFIX}"/*.la
 

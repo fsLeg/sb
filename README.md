@@ -113,4 +113,4 @@ Why did I write `sb` in the first place? Reasons in no particular order:
 # Caveats
 
 - Admittedly, using a master script is more restrictive than a regular SlackBuild. While in a SlackBuild you can change every step as you see fit, in `sb` I have to handle every edge case by increasing the code's complexity and decreasing its maintainability. SlackBuilds themselves do look nicer, though.
-- Slackware wasn't designed with package separation in mind, so it's not possible to put every package into /usr/local prefix, things like plugins, extensions and perl/python/ruby libraries require you to put them into their direct dependency's prefix. So symlinks must be used in such cases as a crutch. The only exception is kernel modules.
+- Slackware wasn't designed with package separation in mind, so it's not possible to put every package into /usr/local prefix, things like plugins, extensions and perl/python/ruby libraries require you to put them into their direct dependency's prefix. Try to keep things inside /usr/local (or whatever _PREFIX other than /usr you chose) unless absolutely necessary to have them in the system's default prefix.
