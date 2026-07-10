@@ -1,0 +1,7 @@
+libccid provides a PC/SC IFD handler implementation for the USB
+smart card drivers compliant to the Chip Card Interface Device (CCID)
+protocol.
+
+This package is needed to communicate with the CCID smartcard readers
+through the PC/SC Lite resource manager (pcscd). It also supports
+various Gemplus serial smart card readers.

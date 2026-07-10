@@ -1,0 +1,34 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="ccid"
+VERSION="1.8.2"
+BUILD="${BUILD:-1}"
+DESCRIPTION="PC/SC driver for USB CCID smart card readers"
+HOMEPAGE="https://ccid.apdu.fr/"
+DOWNLOAD="https://ccid.apdu.fr/files/${PRGNAM}-${VERSION}.tar.xz"
+SHA256SUM="d74294e23d436546c3e719c95a4da180b17f5e7ffdd36efca53f75351cb0de75"
+REQUIRES="pcsc-lite"
+
+unpack () {
+  tar xfv $CWD/$PRGNAM-$VERSION.tar.xz
+}
+
+build () {
+  meson setup --prefix=$_PREFIX \
+              --libdir=$_PREFIX/lib$LIBDIRSUFFIX \
+              --sysconfdir=$SYSCONFDIR \
+              -Dclass=true \
+              -Dserial=true \
+              -Dcomposite-as-multislot=true \
+              -Dzlp=true \
+              -Denable-extras=true \
+              -Dstrip=true \
+        build
+
+  meson compile -C build
+  meson install -C build --destdir=$PKG
+
+  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a AUTHORS COPYING README.md SCARD*.md \
+    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+}
