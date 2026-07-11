@@ -9,7 +9,7 @@ HOMEPAGE="https://wiki.qt.io/Qt_for_Python"
 DOWNLOAD="https://github.com/PySide/pyside-setup/archive/${VERSION}/${TARNAM}-${VERSION}.tar.gz"
 SHA256SUM="055b467903327e947b60ddefd2e9e66f6b7558b92a0728c4596e0dc8ce5dd695"
 REQUIRES="mypy python3-numpy qt6"
-BUILD_REQUIRES="python3-build python3-packaging-opt python3-setuptools-opt python3-wheel"
+BUILD_REQUIRES="llvm-opt python3-build python3-packaging-opt python3-setuptools-opt python3-wheel"
 
 unpack () {
   tar xfv $CWD/$TARNAM-$VERSION.tar.gz
@@ -24,6 +24,10 @@ unpack () {
     fi
   fi
   export PYTHONPATH="/opt/python$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')/site-packages"
+
+  # fix missing tool wrappers
+  sed -i 's|else qt_tools_path / "libexec"|else qt_tools_path / "bin"|' \
+      $PRGNAM-$VERSION/build_scripts/utils.py
 }
 
 build () {
