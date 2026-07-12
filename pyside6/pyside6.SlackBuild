@@ -28,6 +28,10 @@ unpack () {
   # fix missing tool wrappers
   sed -i 's|else qt_tools_path / "libexec"|else qt_tools_path / "bin"|' \
       $PRGNAM-$VERSION/build_scripts/utils.py
+
+  # fix unescaped quotes
+  sed -i "s|print(f\"{context\[\"message\"\]} from task {context\[\"task\"\]\._name},\"+|print(f'{context[\"message\"]} from task {context[\"task\"]._name},'+|" \
+      $PRGNAM-$VERSION/sources/pyside6/PySide6/QtAsyncio/events.py
 }
 
 build () {
