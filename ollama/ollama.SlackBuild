@@ -72,6 +72,7 @@ build () {
         -DOLLAMA_LIB_DIR="lib$LIBDIRSUFFIX/$PRGNAM" \
         -DOLLAMA_VERSION="$VERSION" \
         $([[ -n "$BACKENDS" ]] && echo "-DOLLAMA_LLAMA_BACKENDS=${BACKENDS%;}") \
+        $([[ "$CUDA" == "ON" ]] && echo "-DCMAKE_CUDA_ARCHITECTURES=native") \
         $([[ "$MLX" == "ON" ]] && echo "-DOLLAMA_MLX_BACKENDS=cuda_v13" )
   cmake --build build
 
