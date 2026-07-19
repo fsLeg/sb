@@ -1,0 +1,50 @@
+# Maintainer: Bob Dobbs <bob@dobbs.com>
+
+PRGNAM="ffdec"
+TARNAM="jpexs-decompiler"
+VERSION="26.2.1"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Open Source Flash SWF decompiler and editor"
+HOMEPAGE="https://github.com/jindrapetrik/jpexs-decompiler"
+DOWNLOAD="https://github.com/jindrapetrik/jpexs-decompiler/archive/version${VERSION}/${TARNAM}-version${VERSION}.tar.gz"
+SHA256SUM="bc74ba4610df1da263f012011e1f45e3a8189427ee087f69d95f40c105a07d98"
+REQUIRES="jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
+BUILD_REQUIRES="apache-ant"
+
+unpack () {
+  tar xfv $CWD/$TARNAM-version$VERSION.tar.gz
+  mv $TARNAM-version$VERSION $PRGNAM-$VERSION
+
+  # embed version info
+  # https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=ffdec
+  sed -ri 's|(name="version.major" value=")0(")|\1'"$(echo $VERSION | cut -d. -f1)"'\2|g
+           s|(name="version.minor" value=")0(")|\1'"$(echo $VERSION | cut -d. -f2)"'\2|g
+           s|(name="version.release" value=")0(")|\1'"$(echo $VERSION | cut -d. -f3)"'\2|g
+           s|(name="version.debug" value=")true(")|\1false\2|g' \
+      $PRGNAM-$VERSION/build.xml
+
+  # sidestep git requirement
+  mkdir -p $TMP/.bin
+  ln -sf "$(which true)" $TMP/.bin/git
+  export PATH=$TMP/.bin:$PATH
+}
+
+build () {
+  ant build
+
+  install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM dist/$PRGNAM.jar
+  install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/lib lib/*.jar
+  install -Dm755 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM dist/$PRGNAM.sh
+  install -Dm644 $CWD/$PRGNAM.desktop $PKG/$_PREFIX/share/applications/com.jpexs.decompiler.flash.desktop
+  sed -i "s|@PREFIX@|$_PREFIX|" $PKG/$_PREFIX/share/applications/com.jpexs.decompiler.flash.desktop
+  install -Dm644 -t $PKG/$_PREFIX/share/metainfo resources/com.jpexs.decompiler.flash.metainfo.xml
+  install -Dm755 -t $PKG/$_PREFIX/bin resources/$PRGNAM
+  sed -i "s|SCRIPT_DIR=.*|SCRIPT_DIR=$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM|" \
+    $PKG/$_PREFIX/bin/$PRGNAM
+  for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256 512x512; do
+    install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
+    magick resources/icon.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
+  done
+
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION resources/license.txt *.md
+}

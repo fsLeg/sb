@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+     |-----handy-ruler------------------------------------------------------|
+ffdec: ffdec (Open Source Flash SWF decompiler and editor)
+ffdec:
+ffdec: JPEXS Free Flash Decompiler (FFDec) is opensource flash SWF
+ffdec: decompiler and editor. Extract resources, convert SWF to FLA, edit
+ffdec: ActionScript, replace images, sounds, texts or fonts. Various output
+ffdec: formats available.
+ffdec:
+ffdec: Homepage: https://github.com/jindrapetrik/jpexs-decompiler
+ffdec:
+ffdec:
+ffdec:
