@@ -1,0 +1,28 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="kakoune"
+VERSION="2026.05.21"
+BUILD="${BUILD:-1}"
+DESCRIPTION="modal text editor"
+HOMEPAGE="https://kakoune.org"
+DOWNLOAD="https://github.com/mawww/kakoune/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.bz2"
+SHA256SUM="be1deb3fe9808a0733ab1057309da380bb757307e8fdbb22dc478b674b6bad34"
+
+unpack () {
+  tar xfv $CWD/$PRGNAM-$VERSION.tar.bz2
+
+  # fix paths
+  sed -i "/^docdir/s|/share.*|/doc/$PRGNAM-$VERSION|
+          /^mandir/s|/share||" \
+      $PRGNAM-$VERSION/Makefile
+}
+
+build () {
+  make
+  make DESTDIR=$PKG \
+       PREFIX=$_PREFIX \
+       install-strip
+
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+    CHANGELOG CONTRIBUTING UNLICENSE VIMTOKAK
+}
