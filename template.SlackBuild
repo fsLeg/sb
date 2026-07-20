@@ -17,14 +17,14 @@ CONFLICTS="" # optional. list any packages this package would conflict with
 
 unpack () {
   # This function should prepare the source tree in the directory that
-  # must be named $PRGNAM-$VERSION, i. e. appname-1.2.3. Usually this
+  # must be named $PRGNAM-$VERSION, i. e. $PRGNAM-$VERSION. Usually this
   # does the trick:
   #
-  # tar xfv $CWD/appname-1.2.3.tar.gz
+  # tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
   #
   # Or, for git repos:
   #
-  # git clone $CWD/appname.git appname-1.2.3
+  # git clone $CWD/$PRGNAM.git $PRGNAM-$VERSION
   #
   # If there are any patches to apply or additional files to place or
   # move around before building, do that here. At this step you're in
