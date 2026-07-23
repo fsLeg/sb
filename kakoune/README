@@ -1,4 +1,4 @@
-Kakoune is a code editor that implements Vi’s "keystrokes as a text
+Kakoune is a code editor that implements Vi's "keystrokes as a text
 editing language" model. As it is also a modal editor, it is somewhat
 similar to the Vim editor (after which Kakoune was originally inspired).
 

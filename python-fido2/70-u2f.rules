@@ -177,7 +177,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="24dc", ATTRS{idProduct
 # JaCarta U2F by Aladdin Software Security R.D.
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="24dc", ATTRS{idProduct}=="0501", TAG+="uaccess", GROUP="plugdev", MODE="0660"
 
-# Happlink Security Key by Plug‐up
+# Happlink Security Key by Plug-up
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2581", ATTRS{idProduct}=="f1d0", TAG+="uaccess", GROUP="plugdev", MODE="0660"
 
 # Bluink Key by Bluink Ltd
