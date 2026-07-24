@@ -54,7 +54,7 @@ CHECKSUMS="$(echo "${CHECKSUMS% }" | tr ' ' '\n' | awk '{if(NR>1) printf "\n%11s
 perl -0777 -pi -e 's|SHA256SUM="[-0-9a-f\s\\]*"|SHA256SUM="'"$CHECKSUMS"'"|' "$PRGNAM.SlackBuild"
 
 if [[ -z "$NOBUILD" ]]; then
-  time fakeroot "$CWD/sb" "$PRGNAM.SlackBuild"
+  time nice -n 19 fakeroot "$CWD/sb" "$PRGNAM.SlackBuild"
 fi
 
 cd "$CWD"
