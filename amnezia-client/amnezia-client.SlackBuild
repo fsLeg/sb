@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="amnezia-client"
-VERSION="4.8.19.0"
+VERSION="5.0.0.5"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Amnezia VPN client for desktop"
 HOMEPAGE="https://amnezia.org"
 DOWNLOAD="https://github.com/amnezia-vpn/amnezia-client/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="651ff5183dca618c0c242031ae3f6f9b60bf35dbdbed53dbbb695fc29b1fd25f"
+SHA256SUM="507e44cdbe4f1fc71b14fbebf73d53d898c02853c23deb8bbd358310f5706a5a"
 
 unpack () {
   if [ ! "$SLACKVER" = "current" ]; then
@@ -22,63 +22,48 @@ unpack () {
           $PRGNAM-$VERSION/.gitmodules
   get_submodules $PRGNAM-$VERSION
 
-  # apply patches from ALT Linux
-  # https://packages.altlinux.org/en/sisyphus/srpms/amnezia-vpn/specfiles/
-  patch -p1 -d $PRGNAM-$VERSION < $CWD/amnezia-vpn-tun2-sudo.patch
-  # Fix utilites exec path
-  sed -e 's|return Utils::executable("../../client/bin/openvpn", true);|return Utils::usrExecutable("'$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM'/openvpn");|' \
-      -e 's|return Utils::executable("../../client/bin/tun2socks", true);|return Utils::usrExecutable("'$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM'/tun2socks");|' \
-      -i $PRGNAM-$VERSION/client/utilities.cpp
-  # Fix WireGuard GO exec path
-  sed -e 's|m_tunnel.start(appPath.filePath("../../client/bin/wireguard-go"), wgArgs);|m_tunnel.start("'$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM'/wireguard-go", wgArgs);|' \
-      -i $PRGNAM-$VERSION/client/platforms/linux/daemon/wireguardutilslinux.cpp
-  # Fix update resolv conf path
-  sed -e 's|.arg(qApp->applicationDirPath());|.arg("'$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM'");|' \
-      -i $PRGNAM-$VERSION/client/configurators/openvpn_configurator.cpp
-  # Use system libs instead of 3rd-party prebuild ones
-  sed -e 's|set(ZLIB_LIB_PATH "${LIBSSH_ROOT_DIR}/linux/x86_64/libz.a")|set(ZLIB_LIB_PATH "/usr/lib'$LIBDIRSUFFIX'/libz.so")|' \
-      -e 's|set(LIBSSH_LIB_PATH "${LIBSSH_ROOT_DIR}/linux/x86_64/libssh.a")|set(LIBSSH_LIB_PATH "/usr/lib'$LIBDIRSUFFIX'/libssh.so")|' \
-      -e 's|set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/linux/include")|set(OPENSSL_INCLUDE_DIR "/usr/include")|' \
-      -e 's|set(OPENSSL_LIB_SSL_PATH "${OPENSSL_ROOT_DIR}/linux/x86_64/libssl.a")|set(OPENSSL_LIB_SSL_PATH "/usr/lib'$LIBDIRSUFFIX'/libssl.so")|' \
-      -e 's|set(OPENSSL_LIB_CRYPTO_PATH "${OPENSSL_ROOT_DIR}/linux/x86_64/libcrypto.a")|set(OPENSSL_LIB_CRYPTO_PATH "/usr/lib'$LIBDIRSUFFIX'/libcrypto.so")|' \
-      -e 's|set(OPENSSL_USE_STATIC_LIBS TRUE)|set(OPENSSL_USE_STATIC_LIBS FALSE)|' \
-      -i $PRGNAM-$VERSION/client/cmake/3rdparty.cmake
-  sed -e 's|set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/linux/include")|set(OPENSSL_INCLUDE_DIR "/usr/include")|' \
-      -e 's|set(OPENSSL_LIB_CRYPTO_PATH "${OPENSSL_ROOT_DIR}/linux/x86_64/libcrypto.a")|set(OPENSSL_LIB_CRYPTO_PATH "/usr/lib'$LIBDIRSUFFIX'/libcrypto.so")|' \
-      -e 's|set(OPENSSL_USE_STATIC_LIBS TRUE)|set(OPENSSL_USE_STATIC_LIBS FALSE)|' \
-      -i $PRGNAM-$VERSION/service/server/CMakeLists.txt
+  # Conan. I'm not dealing with it
+  python3 -m venv $PRGNAM-$VERSION/conan
+  source $PRGNAM-$VERSION/conan/bin/activate
+  pip install conan
+  export CONAN_HOME=$TMP/.conan2
+  unset GOROOT
+
   # Export AGW public key and S3 endpoint for VPN from Amnezia to work
   export PROD_AGW_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAj5mxl/4DL3Sk89ntxs5G\nX3JawGQWIoq6rvNkOzNGuNgedNS2+pi6hZl3Izl1Io9om4KiUlMT6mgLO1hTr9q+\ns7CYhlvroFA7ErucF+9L+7FCt0Igi0kIK/R2/vxd/2HaUrorn/aSvvutkYwbfxqW\nSwtzE+RuBeDWGvEt937OW0oqYONPYv9E4T56Dz/EZ6v2t8ejAnKLbGD/GocMmipK\n7etFSiSMAB2RmaztqTq4NleBepfO80XpYlW9pCSXuHcE8wxHczkzxsbyMAMsG/K3\nvUQY6qPtohqqzSSBwa/8u2ptNHBeor7l7DdYXeR/Nqcc4z92VUkZ5lOVR4evkS5V\n/wQqp5tnOJEj3NjUhEhXFoNEapbZd1bh6iQoUk7jC1TdvKJ/nPKGZAsHRpr0rNKz\nfx/N/Oo6lr2yh/+ps6VxTkbPmB6E85WOO3UvjImZUY0XQdBjWle/4iJLdEC77Nr0\njXhdgeypucy6jkB6iBHMeVMlrNMEV7UxoBR/cCNx55zu/8sml5ByiDvCDT7sRomN\nNgVt5S/FaVjYuzFUifJ12ToChXFgESKFmuso7WluEaWvMIGREdrMrKQKHfYLOzWF\n2B5ZJDqw4o03fU4J/6rw61M1b+rjVpXMjPnzc2A+RgcjTvXv955gfZkwe4lt5wk/\n3j8zMVo3+zLrMTAaEeIUM0UCAwEAAQ==\n-----END PUBLIC KEY-----"
   export PROD_S3_ENDPOINT="https://s3.eu-north-1.amazonaws.com/amnezia/endpoints.json, https://storage.googleapis.com/lambda-list/endpoints.json"
 }
 
 build () {
-  # mold makes the binaries segfault
-  LDFLAGS+=" -fuse-ld=bfd" \
-    qt-cmake -B build
-  cmake --build build --config release
+  # BFD can't properly link, MOLD makes the binaries segfault, LLD works
+  # but requires the rest of LLVM
+  CC="clang" \
+  CXX="clang++" \
+  LDFLAGS+="-fuse-ld=lld" \
+  QT_ROOT_PATH=$QT6DIR \
+    ./deploy/build.sh
 
   install -Dm755 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
-                    deploy/data/deploy-prebuilt/linux/client/bin/{ck-client,openvpn,ss-local,tun2socks,wireguard-go} \
-                    deploy/data/linux/client/bin/update-resolv-conf.sh \
-                    build/client/AmneziaVPN
-  install -d $PKG/$_PREFIX/bin \
-             $PKG/install
+    deploy/build/client/{AmneziaVPN,update-resolv-conf.sh}
+  install -d $PKG/$_PREFIX/bin $PKG/install
   ln -sf ../lib$LIBDIRSUFFIX/$PRGNAM/AmneziaVPN $PKG/$_PREFIX/bin/
   install -Dm755 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
-                    build/service/server/AmneziaVPN-service
+    deploy/build/service/server/{AmneziaVPN-service,amneziawg-go,geo*.dat,openvpn,tun2socks}
+  patchelf --remove-rpath $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/AmneziaVPN*
   install -Dm755 $CWD/rc.amnezia $PKG/$SYSCONFDIR/rc.d/rc.amnezia.new
-  sed -i "s|@PREFIX@|$_PREFIX|g; s|@LIBDIRSUFFIX@|$LIBDIRSUFFIX|g" \
-         $PKG/$SYSCONFDIR/rc.d/rc.amnezia.new
+  sed -i "s|@PREFIX@|$_PREFIX|g
+          s|@LIBDIRSUFFIX@|$LIBDIRSUFFIX|g" \
+    $PKG/$SYSCONFDIR/rc.d/rc.amnezia.new
   install -Dm644 -t $PKG/$_PREFIX/share/applications \
-                    AppDir/AmneziaVPN.desktop
-  sed -i 's|/usr/share/pixmaps/AmneziaVPN\.png|AmneziaVPN|; /Version=/d' \
-         $PKG/$_PREFIX/share/applications/AmneziaVPN.desktop
+    deploy/data/linux/AmneziaVPN.desktop
+  sed -i 's|/usr/share/pixmaps/AmneziaVPN\.png|AmneziaVPN|
+          /Version=/d' \
+    $PKG/$_PREFIX/share/applications/AmneziaVPN.desktop
   for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256 512x512; do
     install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
     magick deploy/data/linux/AmneziaVPN.png -resize $geometry \
            $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/AmneziaVPN.png
   done
   sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g" $CWD/doinst.sh > $PKG/install/doinst.sh
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LICENSE README.md
+  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION *LICENSE* README*.md
 }
