@@ -123,6 +123,7 @@ fi
 # XDG directories
 export XDG_CONFIG_HOME="${TMP}/.config"
 export XDG_CONFIG_CACHE="${TMP}/.cache"
+export XDG_CACHE_HOME="${XDG_CONFIG_CACHE}"
 
 # Temporary directory
 export TMPDIR="${TMP}/.tmp"
@@ -134,10 +135,10 @@ export PKG_CONFIG_PATH="${_PREFIX}/lib${LIBDIRSUFFIX}/pkgconfig:${PKG_CONFIG_PAT
 export PKG_CONFIG_SYSTEM_INCLUDE_PATH="${PKG_CONFIG_SYSTEM_INCLUDE_PATH}:/usr/include:${_PREFIX}/include"
 
 # C and C++
-export CFLAGS="${SLKCFLAGS}"
-export CXXFLAGS="${CFLAGS}"
+export CFLAGS="${SLKCFLAGS} ${CFLAGS}"
+export CXXFLAGS="${SLKCFLAGS} ${CXXFLAGS}"
 export CCACHE_DIR="${XDG_CONFIG_CACHE}/ccache"
-export LDFLAGS="${LDFLAGS} -fuse-ld=$(for file in /usr/bin/ld.?old; do [[ -e "$file" ]] && awk -F'\\.' '{print $NF}' <<< "$file" || echo "bfd" && break; done)"
+export LDFLAGS="-fuse-ld=$(for file in /usr/bin/ld.?old; do [[ -e "$file" ]] && awk -F'\\.' '{print $NF}' <<< "$file" || echo "bfd" && break; done) ${LDFLAGS}"
 
 # NodeJS
 export npm_config_cache="${XDG_CONFIG_CACHE}/npm"
