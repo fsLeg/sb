@@ -16,7 +16,8 @@ unpack () {
 
 build () {
   cmake -G Ninja \
-        -B build
+        -B build \
+        -DFETCH_PROJECTM="ON"
   cmake --build build
 
   DESTDIR=$PKG \
