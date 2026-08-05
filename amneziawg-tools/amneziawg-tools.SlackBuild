@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="amneziawg-tools"
-VERSION="3.0.20260730"
+VERSION="3.0.20260805"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Tools for configuring AmneziaWG"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-tools"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-tools/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="25d5904cdf8021af22d8e45fb46df558fa5b0cf1813fe2101cf3d5e8482f697d"
+SHA256SUM="ac0966e4cab36bf40c7a621d269c47d94bd153b3fc3f205b371dd0f21d54f36d"
 PKGVER="${VERSION//-/.}"
 
 unpack () {
