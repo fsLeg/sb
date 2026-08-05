@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="amneziawg-go"
-VERSION="3.0.3"
+VERSION="3.0.20260805"
 BUILD="${BUILD:-1}"
 DESCRIPTION="AmneziaWG VPN protocol"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-go"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-go/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="b35e32b89a87f54aaa906e18423c44d36a9ff8e3784a63e7a389fd8fa20e2923"
+SHA256SUM="c3cff49b71955228017f0b939d8ec9aaa5a9b16ae95749a0f5f6b8cf27a19d47"
 BUILD_REQUIRES="google-go-lang"
 
 unpack () {
