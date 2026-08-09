@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="chatbox"
-VERSION="1.22.2"
+VERSION="1.22.3"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Powerful AI Client"
 HOMEPAGE="https://chatboxai.app/"
 DOWNLOAD="https://github.com/chatboxai/chatbox/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="ce1101a33200403d1f3980fedec899154518f52232d7e17de76e1ebae186a1d7"
+SHA256SUM="cec084727cd7499972e42468b3c01db0378fcd13b937de4c8e23cfc161662824"
 BUILD_REQUIRES="nodejs|nodejs22"
 
 unpack () {
