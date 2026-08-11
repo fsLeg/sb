@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="fooyin"
-VERSION="0.12.2"
+VERSION="0.12.3"
 BUILD="${BUILD:-1}"
 DESCRIPTION="customisable music player"
 HOMEPAGE="https://fooyin.org/"
 DOWNLOAD="https://github.com/fooyin/fooyin/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="4a4f511ad2a538478f6c9b5ddd397cf4b1616d66ab0d78d9d501527d6943d92f"
+SHA256SUM="146b57102966bed715f9f382c67dd6d3d56d9d9e29eb6717be43485b60a1ecda"
 REQUIRES="qt6"
 OPTIONAL="KDSingleApplication libebur128 libgme libopenmpt soundtouch soxr"
 
