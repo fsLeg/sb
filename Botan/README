@@ -5,3 +5,5 @@ filter/pipe message processing system, and a wide variety of other
 features.
 
 Botan relies on Python3 for its compilation configuration.
+
+To build HTML documentation, use DOCS=yes.
