@@ -9,7 +9,6 @@ DOWNLOAD="https://github.com/helix-editor/helix/releases/download/${VERSION}/${P
 SHA256SUM="2d0cf264ac77f8c25386a636e2b3a09a23dec555568cc9a5b2927f84322f544e"
 BUILD_REQUIRES="rust-opt"
 OPTIONAL="mdbook"
-SKIP_PERMS=1
 
 unpack () {
   mkdir -p $PRGNAM-$VERSION
@@ -21,7 +20,7 @@ unpack () {
 
 build () {
   HELIX_DEFAULT_RUNTIME=$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
-  cargo build --locked --profile opt
+    cargo build --locked --profile opt
 
   install -Dm755 -t $PKG/$_PREFIX/bin target/opt/hx
   install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/themes runtime/themes/*.toml
