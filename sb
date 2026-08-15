@@ -149,6 +149,7 @@ export COREPACK_HOME="${TMP}/.corepack"
 export YARN_CACHE_FOLDER="${XDG_CONFIG_CACHE}/yarn"
 
 ## PNPM
+export PNPM_HOME="${XDG_CONFIG_CACHE}/pnpm"
 mkdir -p "${XDG_CONFIG_HOME}/pnpm"
 cat << EOF > "${XDG_CONFIG_HOME}/pnpm/rc"
 store-dir="${XDG_CONFIG_CACHE}/pnpm/store"
