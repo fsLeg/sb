@@ -10,7 +10,7 @@ SHA256SUM="1e230f08c922cd59b1d71ff8d2219a54f83c57646bcd89ae0550b27cdffa4ebe"
 OPTIONAL="Botan libgit2 qt6"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.xz
 
   # Set the release string to disable the update check
   echo '#define RELEASE "SlackBuild"' > release.h

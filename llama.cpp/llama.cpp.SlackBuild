@@ -10,7 +10,7 @@ SHA256SUM="9fa12ee5c681aef3cce914beafdc976635a68083342af23ca075b67db464b7b8"
 OPTIONAL="cudatoolkit_13 nodejs|nodejs22|nodejs24-bin OpenBLAS openvino rocmtoolkit_7"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 
   if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
     CUDA="yes"

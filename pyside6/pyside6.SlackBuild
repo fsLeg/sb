@@ -12,7 +12,7 @@ REQUIRES="mypy python3-numpy qt6"
 BUILD_REQUIRES="llvm-opt python3-build python3-packaging-opt python3-setuptools-opt python3-wheel"
 
 unpack () {
-  tar xfv $CWD/$TARNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$TARNAM-$VERSION.tar.gz
   mv $TARNAM-$VERSION $PRGNAM-$VERSION
 
   if [ "${LLVM_OPT:-ON}" = "ON" ]; then

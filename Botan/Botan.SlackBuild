@@ -9,7 +9,7 @@ DOWNLOAD="https://botan.randombit.net/releases/${PRGNAM%3}-${VERSION}.tar.xz"
 SHA256SUM="12f5a8358890bbee82edfe9d2e7769b0a610b6dd0e0698aea13d20a675d84620"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.xz
 }
 
 build () {

@@ -10,7 +10,7 @@ DOWNLOAD="https://github.com/brunonymous/${TARNAM}/archive/${VERSION}/${TARNAM}-
 SHA256SUM="010987a3cb27a1f9388a212f637977692284b5616952efa1efae09d2464e9249"
 
 unpack () {
-  tar xvf $CWD/$TARNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$TARNAM-$VERSION.tar.gz
   mv $TARNAM-$VERSION $PRGNAM-$VERSION
 
   # make scoredir respect prefix and fix hi-score permissions

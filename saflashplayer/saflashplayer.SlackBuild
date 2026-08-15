@@ -12,7 +12,7 @@ SKIP_STRIP=1
 
 unpack () {
   mkdir $PRGNAM-$VERSION
-  tar xvf $CWD/flash_player_sa_linux.x86_64.tar.gz -C $PRGNAM-$VERSION
+  $UNTAR $CWD/flash_player_sa_linux.x86_64.tar.gz -C $PRGNAM-$VERSION
 }
 
 build () {

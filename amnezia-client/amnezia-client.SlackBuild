@@ -14,7 +14,7 @@ unpack () {
     exit 1
   fi
 
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 
   # get branches with necessary files
   sed -i '/SortFilterProxyModel.git/a\\tbranch = qt-6

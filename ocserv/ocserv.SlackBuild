@@ -14,7 +14,7 @@ OPTIONAL="GeoIP libmaxmind llhttp oath-toolkit rubygem-ronn"
 unpack () {
   check_gid ocserv 382
   check_uid ocserv 382
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.xz
 
   # this lets meson detect nft binary and use nftables instead of iptables
   export PATH+=":/usr/sbin"

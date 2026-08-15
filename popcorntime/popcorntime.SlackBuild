@@ -12,7 +12,7 @@ BUILD_REQUIRES="yarn"
 NWVER="0.86.0"
 
 unpack () {
-  tar xvf $CWD/$TARNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$TARNAM-$VERSION.tar.gz
   mv $TARNAM-$VERSION $PRGNAM-$VERSION
 
   # Fix libatomic.so copying

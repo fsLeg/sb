@@ -13,7 +13,7 @@ OPTIONAL="cudatoolkit_13 rocmtoolkit_7"
 unpack () {
   check_gid ollama 393
   check_uid ollama 393
-  tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 
   if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
     CUDA="ON"

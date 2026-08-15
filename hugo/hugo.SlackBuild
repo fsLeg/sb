@@ -11,7 +11,7 @@ BUILD_REQUIRES="google-go-lang"
 OPTIONAL="dart-sass"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 }
 
 build () {

@@ -10,7 +10,7 @@ SHA256SUM="8c4e6332d818249ed05ce98e36e6ed8a08e3249ac70f69680842ab2e5fee8510"
 OPTIONAL="libspng highway matio libjxl libheif gi-docgen"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.xz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.xz
 }
 
 build () {

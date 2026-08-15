@@ -11,7 +11,7 @@ REQUIRES="cryptography"
 BUILD_REQUIRES="python3-poetry-core"
 
 unpack () {
-  tar xvf $CWD/${PRGNAM#python-}-$VERSION.tar.gz
+  $UNTAR $CWD/${PRGNAM#python-}-$VERSION.tar.gz
   mv ${PRGNAM#python-}-$VERSION $PRGNAM-$VERSION
 }
 

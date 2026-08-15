@@ -11,7 +11,7 @@ REQUIRES="pcsc-lite"
 OPTIONAL="Sphinx"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 }
 
 build () {

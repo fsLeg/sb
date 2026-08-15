@@ -12,7 +12,7 @@ OPTIONAL="mdbook"
 
 unpack () {
   mkdir -p $PRGNAM-$VERSION
-  tar xvf $CWD/$PRGNAM-$VERSION-source.tar.xz -C $PRGNAM-$VERSION
+  $UNTAR $CWD/$PRGNAM-$VERSION-source.tar.xz -C $PRGNAM-$VERSION
 
   # Grammar sources are bundled, no need to fetch them again
   patch -p1 -d $PRGNAM-$VERSION < $CWD/disable-grammar-fetching.patch

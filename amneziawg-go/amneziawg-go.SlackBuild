@@ -10,7 +10,7 @@ SHA256SUM="c146a640c18468caac71fd158c02a94afcf6beadb5fd585c092bf55cbdefdbff"
 BUILD_REQUIRES="google-go-lang"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 }
 
 build () {

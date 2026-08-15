@@ -9,7 +9,7 @@ DOWNLOAD="https://github.com/mawww/kakoune/releases/download/v${VERSION}/${PRGNA
 SHA256SUM="be1deb3fe9808a0733ab1057309da380bb757307e8fdbb22dc478b674b6bad34"
 
 unpack () {
-  tar xfv $CWD/$PRGNAM-$VERSION.tar.bz2
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.bz2
 
   # fix paths
   sed -i "/^docdir/s|/share.*|/doc/$PRGNAM-$VERSION|

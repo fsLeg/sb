@@ -13,7 +13,7 @@ BUILD_REQUIRES="rust-opt nodejs|nodejs22|nodejs24-bin"
 CONFLICTS="element-desktop-bin"
 
 unpack () {
-  tar xvf $CWD/$WEBNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$WEBNAM-$VERSION.tar.gz
   mv $WEBNAM-$VERSION $PRGNAM-$VERSION
 
   corepack install --global \

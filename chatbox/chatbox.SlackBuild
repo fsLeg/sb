@@ -10,7 +10,7 @@ SHA256SUM="cec084727cd7499972e42468b3c01db0378fcd13b937de4c8e23cfc161662824"
 BUILD_REQUIRES="nodejs|nodejs22"
 
 unpack () {
-  tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 
   corepack install --global \
     "$(node -p "require('./$PRGNAM-$VERSION/package.json').packageManager.split('+')[0]")"

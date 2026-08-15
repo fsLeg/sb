@@ -10,7 +10,7 @@ SHA256SUM="52ee072d93e17adec529ca13dd701c0939b3a210a1c2803379007c7a830f502d"
 BUILD_REQUIRES="google-go-lang"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 
   # Don't fetch another copy of a toolchain
   sed -i '/^toolchain/d' $PRGNAM-$VERSION/go.mod

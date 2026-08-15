@@ -12,7 +12,7 @@ KERNEL="${KERNEL:-$(uname -r)}"
 PKGVER="${VERSION//-/.}_${KERNEL//-/_}"
 
 unpack () {
-  tar xvf $CWD/$TARNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$TARNAM-$VERSION.tar.gz
   mv $TARNAM-$VERSION $PRGNAM-$VERSION
 
   if [[ ! -v USE_DKMS ]] && command -v dkms &> /dev/null; then

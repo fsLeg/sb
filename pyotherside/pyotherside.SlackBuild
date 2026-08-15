@@ -10,7 +10,7 @@ SHA256SUM="9afe075f165c78ec584892887a6411fe1476f2115cf3bba026105bde29292a4b"
 OPTIONAL="Sphinx"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 }
 
 build () {

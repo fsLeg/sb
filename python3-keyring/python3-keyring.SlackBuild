@@ -12,7 +12,7 @@ REQUIRES="python-importlib_metadata python3-jaraco.classes python3-jaraco.contex
 OPTIONAL="python3-shtab"
 
 unpack () {
-  tar xvf $CWD/$TARNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$TARNAM-$VERSION.tar.gz
   mv $TARNAM-$VERSION $PRGNAM-$VERSION
   # drop useless coherent.licensed dependency
   sed -i '/coherent.licensed/d' $PRGNAM-$VERSION/pyproject.toml

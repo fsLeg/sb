@@ -10,7 +10,7 @@ SHA256SUM="cdaed46fcd8923a55974b7bbc7caaadeaaf7aed60cc137e59837b72f575ef641"
 CONFLICTS="nodejs18 nodejs22 nodejs24-bin"
 
 unpack () {
-  tar xvf $CWD/${PRGNAM%js}-v$VERSION.tar.gz
+  $UNTAR $CWD/${PRGNAM%js}-v$VERSION.tar.gz
   mv ${PRGNAM%js}-v$VERSION $PRGNAM-$VERSION
 
   # fix man page path

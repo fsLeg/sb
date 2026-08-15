@@ -11,7 +11,7 @@ SHA256SUM="9f65f6d112560040bac075071703b059bfc7df57db8f4aa81e5f139898e628db"
 unpack () {
   check_gid proxy 396
   check_uid proxy 396
-  tar xfv $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 }
 
 build () {

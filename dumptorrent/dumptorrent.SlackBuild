@@ -9,7 +9,7 @@ DOWNLOAD="https://github.com/tomcdj71/dumptorrent/archive/v${VERSION}/${PRGNAM}-
 SHA256SUM="0550782467b7e30c1b342196605b1d1476809c8508333faab1dc5ba46a933362"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 }
 
 build () {

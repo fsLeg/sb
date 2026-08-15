@@ -21,7 +21,7 @@ GO_BOOTSTRAP=("1.19.13"
               "1.25.13")
 
 unpack () {
-  tar xvf $CWD/go$VERSION.src.tar.gz
+  $UNTAR $CWD/go$VERSION.src.tar.gz
   mv go $PRGNAM-$VERSION
   mkdir -p $PRGNAM-$VERSION/bootstrap
   GOROOT_FINAL=$_PREFIX/lib$LIBDIRSUFFIX/go$VERSION/go
@@ -40,7 +40,7 @@ unpack () {
 
   if [[ -v GO_BOOTSTRAP[@] ]]; then
     for GO_VER in ${GO_BOOTSTRAP[@]}; do
-      tar xvf $CWD/go$GO_VER.src.tar.gz -C $PRGNAM-$VERSION/bootstrap
+      $UNTAR $CWD/go$GO_VER.src.tar.gz -C $PRGNAM-$VERSION/bootstrap
       mv $PRGNAM-$VERSION/bootstrap/go $PRGNAM-$VERSION/bootstrap/go$GO_VER
     done
   fi

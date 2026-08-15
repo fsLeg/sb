@@ -14,7 +14,7 @@ CONFLICTS="PrismLauncher-Unlocked"
 PKGVER="${VERSION//-/.}" # fix package name for pre-releases
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 
   # get dependencies for git sources
   if [ -z "$(ls -A $PRGNAM-$VERSION/libraries/libnbtplusplus)" ]; then

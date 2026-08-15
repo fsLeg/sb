@@ -12,7 +12,7 @@ REQUIRES="jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zu
 BUILD_REQUIRES="apache-ant"
 
 unpack () {
-  tar xfv $CWD/$TARNAM-version$VERSION.tar.gz
+  $UNTAR $CWD/$TARNAM-version$VERSION.tar.gz
   mv $TARNAM-version$VERSION $PRGNAM-$VERSION
 
   # embed version info

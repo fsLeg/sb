@@ -11,7 +11,7 @@ REQUIRES="acpi perl-Gtk3"
 ARCH="noarch"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$PRGNAM-$VERSION.tar.gz
   mv $PRGNAM-$PRGNAM-$VERSION $PRGNAM-$VERSION
 }
 

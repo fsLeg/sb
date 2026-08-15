@@ -11,7 +11,7 @@ SHA256SUM="5c8f49cf3653ae9dd3911b53ca60475b03c8c957eb7385b1bd3d49ec4767ddac"
 REQUIRES="pcsc-lite ccid"
 
 unpack () {
-  tar xvf $CWD/$PRGNAME-$VERSION-linux.tar.gz
+  $UNTAR $CWD/$PRGNAME-$VERSION-linux.tar.gz
   mv $PRGNAME-$VERSION-linux $PRGNAM-$VERSION
 }
 

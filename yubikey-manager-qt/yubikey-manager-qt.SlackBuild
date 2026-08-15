@@ -10,7 +10,7 @@ SHA256SUM="58d78b536a1d1e7d8a2a33b9803fc710d551443c8a45c4bb9dee365937fd3b6d"
 REQUIRES="yubikey-manager pyotherside"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$PRGNAM-$VERSION.tar.gz
   mv $PRGNAM-$PRGNAM-$VERSION $PRGNAM-$VERSION
 
   # Apply a patch from PR#363 to make ykman-gui work again

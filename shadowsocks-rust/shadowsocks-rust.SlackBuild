@@ -10,7 +10,7 @@ SHA256SUM="a89865d1c5203de1b732017dd032e85f943d1592e8d3152eb7d2c4f3fca387bf"
 BUILD_REQUIRES="rust-opt"
 
 unpack () {
-  tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+  $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 }
 
 build () {
