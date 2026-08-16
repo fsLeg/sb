@@ -382,6 +382,9 @@ fi
 if [[ -n "${CONFLICTS}" ]]; then
   echo "${CONFLICTS}" | tr ' ' '\n' > "${PKG}/install/slack-conflicts"
 fi
+if [[ -n "${SUGGESTS}" ]]; then
+  echo "${SUGGESTS}" | tr ' ' '\n' > "${PKG}/install/slack-suggests"
+fi
 
 # Make the package; be sure to leave it in $OUTPUT
 # If package symlinks need to be created during install *before*

@@ -11,6 +11,7 @@ REQUIRES="" # optional. list runtime dependencies
 BUILD_REQUIRES="" # optional. list build-time dependencies
 OPTIONAL="" # optional. list optional dependencies
 CONFLICTS="" # optional. list any packages this package would conflict with
+SUGGESTS="" # optional. list recommended packages to have with this one
 
 # There should not be any executable code outside of functions as the
 # SlackBuild is sourced by sb tool.

@@ -7,6 +7,7 @@ DESCRIPTION="Tools for configuring AmneziaWG"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-tools"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-tools/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="dbd8ce0748d835d18f30bb76720246b7bfc80bd09cd17c379b1c59f683a18493"
+SUGGESTS="amneziawg-go amneziawg-kernel"
 PKGVER="${VERSION//-/.}"
 
 unpack () {
