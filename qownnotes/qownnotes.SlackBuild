@@ -15,6 +15,7 @@ unpack () {
   # Set the release string to disable the update check
   echo '#define RELEASE "SlackBuild"' > release.h
 
+  # Autodetect options
   if [[ ! -v QT6 && "$SLACKVER" == "current" ]]; then
     QT6="yes"
   fi
@@ -26,22 +27,25 @@ unpack () {
   if [[ ! -v BOTAN ]] && pkg-config --exists botan-3; then
     BOTAN="yes"
   fi
-}
 
-build () {
+  # Set options
   if [[ "${QT6:-no}" != "no" ]]; then
     USE_QT6="-DQON_QT6_BUILD=ON"
+    REQUIRES+=(qt6)
   fi
 
   if [[ "${LIBGIT2:-no}" != "no" ]]; then
     USE_LIBGIT2="-DBUILD_WITH_LIBGIT2=ON"
+    REQUIRES+=(libgit2)
   fi
 
   if [[ "${BOTAN:-no}" != "no" ]]; then
     USE_SYSTEM_BOTAN="-DBUILD_WITH_SYSTEM_BOTAN=ON"
+    REQUIRES+=(Botan)
   fi
+}
 
-  mkdir build
+build () {
   cmake \
     -DCMAKE_INSTALL_PREFIX=$_PREFIX \
     -DBUILD_WITH_ASPELL=ON \

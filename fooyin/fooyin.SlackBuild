@@ -12,6 +12,14 @@ OPTIONAL=(KDSingleApplication libebur128 libgme libopenmpt soundtouch soxr)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
+
+  if [[ -d /usr/lib$LIBDIRSUFFIX/cmake/KDSingleApplication-qt6 && "$SLACKVER" != "current" ]];
+                                     then REQUIRES+=(KDSingleApplication); fi
+  if pkg-config --exists libebur128; then REQUIRES+=(libebur128); fi
+  if pkg-config --exists libgme;     then REQUIRES+=(libgme); fi
+  if pkg-config --exists libopenmpt; then REQUIRES+=(libopenmpt); fi
+  if pkg-config --exists soundtouch; then REQUIRES+=(soundtouch); fi
+  if pkg-config --exists soxr;       then REQUIRES+=(soxr); fi
 }
 
 build () {

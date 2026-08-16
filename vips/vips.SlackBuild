@@ -7,19 +7,25 @@ DESCRIPTION="fast image processing library with low memory needs"
 HOMEPAGE="https://www.libvips.org/"
 DOWNLOAD="https://github.com/libvips/libvips/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.xz"
 SHA256SUM="8c4e6332d818249ed05ce98e36e6ed8a08e3249ac70f69680842ab2e5fee8510"
-OPTIONAL=(libspng highway matio libjxl libheif gi-docgen)
+OPTIONAL=(gi-docgen highway libheif libjxl libspng matio)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.xz
-}
 
-build () {
   if [ "${DOCS:-no}" != "no" ]; then
     DOCS=true
   else
     DOCS=false
   fi
 
+  if pkg-config --exists libhwy;  then REQUIRES+=(highway); fi
+  if pkg-config --exists libheif; then REQUIRES+=(libheif); fi
+  if pkg-config --exists libjxl;  then REQUIRES+=(libjxl); fi
+  if pkg-config --exists libspng; then REQUIRES+=(libspng); fi
+  if pkg-config --exists matio;   then REQUIRES+=(matio); fi
+}
+
+build () {
   mkdir build
   meson setup \
     --buildtype=release \

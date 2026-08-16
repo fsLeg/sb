@@ -9,7 +9,7 @@ DOWNLOAD="https://www.infradead.org/ocserv/download/${PRGNAM}-${VERSION}.tar.xz"
 SHA256SUM="42ced08958b9576ab134fcb7bdc7f8df5e13214fd147855f99021fedcf0eedbe"
 REQUIRES=(libev protobuf-c)
 BUILD_REQUIRES=(ipcalc-ng)
-OPTIONAL=(GeoIP libmaxmind llhttp oath-toolkit rubygem-ronn)
+OPTIONAL=(GeoIP libmaxminddb llhttp oath-toolkit rubygem-ronn)
 
 unpack () {
   check_gid ocserv 382
@@ -18,6 +18,11 @@ unpack () {
 
   # this lets meson detect nft binary and use nftables instead of iptables
   export PATH+=":/usr/sbin"
+
+  if pkg-config --exists geoip; then REQUIRES+=(GeoIP); fi
+  if pkg-config --exists libmaxminddb; then REQUIRES+=(libmaxminddb); fi
+  if pkg-config --exists libllhttp; then REQUIRES+=(llhttp); fi
+  if pkg-config --exists liboath; then REQUIRES+=(oath-toolkit); fi
 }
 
 build () {

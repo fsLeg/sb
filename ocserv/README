@@ -25,5 +25,5 @@ Optional dependencies (autodetected):
 - rubygem-ronn - if present at build time, man pages will be
   re-generated
 - GeoIP
-- libmaxmind
+- libmaxminddb
 - oath-toolkit

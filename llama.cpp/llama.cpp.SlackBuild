@@ -12,6 +12,7 @@ OPTIONAL=(cudatoolkit_13 "nodejs|nodejs22|nodejs24-bin" OpenBLAS openvino rocmto
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
 
+  # Autodetect options
   if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
     CUDA="yes"
   fi
@@ -35,6 +36,36 @@ unpack () {
   if [[ ! -v WEBUI ]] && command -v node &> /dev/null; then
     WEBUI="yes"
   fi
+
+  # Set the options
+  if [[ "$CUDA" == "yes" ]]; then
+    USE_CUDA="-DGGML_CUDA=ON"
+    REQUIRES+=(cudatoolkit_13)
+  fi
+
+  if [[ "$HIP" == "yes" ]]; then
+    USE_HIP="-DGGML_HIP=ON"
+    REQUIRES+=(rocmtoolkit_7)
+  fi
+
+  if [[ "$OPENBLAS" == "yes" ]]; then
+    USE_OPENBLAS="-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS"
+    REQUIRES+=(OpenBLAS)
+  fi
+
+  if [[ "$VULKAN" == "yes" ]]; then
+    USE_VULKAN="-DGGML_VULKAN=ON"
+    REQUIRES+=("vulkan-sdk>=1.4")
+  fi
+
+  if [[ "$OPENVINO" == "yes" ]]; then
+    USE_OPENVINO="-DGGML_OPENVINO=ON"
+    REQUIRES+=(openvino)
+  fi
+
+  if [[ "$WEBUI" != "yes" ]]; then
+    USE_WEBUI="-DLLAMA_BUILD_UI=OFF -DLLAMA_USE_PREBUILT_UI=OFF"
+  fi
 }
 
 build () {
@@ -42,12 +73,12 @@ build () {
         -DCMAKE_C_FLAGS="$SLKCFLAGS" \
         -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
         -DCMAKE_INSTALL_PREFIX="$_PREFIX" \
-        $([[ "$CUDA" == "yes" ]] && echo "-DGGML_CUDA=ON") \
-        $([[ "$HIP" == "yes" ]] && echo "-DGGML_HIP=ON") \
-        $([[ "$OPENBLAS" == "yes" ]] && echo "-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS") \
-        $([[ "$VULKAN" == "yes" ]] && echo "-DGGML_VULKAN=ON") \
-        $([[ "$OPENVINO" == "yes" ]] && echo "-DGGML_OPENVINO=ON") \
-        $([[ "$WEBUI" != "yes" ]] && echo "-DLLAMA_BUILD_UI=OFF -DLLAMA_USE_PREBUILT_UI=OFF") \
+        $USE_CUDA \
+        $USE_HIP \
+        $USE_OPENBLAS \
+        $USE_VULKAN \
+        $USE_OPENVINO \
+        $USE_WEBUI \
         -DLLAMA_BUILD_TESTS=OFF \
         -DGGML_BUILD_EXAMPLES=OFF \
         -DGGML_BUILD_TESTS=OFF \

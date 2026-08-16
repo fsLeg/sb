@@ -41,9 +41,10 @@ unpack () {
     export CUDNN_LIBRARY_PATH="/usr/lib64/cudnn"
   fi
 
-  [[ "$CUDA"   == "ON" ]] && BACKENDS+="cuda_v13;"
-  [[ "$ROCM"   == "ON" ]] && BACKENDS+="rocm_v7_2;"
-  [[ "$VULKAN" == "ON" ]] && BACKENDS+="vulkan;"
+  [[ "$CUDA"   == "ON" ]] && BACKENDS+="cuda_v13;"  && REQUIRES+=(cudatoolkit_13)
+  [[ "$ROCM"   == "ON" ]] && BACKENDS+="rocm_v7_2;" && REQUIRES+=(rocmtoolkit_7)
+  [[ "$VULKAN" == "ON" ]] && BACKENDS+="vulkan;"    && REQUIRES+=("vulkan-sdk>=1.4")
+  [[ "$MLX"    == "ON" ]]                           && REQUIRES+=(cudnn nccl OpenBLAS)
 
   [[ -v LLAMACPP ]] && echo "$LLAMACPP" > $PRGNAM-$VERSION/LLAMA_CPP_VERSION
 
