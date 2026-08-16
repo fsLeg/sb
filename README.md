@@ -39,11 +39,11 @@ The following metadata can be omitted if empty.
 
 - DESCRIPTION - brief description of the program, like the part in parentheses in slack-desc file.
 - HOMEPAGE - URL of the program's homepage.
-- REQUIRES - list of runtime dependencies, separate with spaces. Alternative dependencies can be specified using "|" symbol, i. e. `REQUIRES="appname1|altappname1 appname2"`. There must be no spaces before or after the "|" symbol. Also used for slack-required. Feel free to adjust later in script to include autodetected or active optional dependencies.
-- BUILD_REQUIRES - list of build-time dependencies. These are not required to actually run the program in question.
-- OPTIONAL - list of optional packages, either autodetected at build time or enabled through environment variables.
-- CONFLICTS - list of packages this package will conflict with, i. e. due to installing files to the same path. Also used for slack-conflicts.
-- SUGGESTS - list of recommended packages to have with this one. Must not be runtime or build-time dependencies. Also used for slack-suggests.
+- REQUIRES - array of runtime dependencies. Alternative dependencies can be specified using the "|" symbol, i. e. `REQUIRES=("appname1|altappname1" appname2)`, and they must be quoted. Also used for slack-required. Feel free to adjust later in script to include autodetected or active optional dependencies.
+- BUILD_REQUIRES - array of build-time dependencies. These are not required to actually run the program in question.
+- OPTIONAL - array of optional packages, either autodetected at build time or enabled through environment variables.
+- CONFLICTS - array of packages this package will conflict with, i. e. due to installing files to the same path. Also used for slack-conflicts.
+- SUGGESTS - array of recommended packages to have with this one. Must not be runtime or build-time dependencies. Also used for slack-suggests.
 
 ## Functions
 

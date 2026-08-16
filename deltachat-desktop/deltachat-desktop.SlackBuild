@@ -7,7 +7,7 @@ DESCRIPTION="decentralized private messenger"
 HOMEPAGE="https://delta.chat"
 DOWNLOAD="git+https://github.com/deltachat/${PRGNAM}.git"
 SHA256SUM="-"
-BUILD_REQUIRES="nodejs|nodejs22|nodejs24-bin"
+BUILD_REQUIRES=("nodejs|nodejs22|nodejs24-bin")
 
 unpack () {
   git clone $CWD/deltachat-desktop.git $PRGNAM-$VERSION

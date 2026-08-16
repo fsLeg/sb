@@ -8,7 +8,7 @@ DESCRIPTION="Yubico Authenticator for Desktop"
 HOMEPAGE="https://www.yubico.com/products/yubico-authenticator/"
 DOWNLOAD="https://developers.yubico.com/yubioath-flutter/Releases/${PRGNAME}-${VERSION}-linux.tar.gz"
 SHA256SUM="5c8f49cf3653ae9dd3911b53ca60475b03c8c957eb7385b1bd3d49ec4767ddac"
-REQUIRES="pcsc-lite ccid"
+REQUIRES=(pcsc-lite ccid)
 
 unpack () {
   $UNTAR $CWD/$PRGNAME-$VERSION-linux.tar.gz

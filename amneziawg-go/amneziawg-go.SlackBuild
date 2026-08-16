@@ -7,8 +7,8 @@ DESCRIPTION="AmneziaWG VPN protocol"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-go"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-go/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="c146a640c18468caac71fd158c02a94afcf6beadb5fd585c092bf55cbdefdbff"
-BUILD_REQUIRES="google-go-lang"
-SUGGESTS="amneziawg-tools"
+BUILD_REQUIRES=(google-go-lang)
+SUGGESTS=(amneziawg-tools)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz

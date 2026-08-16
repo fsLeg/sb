@@ -7,7 +7,7 @@ DESCRIPTION="Powerful AI Client"
 HOMEPAGE="https://chatboxai.app/"
 DOWNLOAD="https://github.com/chatboxai/chatbox/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="cec084727cd7499972e42468b3c01db0378fcd13b937de4c8e23cfc161662824"
-BUILD_REQUIRES="nodejs|nodejs22"
+BUILD_REQUIRES=("nodejs|nodejs22")
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz

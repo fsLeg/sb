@@ -7,8 +7,8 @@ DESCRIPTION="static HTML and CSS website generator written in Go"
 HOMEPAGE="https://gohugo.io/"
 DOWNLOAD="https://github.com/gohugoio/hugo/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="e9c1e7d8e6e09356cc56317fd01b7493d712692390b89b3d33810cfe1305650e"
-BUILD_REQUIRES="google-go-lang"
-SUGGESTS="dart-sass"
+BUILD_REQUIRES=(google-go-lang)
+SUGGESTS=(dart-sass)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz

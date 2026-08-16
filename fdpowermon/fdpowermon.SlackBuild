@@ -7,7 +7,7 @@ DESCRIPTION="simple battery power monitor for laptops with ACPI"
 HOMEPAGE="https://github.com/yoe/fdpowermon"
 DOWNLOAD="https://github.com/yoe/fdpowermon/archive/${PRGNAM}-${VERSION}/${PRGNAM}-${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="564c739fa5bab315fb588f540ec357073545f22ab7da99ac220e3b58a6c89471"
-REQUIRES="acpi perl-Gtk3"
+REQUIRES=(acpi perl-Gtk3)
 ARCH="noarch"
 
 unpack () {

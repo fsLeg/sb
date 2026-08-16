@@ -7,7 +7,7 @@ DESCRIPTION="Graphical application for configuring a YubiKey"
 HOMEPAGE="https://developers.yubico.com/yubikey-manager-qt/"
 DOWNLOAD="https://github.com/Yubico/yubikey-manager-qt/archive/${PRGNAM}-${VERSION}/${PRGNAM}-${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="58d78b536a1d1e7d8a2a33b9803fc710d551443c8a45c4bb9dee365937fd3b6d"
-REQUIRES="yubikey-manager pyotherside"
+REQUIRES=(yubikey-manager pyotherside)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$PRGNAM-$VERSION.tar.gz

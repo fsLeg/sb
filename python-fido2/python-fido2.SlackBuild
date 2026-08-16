@@ -7,8 +7,8 @@ DESCRIPTION="FIDO2/WebAuthn library for clients and servers"
 HOMEPAGE="https://github.com/Yubico/python-fido2"
 DOWNLOAD="https://github.com/Yubico/python-fido2/releases/download/${VERSION}/${PRGNAM#python-}-${VERSION}.tar.gz"
 SHA256SUM="e39f95920122d64283fda5e5581d95a206e704fa42846bfa4662f86aa0d3333b"
-REQUIRES="cryptography"
-BUILD_REQUIRES="python3-poetry-core"
+REQUIRES=(cryptography)
+BUILD_REQUIRES=(python3-poetry-core)
 
 unpack () {
   $UNTAR $CWD/${PRGNAM#python-}-$VERSION.tar.gz

@@ -7,8 +7,8 @@ DESCRIPTION="Smartcard module for Python"
 HOMEPAGE="https://pyscard.sourceforge.io/"
 DOWNLOAD="https://github.com/LudovicRousseau/pyscard/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="6b84eea9f2fd19a0a54e213b3d76870b21a7792f823755a824f49de822c964c7"
-REQUIRES="pcsc-lite"
-OPTIONAL="Sphinx"
+REQUIRES=(pcsc-lite)
+OPTIONAL=(Sphinx)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz

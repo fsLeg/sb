@@ -8,8 +8,8 @@ DESCRIPTION="Python bindings for Qt6"
 HOMEPAGE="https://wiki.qt.io/Qt_for_Python"
 DOWNLOAD="https://github.com/PySide/pyside-setup/archive/${VERSION}/${TARNAM}-${VERSION}.tar.gz"
 SHA256SUM="055b467903327e947b60ddefd2e9e66f6b7558b92a0728c4596e0dc8ce5dd695"
-REQUIRES="mypy python3-numpy qt6"
-BUILD_REQUIRES="llvm-opt python3-build python3-packaging-opt python3-setuptools-opt python3-wheel"
+REQUIRES=(mypy python3-numpy qt6)
+BUILD_REQUIRES=(llvm-opt python3-build python3-packaging-opt python3-setuptools-opt python3-wheel)
 
 unpack () {
   $UNTAR $CWD/$TARNAM-$VERSION.tar.gz

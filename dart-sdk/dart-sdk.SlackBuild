@@ -11,7 +11,7 @@ DOWNLOAD="git+https://github.com/dart-lang/sdk.git \
 SHA256SUM="-
            -
            c9ec18bec85fd06b5ae43106a0d35ff0d5306ef351a00eb18d3b34fad4cc250e"
-CONFLICTS="dart-sdk-bin"
+CONFLICTS=(dart-sdk-bin)
 
 unpack () {
   git clone $CWD/sdk.git $PRGNAM-$VERSION

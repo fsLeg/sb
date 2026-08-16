@@ -7,7 +7,7 @@ DESCRIPTION="JavaScript runtime"
 HOMEPAGE="https://nodejs.org/"
 DOWNLOAD="https://nodejs.org/dist/v${VERSION}/${PRGNAM%js}-v${VERSION}.tar.gz"
 SHA256SUM="cdaed46fcd8923a55974b7bbc7caaadeaaf7aed60cc137e59837b72f575ef641"
-CONFLICTS="nodejs18 nodejs22 nodejs24-bin"
+CONFLICTS=(nodejs18 nodejs22 nodejs24-bin)
 
 unpack () {
   $UNTAR $CWD/${PRGNAM%js}-v$VERSION.tar.gz

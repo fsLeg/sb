@@ -8,8 +8,8 @@ DESCRIPTION="Open Source Flash SWF decompiler and editor"
 HOMEPAGE="https://github.com/jindrapetrik/jpexs-decompiler"
 DOWNLOAD="https://github.com/jindrapetrik/jpexs-decompiler/archive/version${VERSION}/${TARNAM}-version${VERSION}.tar.gz"
 SHA256SUM="bc74ba4610df1da263f012011e1f45e3a8189427ee087f69d95f40c105a07d98"
-REQUIRES="jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
-BUILD_REQUIRES="apache-ant"
+REQUIRES=("jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25")
+BUILD_REQUIRES=(apache-ant)
 
 unpack () {
   $UNTAR $CWD/$TARNAM-version$VERSION.tar.gz

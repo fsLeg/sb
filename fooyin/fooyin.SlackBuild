@@ -7,8 +7,8 @@ DESCRIPTION="customisable music player"
 HOMEPAGE="https://fooyin.org/"
 DOWNLOAD="https://github.com/fooyin/fooyin/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="38b8f647081e9a6f1d1b52ea76dcf2f9f73c4bd2b4d2d67e0220c458f3fef74e"
-REQUIRES="qt6"
-OPTIONAL="KDSingleApplication libebur128 libgme libopenmpt soundtouch soxr"
+REQUIRES=(qt6)
+OPTIONAL=(KDSingleApplication libebur128 libgme libopenmpt soundtouch soxr)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz

@@ -7,8 +7,8 @@ DESCRIPTION="post-modern modal text editor"
 HOMEPAGE="https://helix-editor.com/"
 DOWNLOAD="https://github.com/helix-editor/helix/releases/download/${VERSION}/${PRGNAM}-${VERSION}-source.tar.xz"
 SHA256SUM="2d0cf264ac77f8c25386a636e2b3a09a23dec555568cc9a5b2927f84322f544e"
-BUILD_REQUIRES="rust-opt"
-OPTIONAL="mdbook"
+BUILD_REQUIRES=(rust-opt)
+OPTIONAL=(mdbook)
 
 unpack () {
   mkdir -p $PRGNAM-$VERSION

@@ -7,8 +7,8 @@ DESCRIPTION="Download and run large language models locally"
 HOMEPAGE="https://github.com/ollama/ollama"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="103767d263ea21fcd9c1803a9093131bb7bcbd4590638690859645c8745c5768"
-BUILD_REQUIRES="cmake-opt google-go-lang"
-OPTIONAL="cudatoolkit_13 rocmtoolkit_7"
+BUILD_REQUIRES=(cmake-opt google-go-lang)
+OPTIONAL=(cudatoolkit_13 rocmtoolkit_7)
 
 unpack () {
   check_gid ollama 393

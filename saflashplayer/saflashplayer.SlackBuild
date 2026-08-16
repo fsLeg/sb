@@ -7,7 +7,7 @@ DESCRIPTION="Stand-Alone Flash Player"
 HOMEPAGE="https://get.adobe.com/flashplayer"
 DOWNLOAD="https://fpdownload.macromedia.com/pub/flashplayer/updaters/32/flash_player_sa_linux.x86_64.tar.gz"
 SHA256SUM="883f7aa23301fc80de879501157533a4acdbfee0721ed7c57676dc032fdf96c3"
-CONFLICTS="saflashplayer-legacy"
+CONFLICTS=(saflashplayer-legacy)
 SKIP_STRIP=1
 
 unpack () {

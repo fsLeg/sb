@@ -7,7 +7,7 @@ DESCRIPTION="Tool for managing your YubiKey configuration"
 HOMEPAGE="https://developers.yubico.com/yubikey-manager/"
 DOWNLOAD="https://github.com/Yubico/yubikey-manager/releases/download/${VERSION}/${PRGNAM/-/_}-${VERSION}.tar.gz"
 SHA256SUM="9aeb4035dcff8f6cb792e83f36e6a9152a9b5b65ac2c2e25e5f20d53c6064e62"
-REQUIRES="ccid click python-fido2 python3-keyring pyscard"
+REQUIRES=(ccid click python-fido2 python3-keyring pyscard)
 
 unpack () {
   $UNTAR $CWD/${PRGNAM/-/_}-$VERSION.tar.gz

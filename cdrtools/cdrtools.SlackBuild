@@ -12,7 +12,7 @@ DOWNLOAD="https://codeberg.org/schilytools/schilytools/releases/download/${TARVE
           https://git.kernel.org/pub/scm/fs/zisofs/zisofs-tools.git/snapshot/zisofs-tools-${ZISOFSVER}.tar.gz"
 SHA256SUM="76db022e450c1791a00e69780b55d18a2e3fc39b5ff870996433f87312032024
            d166de7f2d703d56a0d5779fd3621bed32d3cd26b81b34ab507ff7fd66c54ea6"
-CONFLICTS="cdrkit"
+CONFLICTS=(cdrkit)
 
 unpack () {
   $UNTAR $CWD/$TARNAM-$TARVER.tar.bz2

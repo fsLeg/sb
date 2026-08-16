@@ -8,7 +8,7 @@ DESCRIPTION="AmneziaWG Linux kernel module"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module/archive/v${VERSION}/${TARNAM}-${VERSION}.tar.gz"
 SHA256SUM="a85817876676d5933385712657bd5525a0a2939baaf057f68e3629c7b4553c82"
-SUGGESTS="amneziawg-tools"
+SUGGESTS=(amneziawg-tools)
 KERNEL="${KERNEL:-$(uname -r)}"
 PKGVER="${VERSION//-/.}_${KERNEL//-/_}"
 

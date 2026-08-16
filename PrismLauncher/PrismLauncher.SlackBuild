@@ -7,10 +7,11 @@ DESCRIPTION="Open Source Minecraft launcher"
 HOMEPAGE="https://prismlauncher.org/"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
 SHA256SUM="c66f1267c8d4f3be6838bf8c02ae30eb149ba8d92c75455406db42e1b0aff1c5"
-REQUIRES="qt6 gamemode tomlplusplus cmark"
-BUILD_REQUIRES="cmake-opt jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25"
-OPTIONAL="scdoc glfw3 flite orca"
-CONFLICTS="PrismLauncher-Unlocked"
+REQUIRES=(qt6 gamemode tomlplusplus cmark)
+BUILD_REQUIRES=(cmake-opt "jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25")
+OPTIONAL=(scdoc)
+CONFLICTS=(PrismLauncher-Unlocked)
+SUGGESTS=(glfw3 flite orca)
 PKGVER="${VERSION//-/.}" # fix package name for pre-releases
 
 unpack () {

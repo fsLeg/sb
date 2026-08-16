@@ -8,7 +8,7 @@ DESCRIPTION="Stream free movies and TV shows from torrents"
 HOMEPAGE="https://popcorn-time.site/"
 DOWNLOAD="https://sbo.t-rg.ws/${TARNAM}-${VERSION}.tar.gz"
 SHA256SUM="93ab145004b266adce2d0533c6997eeb68757c9533478623fb5ebd7df5293567"
-BUILD_REQUIRES="yarn"
+BUILD_REQUIRES=(yarn)
 NWVER="0.86.0"
 
 unpack () {
