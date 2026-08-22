@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="amnezia-client"
-VERSION="5.0.0.5"
+VERSION="5.0.1.5"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Amnezia VPN client for desktop"
 HOMEPAGE="https://amnezia.org"
 DOWNLOAD="https://github.com/amnezia-vpn/amnezia-client/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="507e44cdbe4f1fc71b14fbebf73d53d898c02853c23deb8bbd358310f5706a5a"
+SHA256SUM="478a3a983c8e20ba2317b5df69db4a202afcc72629890318025cad7c61fb0c99"
 
 unpack () {
   if [ ! "$SLACKVER" = "current" ]; then
@@ -49,7 +49,7 @@ build () {
   ln -sf ../lib$LIBDIRSUFFIX/$PRGNAM/AmneziaVPN $PKG/$_PREFIX/bin/
   install -Dm755 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
     deploy/build/service/server/{AmneziaVPN-service,amneziawg-go,geo*.dat,openvpn,tun2socks}
-  patchelf --remove-rpath $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/AmneziaVPN*
+  patchelf --remove-rpath $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/{AmneziaVPN*,openvpn}
   install -Dm755 $CWD/rc.amnezia $PKG/$SYSCONFDIR/rc.d/rc.amnezia.new
   sed -i "s|@PREFIX@|$_PREFIX|g
           s|@LIBDIRSUFFIX@|$LIBDIRSUFFIX|g" \
