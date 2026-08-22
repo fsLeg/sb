@@ -50,7 +50,7 @@ unpack () {
 
   if [[ "$OPENBLAS" == "yes" ]]; then
     USE_OPENBLAS="-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS"
-    REQUIRES+=(OpenBLAS)
+    [[ "$SLACKVER" != "current" ]] && REQUIRES+=(OpenBLAS)
   fi
 
   if [[ "$VULKAN" == "yes" ]]; then
