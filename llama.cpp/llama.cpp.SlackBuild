@@ -55,7 +55,7 @@ unpack () {
 
   if [[ "$VULKAN" == "yes" ]]; then
     USE_VULKAN="-DGGML_VULKAN=ON"
-    REQUIRES+=("vulkan-sdk>=1.4")
+    REQUIRES+=("vulkan-sdk >= 1.4")
   fi
 
   if [[ "$OPENVINO" == "yes" ]]; then
