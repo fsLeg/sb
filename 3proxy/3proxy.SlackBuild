@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="3proxy"
-VERSION="0.9.9"
+VERSION="1.0.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="tiny free proxy server"
 HOMEPAGE="https://3proxy.org/"
 DOWNLOAD="https://github.com/3proxy/3proxy/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="596d5471424a7f76612d3daf04557bc2877a4a0b61551eaeca94b1ef3b8563b5"
+SHA256SUM="35b07de1046f3aaeac4a7085101b7e5c453efa3527cbdc42a84690366c7ecfa8"
 
 unpack () {
   check_gid proxy 396
