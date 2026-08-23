@@ -1,16 +1,23 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="llama.cpp"
-VERSION="b10431"
+VERSION="0.2.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="LLM inference in C/C++"
 HOMEPAGE="https://llama-cpp.com/"
-DOWNLOAD="https://github.com/ggml-org/llama.cpp/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="9fa12ee5c681aef3cce914beafdc976635a68083342af23ca075b67db464b7b8"
+DOWNLOAD="https://github.com/ggml-org/llama.cpp/archive/$([[ "${VERSION::1}" != "b" ]] && echo v || :)${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
+SHA256SUM="72e6c3e70c584f84e61697e449ee388f43458d662ef8f3bd3f6b4a054c947958"
 OPTIONAL=(cudatoolkit_13 "nodejs|nodejs22|nodejs24-bin" OpenBLAS openvino rocmtoolkit_7)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
+
+  if [[ "${VERSION::1}" != "b" ]]; then
+    LLAMA_BUILD_NUMBER="$(curl --follow https://github.com/ggml-org/llama.cpp/releases/download/v$VERSION/nightly-tag.txt)"
+    LLAMA_BUILD_IS_DEV=OFF
+  else
+    LLAMA_BUILD_NUMBER="$VERSION"
+  fi
 
   # Autodetect options
   if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
@@ -84,7 +91,8 @@ build () {
         -DGGML_BUILD_TESTS=OFF \
         -DGGML_LTO=ON \
         -DBUILD_SHARED_LIBS=ON \
-        -DLLAMA_BUILD_NUMBER="${VERSION#b}" \
+        -DLLAMA_BUILD_NUMBER="${LLAMA_BUILD_NUMBER#b}" \
+        ${LLAMA_BUILD_IS_DEV:+"-DLLAMA_BUILD_IS_DEV=$LLAMA_BUILD_IS_DEV"} \
         -Wno-dev
   cmake --build build \
         --config Release
