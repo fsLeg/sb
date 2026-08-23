@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="deltachat-desktop"
-VERSION="2.59.0"
+VERSION="2.59.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="decentralized private messenger"
 HOMEPAGE="https://delta.chat"
