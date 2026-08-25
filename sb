@@ -377,13 +377,19 @@ done
 
 # Add metadata for slapt-get to use
 if [[ -n "${REQUIRES}" ]]; then
-  echo "${REQUIRES[@]}" | tr ' ' '\n' > "${PKG}/install/slack-required"
+  for DEP in "${REQUIRES[@]}"; do
+    echo "${DEP}" >> "${PKG}/install/slack-required"
+  done
 fi
 if [[ -n "${CONFLICTS}" ]]; then
-  echo "${CONFLICTS[@]}" | tr ' ' '\n' > "${PKG}/install/slack-conflicts"
+  for DEP in "${CONFLICTS[@]}"; do
+    echo "${DEP}" >> "${PKG}/install/slack-required"
+  done
 fi
 if [[ -n "${SUGGESTS}" ]]; then
-  echo "${SUGGESTS[@]}" | tr ' ' '\n' > "${PKG}/install/slack-suggests"
+  for DEP in "${SUGGESTS[@]}"; do
+    echo "${DEP}" >> "${PKG}/install/slack-required"
+  done
 fi
 
 # Make the package; be sure to leave it in $OUTPUT
