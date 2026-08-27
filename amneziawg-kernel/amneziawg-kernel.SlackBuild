@@ -2,12 +2,12 @@
 
 PRGNAM="amneziawg-kernel"
 TARNAM="amneziawg-linux-kernel-module"
-VERSION="3.1.20260812"
+VERSION="3.1.20260827"
 BUILD="${BUILD:-1}"
 DESCRIPTION="AmneziaWG Linux kernel module"
 HOMEPAGE="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module"
 DOWNLOAD="https://github.com/amnezia-vpn/amneziawg-linux-kernel-module/archive/v${VERSION}/${TARNAM}-${VERSION}.tar.gz"
-SHA256SUM="a85817876676d5933385712657bd5525a0a2939baaf057f68e3629c7b4553c82"
+SHA256SUM="eb140871ec14c8fec322b497bc9ef2d3a76f240dfb0738ce6a2666c995fd3e93"
 SUGGESTS=(amneziawg-tools)
 KERNEL="${KERNEL:-$(uname -r)}"
 PKGVER="${VERSION//-/.}_${KERNEL//-/_}"
