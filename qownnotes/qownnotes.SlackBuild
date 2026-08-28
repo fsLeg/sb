@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="qownnotes"
-VERSION="26.8.6"
+VERSION="26.8.11"
 BUILD="${BUILD:-1}"
 DESCRIPTION="notepad with markdown support and Nextcloud integration"
 HOMEPAGE="https://www.qownnotes.org/"
 DOWNLOAD="https://github.com/pbek/QOwnNotes/releases/download/v${VERSION}/${PRGNAM}-${VERSION}.tar.xz"
-SHA256SUM="25819da08a0112c01bb43e0fcb5f9265c9ac08c92ab800db0a4e5896e0d270c4"
+SHA256SUM="d80aae760e20fb092b406cbc76f3f7fc2bd946c5597df6a3f132d31107f56a87"
 OPTIONAL=(Botan libgit2 qt6)
 
 unpack () {
