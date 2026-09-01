@@ -383,12 +383,12 @@ if [[ -n "${REQUIRES}" ]]; then
 fi
 if [[ -n "${CONFLICTS}" ]]; then
   for DEP in "${CONFLICTS[@]}"; do
-    echo "${DEP}" >> "${PKG}/install/slack-required"
+    echo "${DEP}" >> "${PKG}/install/slack-conflicts"
   done
 fi
 if [[ -n "${SUGGESTS}" ]]; then
   for DEP in "${SUGGESTS[@]}"; do
-    echo "${DEP}" >> "${PKG}/install/slack-required"
+    echo "${DEP}" >> "${PKG}/install/slack-suggests"
   done
 fi
 
