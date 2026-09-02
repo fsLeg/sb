@@ -1,7 +1,7 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="google-go-lang"
-VERSION="1.27.0"
+VERSION="1.27.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Core compiler tools for the Go programming language"
 HOMEPAGE="https://go.dev"
@@ -10,7 +10,7 @@ DOWNLOAD="https://go.dev/dl/go${VERSION}.src.tar.gz
           https://go.dev/dl/go1.23.12.src.tar.gz
           https://go.dev/dl/go1.21.13.src.tar.gz
           https://go.dev/dl/go1.19.13.src.tar.gz"
-SHA256SUM="7002403d7cc44529ef6d26f69a44818263395ead7c16c05a5808ae047ebeb0e5
+SHA256SUM="4e408abae126d916b6164627193f2c54f0e3ca1312d693b86db45f862ab238b1
            9e83f44f5fc297378861b4e16cc6aa114be8add7993fb3ceb2c512380aa4d582
            e1cce9379a24e895714a412c7ddd157d2614d9edbe83a84449b6e1840b4f1226
            71fb31606a1de48d129d591e8717a63e0c5565ffba09a24ea9f899a13214c34d
