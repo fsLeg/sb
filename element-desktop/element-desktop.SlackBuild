@@ -13,13 +13,6 @@ BUILD_REQUIRES=(rust-opt "nodejs|nodejs22|nodejs24-bin")
 CONFLICTS=(element-desktop-bin)
 
 unpack () {
-  if [[ "$ROOT_TYPE" == "fakeroot" ]]; then
-    echo "This piece of shit requires to be built as a single real user."
-    echo "You have to actually run this script as root. Blame Nx developers."
-    echo "User discretion is advised."
-    exit 1
-  fi
-
   $UNTAR $CWD/$WEBNAM-$VERSION.tar.gz
   mv $WEBNAM-$VERSION $PRGNAM-$VERSION
 
@@ -29,19 +22,24 @@ unpack () {
   mkdir -p $COREPACK_HOME/bin
   corepack enable --install-directory $COREPACK_HOME/bin
   export PATH="$COREPACK_HOME/bin:$PATH"
+
+  # fight the nx
   export NX_TUI=false
   export NX_SOCKET_DIR="$TMP/.nx"
+  # this commit no longer allows building with fakeroot using nx-23.1.2+:
+  # https://github.com/nrwl/nx/commit/63e1abb287a3d69f8ba981828a1de325d0d3dc68
+  sed -ri 's/nx:\s[0-9]{2}\.[0-9]\.[0-9]$/nx: 23.1.1/' $PRGNAM-$VERSION/pnpm-workspace.yaml
 }
 
 build () {
-  pnpm install --frozen-lockfile
+  pnpm install 
   VERSION=$VERSION \
     pnpm -C apps/web run build
 
   cd apps/desktop
   mkdir -p deploys
   mv ../web/webapp deploys/element-v$VERSION
-  pnpm install --frozen-lockfile
+  pnpm install
   pnpm run fetch --noverify --cfgdir ""
   CRATE_CC_NO_DEFAULTS=1 \
     pnpm run build:native
