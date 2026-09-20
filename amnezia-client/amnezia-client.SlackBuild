@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="amnezia-client"
-VERSION="5.0.2.1"
+VERSION="5.0.3.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Amnezia VPN client for desktop"
 HOMEPAGE="https://amnezia.org"
 DOWNLOAD="https://github.com/amnezia-vpn/amnezia-client/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="2b16fd663a666e0aea45a8df28e34e319114290936a258b11b17a732bac50231"
+SHA256SUM="04ea1e41c1eb17ac89e85fa788c1d6d8bb7ba1216b443f7359133e33864fb4f0"
 
 unpack () {
   if [ ! "$SLACKVER" = "current" ]; then
@@ -27,6 +27,15 @@ unpack () {
   source $PRGNAM-$VERSION/conan/bin/activate
   pip install conan
   export CONAN_HOME=$TMP/.conan2
+  # LLVM 23 is too new for Conan to know about it. Popullate local settings and add the clang version.
+  conan --version &> /dev/null
+  python3 -c "
+import yaml
+c='$CONAN_HOME/settings.yml'
+d=yaml.safe_load(open(c))
+d['compiler']['clang']['version'].append('23')
+yaml.safe_dump(d, open(c, 'w'))
+"
   unset GOROOT
 
   # Export AGW public key and S3 endpoint for VPN from Amnezia to work
