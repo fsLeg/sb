@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ccid"
-VERSION="1.8.3"
+VERSION="1.8.4"
 BUILD="${BUILD:-1}"
 DESCRIPTION="PC/SC driver for USB CCID smart card readers"
 HOMEPAGE="https://ccid.apdu.fr/"
 DOWNLOAD="https://ccid.apdu.fr/files/${PRGNAM}-${VERSION}.tar.xz"
-SHA256SUM="2f22877569154a75d54922db45c4e0cb3d290e72c60c574dc08966599cdcc5ac"
+SHA256SUM="4ff98151a7feb828a711e2f9d68c6b6065a97c597a81c2cbbd11d7f7edcfe743"
 REQUIRES=(pcsc-lite)
 
 unpack () {
