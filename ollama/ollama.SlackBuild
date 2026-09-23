@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ollama"
-VERSION="0.34.2"
+VERSION="0.34.3"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Download and run large language models locally"
 HOMEPAGE="https://github.com/ollama/ollama"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="3fb06dc496f321749423792066f299205c433b815540c1f23f18368540401640"
+SHA256SUM="89aecca954feb03ff39c781ff321b0055349b82720b0c3832a2336e0ea9da029"
 BUILD_REQUIRES=(cmake-opt google-go-lang)
 OPTIONAL=(cudatoolkit_13 rocmtoolkit_7)
 
@@ -63,9 +63,6 @@ unpack () {
       $PRGNAM-$VERSION/ml/path.go
   sed -i '/"CUDA_PATH"/d; /"CUDA_HOME"/d' \
       $PRGNAM-$VERSION/mlxrunner/client.go
-
-  # add "PARAMETER think" for Modelfile, PR14108
-  patch -p1 -d $PRGNAM-$VERSION -i $CWD/14108.patch
 }
 
 build () {
