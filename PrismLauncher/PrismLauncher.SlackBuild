@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="PrismLauncher"
-VERSION="11.1.0"
+VERSION="11.1.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Open Source Minecraft launcher"
 HOMEPAGE="https://prismlauncher.org/"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="4f6875b95a19f973da2a6888a71efbe439919061cd4630a54744470ab7fcef43"
+SHA256SUM="8a953c25afd0a62d2050edac9fe23d93dcaee27c94b4d1dc86740332c64d2497"
 REQUIRES=(qt6 gamemode tomlplusplus cmark)
 BUILD_REQUIRES=(cmake-opt "jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25")
 OPTIONAL=(scdoc)
