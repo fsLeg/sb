@@ -2,20 +2,25 @@
 
 PRGNAM="element-desktop"
 WEBNAM="element-web"
-VERSION="1.12.29"
+VERSION="1.12.30"
+SESHVER="6.0.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="secure and independent communication via Matrix"
 HOMEPAGE="https://element.io/"
-DOWNLOAD="https://github.com/element-hq/$WEBNAM/archive/v$VERSION/$WEBNAM-$VERSION.tar.gz"
-SHA256SUM="cbba81c946505c24e35d9de109ffc93ddf6c0c22af7f347ce678cc6c5286a350"
+DOWNLOAD="https://github.com/element-hq/$WEBNAM/archive/v$VERSION/$WEBNAM-$VERSION.tar.gz
+          https://github.com/matrix-org/seshat/archive/$SESHVER/seshat-$SESHVER.tar.gz"
+SHA256SUM="d551e361037939913bca4a572e2364fc040f90256689ec518269fc8d60a9953a
+           600b494343cb01a4d4970c0ec46bcac2b11e4a1a5ddb3adea627d38906f2340e"
 REQUIRES=(sqlcipher)
 BUILD_REQUIRES=(rust-opt "nodejs|nodejs22|nodejs24-bin")
 CONFLICTS=(element-desktop-bin)
 
 unpack () {
+  $UNTAR $CWD/seshat-$SESHVER.tar.gz
   $UNTAR $CWD/$WEBNAM-$VERSION.tar.gz
   mv $WEBNAM-$VERSION $PRGNAM-$VERSION
 
+  # install the package managers
   corepack install --global \
     $(node -p "p=require('./$PRGNAM-$VERSION/package.json').devEngines.packageManager;p.name+'@'+p.version.split('+')[0]") \
     "yarn@^1"
@@ -32,6 +37,12 @@ unpack () {
 }
 
 build () {
+  pushd ../seshat-$SESHVER/seshat-node
+    yarn install
+    CRATE_CC_NO_DEFAULTS=1 \
+      yarn run build
+  popd
+
   pnpm install 
   VERSION=$VERSION \
     pnpm -C apps/web run build
@@ -39,10 +50,10 @@ build () {
   cd apps/desktop
   mkdir -p deploys
   mv ../web/webapp deploys/element-v$VERSION
+  mv ../../../seshat-$SESHVER/seshat-node ./
+  pnpm link ./seshat-node
   pnpm install
   pnpm run fetch --noverify --cfgdir ""
-  CRATE_CC_NO_DEFAULTS=1 \
-    pnpm run build:native
   pnpm run build --publish never
 
   install -d $PKG/$_PREFIX/{bin,lib$LIBDIRSUFFIX,share/applications}
