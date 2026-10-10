@@ -66,6 +66,7 @@ The `sb` tool provides various variables and a few functions in hopes of being u
 - PYVER - major Python3 version (i. e. 3.9)
 - SLACKVER - Slackware version (numerical or "current")
 - UNTAR - `tar --no-same-owner -xvf`
+- PKGDOC - $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER. If PKGVER is not defined in the SlackBuild, it defaults to VERSION. The directory is created automatically.
 
 CFLAGS and the like are already exported, so you don't need to set them, unless you want to change them. For full list of variables see the source of sb. CFLAGS and CXXFLAGS are set to use gold/mold as the linker in Slackware-stable and -current respectively.
 

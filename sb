@@ -259,8 +259,10 @@ if [[ -z "${PKGVER}" ]]; then
   PKGVER="${VERSION}"
 fi
 
+PKGDOC="${PKG}/${_PREFIX}/doc/${PRGNAM}-${PKGVER}"
+
 rm -rf "${PKG}"
-mkdir -p "${TMP}" "${PKG}" "${OUTPUT}"
+mkdir -p "${TMP}" "${PKG}" "${OUTPUT}" "${PKGDOC}"
 rm -rf "${TMP}/${PRGNAM}-${VERSION}"
 
 if [[ -n "${PRINT_PACKAGE_NAME}" ]]; then
