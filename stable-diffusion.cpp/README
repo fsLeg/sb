@@ -1,0 +1,24 @@
+stable-diffusion.cpp provides diffusion model (SD, Flux, Wan, Qwen
+Image, Z-Image, ...) inference in pure C/C++.
+
+Features:
+- Plain C/C++ implementation based on ggml, working in the same way as llama.cpp
+- Super lightweight and without external dependencies
+- Supports Image Models, Image Edit Models and  Video Models
+- PhotoMaker support.
+- IP-Adapter support (SD 1.5 and SDXL, including Plus)
+- Control Net support with SD 1.5
+- ADetailer
+- LoRA support, same as stable-diffusion-webui
+- Latent Consistency Models support (LCM/LCM-LoRA)
+- Faster and memory efficient latent decoding with TAESD
+- Upscale images generated with ESRGAN
+
+If you have vulkan-sdk 1.4+, vulkan backend will be built, use VULKAN=no
+to disable.
+
+Optional dependencies (autodetected):
+- cudatoolkit_13 - for CUDA backend, use CUDA=no to disable
+- rocmtoolkit_7 - for HIP backend, use HIP=no to disable
+- OpenBLAS - for BLAS backend, use OPENBLAS=no to disable
+- nodejs - for WebUI

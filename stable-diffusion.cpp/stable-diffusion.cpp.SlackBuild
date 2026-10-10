@@ -1,0 +1,110 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="stable-diffusion.cpp"
+VERSION="955"
+HASH="b7a74e6"
+TARNAM="${PRGNAM}-master-${VERSION}-${HASH}"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Diffusion model inference in pure C/C++"
+HOMEPAGE="https://github.com/leejet/stable-diffusion.cpp"
+DOWNLOAD="https://github.com/leejet/stable-diffusion.cpp/archive/master-${VERSION}-${HASH}/${TARNAM}.tar.gz"
+SHA256SUM="f84c6241a51c359bbf3ed3e8c3b8bf22c2abe7603b3132e5f70c2228ecb5b8ba"
+OPTIONAL=(cudatoolkit_13 "nodejs|nodejs22|nodejs24-bin" "OpenBLAS|openblas" rocmtoolkit_7)
+PKGVER="r${VERSION}_${HASH}"
+
+unpack () {
+  $UNTAR $CWD/$TARNAM.tar.gz
+  mv $TARNAM $PRGNAM-$VERSION
+
+  # developers didn't specify that you need a specific branch of ggml
+  sed -i '/ggml.git/a\\tbranch = sd.cpp' $PRGNAM-$VERSION/.gitmodules
+
+  get_submodules $PRGNAM-$VERSION
+
+  corepack install --global "$(node -p "require('./$PRGNAM-$VERSION/examples/server/frontend/package.json').packageManager")"
+  mkdir -p $COREPACK_HOME/bin
+  corepack enable --install-directory $COREPACK_HOME/bin
+  export PATH="$COREPACK_HOME/bin:$PATH"
+
+  # remove version autodetection
+  sed -i '/find_program(GIT_EXE/d' $PRGNAM-$VERSION/CMakeLists.txt
+
+  # Autodetect options
+  if [[ ! -v CUDA ]] && command -v nvcc &> /dev/null; then
+    CUDA="yes"
+  fi
+
+  if [[ ! -v HIP ]] && command -v hipconfig &> /dev/null; then
+    HIP="yes"
+  fi
+
+  if [[ ! -v OPENBLAS ]] && pkg-config --exists openblas; then
+    OPENBLAS="yes"
+  fi
+
+  if [[ ! -v VULKAN ]] && pkg-config --atleast-version=1.4 vulkan; then
+    VULKAN="yes"
+  fi
+
+  # Set the options
+  if [[ "$CUDA" == "yes" ]]; then
+    USE_CUDA="-DSD_CUDA=ON"
+    REQUIRES+=(cudatoolkit_13)
+  fi
+
+  if [[ "$HIP" == "yes" ]]; then
+    USE_HIP="-DSD_HIPBLAS=ON"
+    REQUIRES+=(rocmtoolkit_7)
+  fi
+
+  if [[ "$OPENBLAS" == "yes" ]]; then
+    USE_OPENBLAS="-DGGML_OPENBLAS=ON"
+    REQUIRES+=("OpenBLAS | openblas")
+  fi
+
+  if [[ "$VULKAN" == "yes" ]]; then
+    USE_VULKAN="-DSD_VULKAN=ON"
+    REQUIRES+=("vulkan-sdk >= 1.4")
+  fi
+}
+
+build () {
+  cmake -B build \
+        -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+        -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+        -DCMAKE_INSTALL_PREFIX="$_PREFIX" \
+        $USE_CUDA \
+        $USE_HIP \
+        $USE_OPENBLAS \
+        $USE_VULKAN \
+        -DSD_USE_SYSTEM_WEBP=ON \
+        -DGGML_BUILD_EXAMPLES=OFF \
+        -DGGML_BUILD_TESTS=OFF \
+        -DGGML_LTO=ON \
+        -DSD_BUILD_SHARED_LIBS=ON \
+        -DSD_BUILD_SHARED_GGML_LIB=OFF \
+        -DSDCPP_BUILD_VERSION=r$VERSION \
+        -DSDCPP_BUILD_COMMIT=$HASH \
+        -Wno-dev
+  cmake --build build \
+        --config Release
+
+  DESTDIR=$PKG \
+  cmake --install build \
+        --prefix $_PREFIX
+
+  # ggml is built statically into libstable-diffusion.so
+  find $PKG -name "*.a" -type f -delete
+
+  # remove ggml includes since they aren't supposed to be provided
+  rm -r $PKG/$_PREFIX/include/{ggml,gguf}* \
+        $PKG/$_PREFIX/lib$LIBDIRSUFFIX/cmake/ggml
+
+  cp -a -t $PKGDOC \
+    AGENTS.md CLAUDE.md CONTRIBUTING.md LICENSE README.md docs/
+  install -Dm644 -t $PKGDOC/oniguruma \
+    thirdparty/oniguruma/COPYING
+  install -Dm644 -t $PKGDOC/utf8proc \
+    thirdparty/utf8proc/LICENSE.md
+  rm -rf $PKG/$_PREFIX/share
+}
