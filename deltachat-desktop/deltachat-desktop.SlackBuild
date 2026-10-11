@@ -28,16 +28,16 @@ build () {
     pnpm pack:linux:dir
   popd
 
-  install -d $PKG/$_PREFIX/{bin,doc/$PRGNAM-$VERSION,lib$LIBDIRSUFFIX,share/applications}
-  cp -aR packages/target-electron/dist/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+  install -d $PKG/$_PREFIX/{bin,lib$LIBDIRSUFFIX,share/applications}
+  cp -a packages/target-electron/dist/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
   install -Dm644 $CWD/$PRGNAM.desktop $PKG/$_PREFIX/share/applications/chat.delta.DeltaChat.desktop
   sed -i "s|@PREFIX@|$_PREFIX|" $PKG/$_PREFIX/share/applications/chat.delta.DeltaChat.desktop
   ln -s $_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/$PRGNAM $PKG/$_PREFIX/bin/
   for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256 512x512; do
     install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
     magick packages/target-electron/build/icon.png -resize $geometry \
-           $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
+      $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
   done
-  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
-            CHANGELOG.md CONTRIBUTING.md LICENSE README.md docs/
+  cp -a -t $PKGDOC \
+    CHANGELOG.md CONTRIBUTING.md LICENSE README.md docs/
 }

@@ -34,7 +34,7 @@ build () {
        bin/sass.dart
 
   install -Dm755 -t $PKG/$_PREFIX/bin sass
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     README.md AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE
 }
 

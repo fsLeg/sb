@@ -57,6 +57,6 @@ build () {
   cmake --build build
 
   DESTDIR=$PKG cmake --install build
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     CHANGELOG.md LICENSE README.md shortcuts.md
 }

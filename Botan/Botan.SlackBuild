@@ -31,6 +31,7 @@ build () {
   make
 
   make install DESTDIR=$PKG
-  mv $PKG/$_PREFIX/doc/${PRGNAM@L}-$VERSION $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  install -m644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION license.txt readme.rst
+  mv $PKG/$_PREFIX/doc/${PRGNAM@L}-$VERSION/* $PKGDOC/
+  rmdir $PKG/$_PREFIX/doc/${PRGNAM@L}-$VERSION
+  install -Dm644 -t $PKGDOC license.txt readme.rst
 }

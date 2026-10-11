@@ -74,5 +74,5 @@ build () {
            $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/AmneziaVPN.png
   done
   sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g" $CWD/doinst.sh > $PKG/install/doinst.sh
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION *LICENSE* README*.md
+  install -Dm644 -t $PKGDOC *LICENSE* README*.md
 }

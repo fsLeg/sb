@@ -17,7 +17,7 @@ unpack () {
 
 build () {
   $UNTAR data.tar.xz -C $PKG
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     $PKG/usr/share/doc/${PRGNAM%-bin}/* $PKG/opt/Element/LICENSE*
   rm -rf $PKG/usr/share/doc
 }

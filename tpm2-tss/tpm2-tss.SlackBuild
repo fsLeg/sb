@@ -22,7 +22,7 @@ build () {
     --sysconfdir=$SYSCONFDIR \
     --localstatedir=$LOCALSTATEDIR \
     --mandir=$_PREFIX/man \
-    --docdir=$_PREFIX/doc/$PRGNAM-$VERSION \
+    --docdir=${PKGDOC#"$PKG"} \
     --disable-static \
     --build=$ARCH-slackware-linux \
     --with-udevrulesdir=$SYSCONFDIR/udev/rules.d \
@@ -32,6 +32,6 @@ build () {
   make
 
   make install DESTDIR=$PKG
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     CHANGELOG.md CONTRIBUTING.md LICENSE MAINTAINERS.md README.md
 }

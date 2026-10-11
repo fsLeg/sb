@@ -23,6 +23,6 @@ build () {
        PREFIX=$_PREFIX \
        install-strip
 
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     CHANGELOG CONTRIBUTING UNLICENSE VIMTOKAK
 }

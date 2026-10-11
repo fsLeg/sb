@@ -39,10 +39,10 @@ build () {
   meson compile -C build
 
   meson install --destdir=$PKG -C build
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     CITATION.cff CODE_OF_CONDUCT.md CONTRIBUTING.md ChangeLog LICENSE README.md
   if [ "${DOCS}" == "true" ]; then
-    mv $PKG/$_PREFIX/share/doc/vips $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html
+    mv $PKG/$_PREFIX/share/doc/vips $PKGDOC/html
     rmdir $PKG/$_PREFIX/share/doc
   fi
 }

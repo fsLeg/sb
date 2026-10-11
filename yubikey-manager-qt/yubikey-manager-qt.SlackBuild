@@ -26,5 +26,5 @@ build () {
   install -Dm644 -t $PKG/$_PREFIX/share/pixmaps resources/icons/ykman.png
   install -Dm644 -t $PKG/$_PREFIX/share/metainfo resources/com.yubico.yubikey_manager.metainfo.xml
   install -Dm644 -t $PKG/$_PREFIX/share/applications resources/ykman-gui.desktop
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION COPYING NEWS README
+  install -Dm644 -t $PKGDOC COPYING NEWS README
 }

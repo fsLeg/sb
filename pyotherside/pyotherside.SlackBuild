@@ -19,11 +19,10 @@ build () {
 
   make install INSTALL_ROOT=$PKG
   rm -rf $PKG/usr/tests
-  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
   if [ "${DOCS:-no}" != "no" ]; then
     make -C docs html
-    cp -aR _build/html $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+    cp -a _build/html $PKGDOC/
   fi
-  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
-            LICENSE README.md examples/
+  cp -a -t $PKGDOC \
+    LICENSE README.md examples/
 }

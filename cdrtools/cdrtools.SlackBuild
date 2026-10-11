@@ -96,16 +96,16 @@ build () {
   install -d $PKG/install
   sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g" \
     $CWD/doinst.sh > $PKG/install/doinst.sh
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     CDDL.Schily.txt CONTRIBUTORS COPYING GPL-2.0.txt LGPL-2.1.txt Schily.Copyright \
     README READMEs/README.{linux,mkisofs}
-  mv $PKG/$_PREFIX/share/doc/* $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  mv $PKG/$_PREFIX/share/doc/* $PKGDOC/
   rmdir $PKG/$_PREFIX/share/doc
-  install -m644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/cdda2wav \
+  install -m644 -t $PKGDOC/cdda2wav \
     cdda2wav/{Changelog,FAQ,Frontends,HOWTOUSE,NEEDED,OtherProgs,THANKS,TODO}
-  install -m644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/mkisofs \
+  install -m644 -t $PKGDOC/mkisofs \
     mkisofs/{COPYING*,ChangeLog*,RELEASE,TODO}
-  reset_permissions $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  reset_permissions $PKGDOC
 
   pushd ../zisofs-tools-$ZISOFSVER
     reset_permissions

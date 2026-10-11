@@ -46,5 +46,5 @@ build () {
     magick resources/icon.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
   done
 
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION resources/license.txt *.md
+  install -Dm644 -t $PKGDOC resources/license.txt *.md
 }

@@ -27,8 +27,8 @@ build () {
   pnpm run build
   pnpm exec electron-builder build --publish never --config electron-builder.yml  --linux dir
 
-  install -d $PKG/$_PREFIX/{bin,doc/$PRGNAM-$VERSION,lib$LIBDIRSUFFIX,share/applications}
-  cp -aR release/build/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+  install -d $PKG/$_PREFIX/{bin,lib$LIBDIRSUFFIX,share/applications}
+  cp -a release/build/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
   ln -s $_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/xyz.chatboxapp.ce $PKG/$_PREFIX/bin/$PRGNAM
   install -Dm644 $CWD/$PRGNAM.desktop $PKG/$_PREFIX/share/applications/xyz.chatboxapp.ce.desktop
   sed -i "s|@PREFIX@|$_PREFIX|" $PKG/$_PREFIX/share/applications/xyz.chatboxapp.ce.desktop
@@ -36,6 +36,6 @@ build () {
     install -Dm644 release/build/linux-unpacked/resources/assets/icons/$geometry.png \
       $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
   done
-  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  cp -a -t $PKGDOC \
     LICENSE README.md doc/FAQ.md docs/
 }

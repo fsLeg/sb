@@ -35,7 +35,7 @@ build () {
   rm -rf $PKG/$_PREFIX/{include,lib$LIBDIRSUFFIX/cmake}
   rm -rf $PKG/$_PREFIX/lib$LIBDIRSUFFIX/*.a
 
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION CHANGELOG.md
-  mv $PKG/$_PREFIX/share/doc/fooyin/* $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  install -Dm644 -t $PKGDOC CHANGELOG.md
+  mv $PKG/$_PREFIX/share/doc/fooyin/* $PKGDOC
   rm -rf $PKG/$_PREFIX/share/doc
 }

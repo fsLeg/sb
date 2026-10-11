@@ -18,5 +18,5 @@ build () {
   go build -v
 
   install -Dm755 -t $PKG/$_PREFIX/sbin amneziawg-go
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LICENSE README.md
+  install -Dm644 -t $PKGDOC LICENSE README.md
 }

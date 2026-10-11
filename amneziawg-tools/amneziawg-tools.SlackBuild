@@ -26,7 +26,6 @@ build () {
   DESTDIR=$PKG \
   make -C src install
 
-  install -d $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER
-  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER \
+  cp -a -t $PKGDOC \
     COPYING README.md contrib/
 }

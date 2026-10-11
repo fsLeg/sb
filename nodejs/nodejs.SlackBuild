@@ -48,7 +48,7 @@ build () {
   ln -sf $_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/lib/utils/completion.sh \
          $PKG/$_PREFIX/share/bash-completion/completions/npm
   compress_files $PKG/$_PREFIX/lib$LIBDIRSUFFIX/node_modules/npm/man
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LICENSE *.md
-  mv $PKG/$_PREFIX/doc/node/* $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  install -Dm644 -t $PKGDOC LICENSE *.md
+  mv $PKG/$_PREFIX/doc/node/* $PKGDOC/
   rmdir $PKG/$_PREFIX/doc/node
 }

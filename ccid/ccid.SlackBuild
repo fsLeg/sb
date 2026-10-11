@@ -28,7 +28,6 @@ build () {
   meson compile -C build
   meson install -C build --destdir=$PKG
 
-  mkdir -p $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -a AUTHORS COPYING README.md SCARD*.md \
-    $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
+  cp -a -t $PKGDOC \
+    AUTHORS COPYING README.md SCARD*.md
 }

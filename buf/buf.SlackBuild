@@ -32,5 +32,5 @@ build () {
   ./build/buf manpages build/manpages
   install -Dm755 -t $PKG/$_PREFIX/bin build/{buf,protoc-gen-buf-lint,protoc-gen-buf-breaking}
   install -Dm644 -t $PKG/$_PREFIX/man/man1 build/manpages/*
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION CHANGELOG.md LICENSE README.md
+  install -Dm644 -t $PKGDOC CHANGELOG.md LICENSE README.md
 }

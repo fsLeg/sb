@@ -28,6 +28,6 @@ build () {
   install -Dm644 -t $PKG/$_PREFIX/man/man1 $PRGNAM.1.gz
   install -Dm644 -t $PKG/$_PREFIX/share/pixmaps $PRGNAM.png
 
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     CHANGELOG.md LICENSE README.md
 }

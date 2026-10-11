@@ -49,6 +49,6 @@ build () {
   cmake --build --preset linux
 
   DESTDIR=$PKG cmake --install build
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     CONTRIBUTING.md COPYING.md README.md LICENSE
 }

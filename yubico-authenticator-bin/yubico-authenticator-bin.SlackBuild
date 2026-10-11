@@ -17,7 +17,7 @@ unpack () {
 
 build () {
   install -d $PKG/opt/${PRGNAME}
-  cp -aR -t $PKG/opt/${PRGNAME} data/ helper/ lib/ linux_support/ authenticator
+  cp -a -t $PKG/opt/${PRGNAME} data/ helper/ lib/ linux_support/ authenticator
   install -Dm644 -t $PKG/$_PREFIX/share/applications linux_support/com.yubico.yubioath.desktop
   sed -i "s|@EXEC_PATH|/opt/${PRGNAME}|g" $PKG/$_PREFIX/share/applications/com.yubico.yubioath.desktop
   install -d $PKG/$_PREFIX/bin
@@ -26,5 +26,5 @@ build () {
 /opt/${PRGNAME}/authenticator $@
 EOF
   chmod 755 $PKG/$_PREFIX/bin/authenticator
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION README.adoc
+  install -Dm644 -t $PKGDOC README.adoc
 }

@@ -24,6 +24,6 @@ build () {
   install -Dm644 -t $PKG/$_PREFIX/share/icons/oxygen/base/22x22/status/ icons/*.png
   install -d $PKG/$_PREFIX/man/man1
   pod2man < fdpowermon > $PKG/$_PREFIX/man/man1/fdpowermon.1
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION debian/copyright debian/changelog README.md
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/examples theme.pl
+  install -Dm644 -t $PKGDOC debian/copyright debian/changelog README.md
+  install -Dm644 -t $PKGDOC/examples theme.pl
 }

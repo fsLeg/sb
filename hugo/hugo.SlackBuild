@@ -50,8 +50,8 @@ build () {
   ./hugo completion bash > $PKG/$_PREFIX/share/bash-completion/completions/$PRGNAM
   ./hugo completion fish > $PKG/$_PREFIX/share/fish/vendor_completions.d/$PRGNAM.fish
   ./hugo completion zsh > $PKG/$_PREFIX/share/zsh/site-functions/_$PRGNAM
-  ./hugo gen doc --dir $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  ./hugo gen doc --dir $PKGDOC
+  install -Dm644 -t $PKGDOC \
     CONTRIBUTING.md LICENSE README.md SECURITY.md
 }
 

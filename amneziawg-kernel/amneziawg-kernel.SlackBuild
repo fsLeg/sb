@@ -58,6 +58,6 @@ build () {
     cp -a $PKG/install/doinst.sh $PKG/install/douninst.sh
   fi
 
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$PKGVER \
+  install -Dm644 -t $PKGDOC \
     COPYING README.md
 }

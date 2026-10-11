@@ -57,7 +57,7 @@ build () {
   pnpm run build --publish never
 
   install -d $PKG/$_PREFIX/{bin,lib$LIBDIRSUFFIX,share/applications}
-  cp -aR dist/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+  cp -a dist/linux-unpacked $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
   install -Dm644 $CWD/element-desktop.desktop $PKG/$_PREFIX/share/applications/io.element.Element.desktop
   sed -i "s|@PREFIX@|$_PREFIX|" $PKG/$_PREFIX/share/applications/io.element.Element.desktop
   ln -s $_PREFIX/lib$LIBDIRSUFFIX/element-desktop/element-desktop $PKG/$_PREFIX/bin/
@@ -65,6 +65,6 @@ build () {
     install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
     magick build/icon.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
   done
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -Dm644 -t $PKGDOC \
     CHANGELOG.md README.md ../../{AUTHORS.rst,CONTRIBUTING.md,LICENSE-*}
 }

@@ -32,7 +32,6 @@ build () {
     $PKG/$_PREFIX/share/applications/fr.tlk.linux.$TARNAM.desktop
   install -Dm644 -t $PKG/$_PREFIX/share/pixmaps $PRGNAM.xpm
 
-  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  cp -a -t $PKGDOC \
     AUTHORS CHANGES COPYING README html/
 }

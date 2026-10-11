@@ -37,7 +37,6 @@ unpack () {
 build () {
   python3 setup.py install --root=$PKG
 
-  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION
-  cp -aR -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  cp -a -t $PKGDOC \
     README.* LICENSES/ doc/changelogs/
 }

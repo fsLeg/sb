@@ -24,7 +24,7 @@ build () {
 
   install -Dm755 -t $PKG/$_PREFIX/bin target/opt/hx
   install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/themes runtime/themes/*.toml
-  cp -aR runtime/queries $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/
+  cp -a runtime/queries $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/
   install -Dm755 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/grammars runtime/grammars/*.so
   install -Dm644 -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM runtime/tutor
   install -Dm644 contrib/completion/hx.bash $PKG/$_PREFIX/share/bash-completion/completions/$PRGNAM
@@ -35,9 +35,9 @@ build () {
     install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
     magick contrib/helix.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
   done
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LICENSE README.md CHANGELOG.md docs/*.md
+  install -Dm644 -t $PKGDOC LICENSE README.md CHANGELOG.md docs/*.md
   if [ "${DOCS:-no}" != "no" ]; then
-    mdbook build --dest-dir $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html book
-    rm -rf $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/html/{CNAME,404.html,.nojekyll,generated}
+    mdbook build --dest-dir $PKGDOC/html book
+    rm -rf $PKGDOC/html/{CNAME,404.html,.nojekyll,generated}
   fi
 }

@@ -366,8 +366,7 @@ find "${PKG}" -name perllocal.pod \
   | xargs rm -f
 
 # Include the SlackBuild script in the documentation directory
-mkdir -p "${PKG}${_PREFIX}/doc/${PRGNAM}-${PKGVER}"
-cat "${CWD}/${PRGNAM}.SlackBuild" > "${PKG}${_PREFIX}/doc/${PRGNAM}-${PKGVER}/${PRGNAM}.SlackBuild"
+cat "${CWD}/${PRGNAM}.SlackBuild" > "${PKGDOC}/${PRGNAM}.SlackBuild"
 
 # Copy the slack-desc (and a custom doinst.sh and douninst.sh if necessary) into ./install
 mkdir -p "${PKG}/install"

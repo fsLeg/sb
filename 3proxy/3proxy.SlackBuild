@@ -52,10 +52,10 @@ build () {
        $CWD/rc.$PRGNAM > $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
   chmod 0755 $PKG/$SYSCONFDIR/rc.d/rc.$PRGNAM.new
 
-  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/ru
-  iconv -f koi8-r -t utf-8 -o $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/ru/example1.txt doc/ru/example1.txt
-  iconv -f koi8-r -t utf-8 -o $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/ru/iodbc.txt doc/ru/iodbc.txt
-  cp -aR --update=none -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  install -d $PKGDOC/ru
+  iconv -f koi8-r -t utf-8 -o $PKGDOC/ru/example1.txt doc/ru/example1.txt
+  iconv -f koi8-r -t utf-8 -o $PKGDOC/ru/iodbc.txt doc/ru/iodbc.txt
+  cp -a --update=none -t $PKGDOC \
     authors copying README.md doc/{html,ru}/ cfg/
   install -d $PKG/install
   sed "s|@SYSCONFDIR@|${SYSCONFDIR#/}|g

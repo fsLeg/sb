@@ -56,15 +56,14 @@ build () {
     ./tools/build.py --mode release create_sdk
   popd
 
-  install -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
-             $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
+  install -d $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM \
              $PKG/$_PREFIX/bin
-  cp -aR sdk/out/Release${PLATFORM@U}/$PRGNAM $PKG/$_PREFIX/lib$LIBDIRSUFFIX/
+  cp -a sdk/out/Release${PLATFORM@U}/$PRGNAM $PKG/$_PREFIX/lib$LIBDIRSUFFIX/
   for PRG in dart dartaotruntime; do
     ln -sf ../lib$LIBDIRSUFFIX/$PRGNAM/bin/$PRG $PKG/$_PREFIX/bin/
   done
-  unzip -d $PKG/$_PREFIX/doc/$PRGNAM-$VERSION $CWD/dartdocs-gen-api.zip
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION \
+  unzip -d $PKGDOC $CWD/dartdocs-gen-api.zip
+  install -Dm644 -t $PKGDOC \
     AUTHORS CHANGELOG.md LICENSE OWNERS PATENT_GRANT README.md SECURITY.md
-  cp -aR docs $PKG/$_PREFIX/doc/$PRGNAM-$VERSION/
+  cp -a docs $PKGDOC/
 }

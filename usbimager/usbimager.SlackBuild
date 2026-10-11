@@ -25,5 +25,5 @@ build () {
   sed -i '/Version=/d; s/Application;//' $PKG/$_PREFIX/share/applications/com.gitlab.bztsrc.$PRGNAM.desktop
 
   mv $PKG/$_PREFIX/share/man $PKG/$_PREFIX/
-  install -Dm644 -t $PKG/$_PREFIX/doc/$PRGNAM-$VERSION LICENSE README.md usbimager-manual.pdf
+  install -Dm644 -t $PKGDOC LICENSE README.md usbimager-manual.pdf
 }
