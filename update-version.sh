@@ -30,8 +30,19 @@ fi
 cd "$PRGNAM"
 
 source "$PRGNAM.SlackBuild"
-sed -i "s|${VERSION/\./\\.}|$NEWVER|g" "$PRGNAM.SlackBuild"
-unset -v VERSION
+case "$PRGNAM" in
+  stable-diffusion.cpp)
+    IFS="-" read -r _ REV NEWHASH <<< "$NEWVER"
+    sed -i "s|^VERSION=\"$VERSION\"|VERSION=\"$REV\"|
+            s|^HASH=\"$HASH\"$|HASH=\"$NEWHASH\"|" \
+        "$PRGNAM.SlackBuild"
+    unset REV NEWHASH
+    ;;
+  *)
+    sed -i "s|${VERSION/\./\\.}|$NEWVER|g" "$PRGNAM.SlackBuild"
+    ;;
+esac
+unset -v VERSION DOWNLOAD
 source "$PRGNAM.SlackBuild"
 
 for URL in $DOWNLOAD; do
