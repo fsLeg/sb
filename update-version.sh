@@ -33,10 +33,20 @@ source "$PRGNAM.SlackBuild"
 case "$PRGNAM" in
   stable-diffusion.cpp)
     IFS="-" read -r _ REV NEWHASH <<< "$NEWVER"
-    sed -i "s|^VERSION=\"$VERSION\"|VERSION=\"$REV\"|
+    sed -i "s|^VERSION=\"$VERSION\"$|VERSION=\"$REV\"|
             s|^HASH=\"$HASH\"$|HASH=\"$NEWHASH\"|" \
         "$PRGNAM.SlackBuild"
-    unset REV NEWHASH
+    unset HASH REV NEWHASH
+    ;;
+  element-desktop)
+    # this should probably be done on a tarball instead, but this way
+    # there's no need to juggle the URLs and possibly re-read the
+    # SlackBuild the third time
+    NEWSESH="$(curl -fsSL "https://raw.githubusercontent.com/element-hq/element-web/refs/tags/v$NEWVER/apps/desktop/package.json" | node -p 'JSON.parse(require("fs").readFileSync(0,"utf8")).dependencies["@matrix-org/seshat"].replace(/[^0-9.]/g, "")')"
+    sed -i "s|^VERSION=\"$VERSION\"$|VERSION=\"$NEWVER\"|
+            s|^SESHVER=\"$SESHVER\"$|SESHVER=\"$NEWSESH\"|" \
+        "$PRGNAM.SlackBuild"
+    unset SESHVER NEWSESH
     ;;
   *)
     sed -i "s|${VERSION/\./\\.}|$NEWVER|g" "$PRGNAM.SlackBuild"
