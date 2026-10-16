@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ocserv"
-VERSION="1.5.0"
+VERSION="1.6.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="OpenConnect SSL VPN server"
 HOMEPAGE="https://ocserv.openconnect-vpn.net"
 DOWNLOAD="https://www.infradead.org/ocserv/download/${PRGNAM}-${VERSION}.tar.xz"
-SHA256SUM="42ced08958b9576ab134fcb7bdc7f8df5e13214fd147855f99021fedcf0eedbe"
+SHA256SUM="2d3303a0d9e06eabfa08694b9dca3c558fef36418857bebf1b8de57ece5f9f32"
 REQUIRES=(libev protobuf-c)
 BUILD_REQUIRES=(ipcalc-ng)
 OPTIONAL=(GeoIP libmaxminddb llhttp oath-toolkit rubygem-ronn)
