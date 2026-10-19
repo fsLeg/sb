@@ -2,12 +2,12 @@
 
 PRGNAM="ffdec"
 TARNAM="jpexs-decompiler"
-VERSION="26.3.0"
+VERSION="26.4.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Open Source Flash SWF decompiler and editor"
 HOMEPAGE="https://github.com/jindrapetrik/jpexs-decompiler"
 DOWNLOAD="https://github.com/jindrapetrik/jpexs-decompiler/archive/version${VERSION}/${TARNAM}-version${VERSION}.tar.gz"
-SHA256SUM="a20879c40ad364427ae01101b7a48fd56681512cfc4d26d69e3f0c2da24db04a"
+SHA256SUM="06388096501193635ddd823bed1f4d811b4fff9aab95eb46c51829fc9c4fd344"
 REQUIRES=("jdk|openjdk8|zulu-openjdk8|jdk11|OpenJDK11|zulu-openjdk11|OpenJDK17|zulu-openjdk17|jdk19|OpenJDK21|zulu-openjdk21|jdk23|zulu-openjdk25")
 BUILD_REQUIRES=(apache-ant)
 
