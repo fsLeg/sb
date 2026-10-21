@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="nodejs"
-VERSION="22.23.3"
+VERSION="22.23.4"
 BUILD="${BUILD:-1}"
 DESCRIPTION="JavaScript runtime"
 HOMEPAGE="https://nodejs.org/"
 DOWNLOAD="https://nodejs.org/dist/v${VERSION}/${PRGNAM%js}-v${VERSION}.tar.gz"
-SHA256SUM="9436c81b284889303d39f5b8bd629bf19e790c665ccb94b4994aa87220d9799a"
+SHA256SUM="4dd79de8cdc85d65cb32f48a75aee1067bf00bf94b96ecc8e4c2f82f6f0272c2"
 CONFLICTS=(nodejs18 nodejs22 nodejs24-bin)
 
 unpack () {
@@ -28,7 +28,10 @@ unpack () {
   sed -i "s|math.h|cmath|" $PRGNAM-$VERSION/src/node_crypto.cc
 
   # a workaround for a GCC 11.2 bug that prevents NodeJS 22 from building
-  patch -p1 -d $PRGNAM-$VERSION < $CWD/nodejs22_gcc11.2_bug.patch
+  patch -p1 -d $PRGNAM-$VERSION -i $CWD/nodejs22_gcc11.2_bug.patch
+
+  # PR66895, fix build with --shared-brotli
+  patch -p1 -d $PRGNAM-$VERSION -i $CWD/brotli.patch
 }
 
 build () {
