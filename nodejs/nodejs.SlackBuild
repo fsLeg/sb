@@ -2,7 +2,7 @@
 
 PRGNAM="nodejs"
 VERSION="22.23.4"
-BUILD="${BUILD:-1}"
+BUILD="${BUILD:-2}"
 DESCRIPTION="JavaScript runtime"
 HOMEPAGE="https://nodejs.org/"
 DOWNLOAD="https://nodejs.org/dist/v${VERSION}/${PRGNAM%js}-v${VERSION}.tar.gz"
