@@ -29,7 +29,10 @@ fi
 
 cd "$PRGNAM"
 
+# get old values
 source "$PRGNAM.SlackBuild"
+
+# version update hooks
 case "$PRGNAM" in
   stable-diffusion.cpp)
     IFS="-" read -r _ REV NEWHASH <<< "$NEWVER"
@@ -53,6 +56,11 @@ case "$PRGNAM" in
     ;;
 esac
 unset -v VERSION DOWNLOAD
+
+# reset build number back to 1
+sed -i 's|^BUILD="\${BUILD:-[0-9]\{1,\}}"$|BUILD="${BUILD:-1}"|' "$PRGNAM.SlackBuild"
+
+# get new values
 source "$PRGNAM.SlackBuild"
 
 for URL in $DOWNLOAD; do
