@@ -1,14 +1,14 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="stable-diffusion.cpp"
-VERSION="975"
-HASH="95b3090"
+VERSION="995"
+HASH="fd21ecf"
 TARNAM="${PRGNAM}-master-${VERSION}-${HASH}"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Diffusion model inference in pure C/C++"
 HOMEPAGE="https://github.com/leejet/stable-diffusion.cpp"
 DOWNLOAD="https://github.com/leejet/stable-diffusion.cpp/archive/master-${VERSION}-${HASH}/${TARNAM}.tar.gz"
-SHA256SUM="241db92b3ef120ff3f70135faf60d8537b5c90966b7fb48ebcde5cc1b367a701"
+SHA256SUM="47c2e99e03b1da0bc3502931fc5abef045a126806c72b8bac9cf1b53e8947f44"
 OPTIONAL=(cudatoolkit_13 "nodejs|nodejs22|nodejs24-bin" "OpenBLAS|openblas" rocmtoolkit_7)
 PKGVER="r${VERSION}_${HASH}"
 
