@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="ollama"
-VERSION="0.40.7"
+VERSION="0.40.9"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Download and run large language models locally"
 HOMEPAGE="https://github.com/ollama/ollama"
 DOWNLOAD="https://github.com/${PRGNAM}/${PRGNAM}/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="9db79f02285556ace3f724c1609e6fbf3d17a9812049400f22567ced591b2c16"
+SHA256SUM="9e99fd4c86ebb5ff948a7f22a667b0c0a5d80a14b86aaf232f282c092e0d6ca7"
 BUILD_REQUIRES=(cmake-opt google-go-lang)
 OPTIONAL=(cudatoolkit_13 rocmtoolkit_7)
 
