@@ -2,7 +2,7 @@
 
 PRGNAM="nodejs"
 VERSION="22.23.4"
-BUILD="${BUILD:-2}"
+BUILD="${BUILD:-3}"
 DESCRIPTION="JavaScript runtime"
 HOMEPAGE="https://nodejs.org/"
 DOWNLOAD="https://nodejs.org/dist/v${VERSION}/${PRGNAM%js}-v${VERSION}.tar.gz"
@@ -29,9 +29,6 @@ unpack () {
 
   # a workaround for a GCC 11.2 bug that prevents NodeJS 22 from building
   patch -p1 -d $PRGNAM-$VERSION -i $CWD/nodejs22_gcc11.2_bug.patch
-
-  # PR66895, fix build with --shared-brotli
-  patch -p1 -d $PRGNAM-$VERSION -i $CWD/brotli.patch
 }
 
 build () {
