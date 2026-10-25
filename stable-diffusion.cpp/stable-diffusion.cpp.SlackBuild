@@ -1,14 +1,14 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="stable-diffusion.cpp"
-VERSION="1006"
-HASH="0886f11"
+VERSION="1014"
+HASH="012c7f8"
 TARNAM="${PRGNAM}-master-${VERSION}-${HASH}"
-BUILD="${BUILD:-2}"
+BUILD="${BUILD:-1}"
 DESCRIPTION="Diffusion model inference in pure C/C++"
 HOMEPAGE="https://github.com/leejet/stable-diffusion.cpp"
 DOWNLOAD="https://github.com/leejet/stable-diffusion.cpp/archive/master-${VERSION}-${HASH}/${TARNAM}.tar.gz"
-SHA256SUM="e802bc420931f29bce2aa28de65d201b3a609b76b6dcd4ef7551d857a63eed77"
+SHA256SUM="330fe59a2a739003214f69d2c9c6794d980afca6dc335fd3e8df10420e71dbf2"
 OPTIONAL=(cudatoolkit_13 "nodejs|nodejs22|nodejs24-bin" "OpenBLAS|openblas" rocmtoolkit_7)
 PKGVER="r${VERSION}_${HASH}"
 
@@ -20,9 +20,6 @@ unpack () {
   sed -i '/ggml.git/a\\tbranch = sd.cpp' $PRGNAM-$VERSION/.gitmodules
 
   get_submodules $PRGNAM-$VERSION
-
-  # remove commit that significantly slows down generation on low-end NVidia Turing cards
-  patch -Rp1 -d $PRGNAM-$VERSION/ggml -i $CWD/a5915eb0e47adef21c3f25b889a008925ea838c2.patch
 
   corepack install --global "$(node -p "require('./$PRGNAM-$VERSION/examples/server/frontend/package.json').packageManager")"
   mkdir -p $COREPACK_HOME/bin
@@ -53,6 +50,16 @@ unpack () {
   if [[ "$CUDA" == "yes" ]]; then
     USE_CUDA="-DSD_CUDA=ON"
     REQUIRES+=(cudatoolkit_13)
+    CUDA_ARCHS="$(offload-arch --only=nvptx)"
+    if [[ -n "$CUDA_ARCHS" ]]; then
+      for CUDA_ARCH in $CUDA_ARCHS; do
+        if [[ "$CUDA_ARCH" == "sm_75" ]]; then
+          # remove commit that significantly slows down generation on low-end NVidia Turing cards
+          patch -Rp1 -d $PRGNAM-$VERSION/ggml -i $CWD/a5915eb0e47adef21c3f25b889a008925ea838c2.patch
+          break
+        fi
+      done
+    fi
   fi
 
   if [[ "$HIP" == "yes" ]]; then
