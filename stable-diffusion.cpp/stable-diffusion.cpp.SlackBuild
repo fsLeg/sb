@@ -4,7 +4,7 @@ PRGNAM="stable-diffusion.cpp"
 VERSION="1006"
 HASH="0886f11"
 TARNAM="${PRGNAM}-master-${VERSION}-${HASH}"
-BUILD="${BUILD:-1}"
+BUILD="${BUILD:-2}"
 DESCRIPTION="Diffusion model inference in pure C/C++"
 HOMEPAGE="https://github.com/leejet/stable-diffusion.cpp"
 DOWNLOAD="https://github.com/leejet/stable-diffusion.cpp/archive/master-${VERSION}-${HASH}/${TARNAM}.tar.gz"
@@ -20,6 +20,9 @@ unpack () {
   sed -i '/ggml.git/a\\tbranch = sd.cpp' $PRGNAM-$VERSION/.gitmodules
 
   get_submodules $PRGNAM-$VERSION
+
+  # remove commit that significantly slows down generation on low-end NVidia Turing cards
+  patch -Rp1 -d $PRGNAM-$VERSION/ggml -i $CWD/a5915eb0e47adef21c3f25b889a008925ea838c2.patch
 
   corepack install --global "$(node -p "require('./$PRGNAM-$VERSION/examples/server/frontend/package.json').packageManager")"
   mkdir -p $COREPACK_HOME/bin

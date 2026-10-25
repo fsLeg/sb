@@ -1,0 +1,57 @@
+From a5915eb0e47adef21c3f25b889a008925ea838c2 Mon Sep 17 00:00:00 2001
+From: leejet <leejet714@gmail.com>
+Date: Sat, 24 Oct 2026 01:26:49 +0800
+Subject: [PATCH] ggml-cuda : guard SageAttention kernels on unsupported
+ architectures
+
+---
+ src/ggml-cuda/sageattention/attn.cuh     | 5 +++++
+ src/ggml-cuda/sageattention/attn_fp8.cuh | 5 +++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/src/ggml-cuda/sageattention/attn.cuh b/src/ggml-cuda/sageattention/attn.cuh
+index 7e66d62162..64c856e562 100644
+--- a/src/ggml-cuda/sageattention/attn.cuh
++++ b/src/ggml-cuda/sageattention/attn.cuh
+@@ -47,6 +47,8 @@ __global__ void qk_int_sv_f16_attn_kernel(int8_t *__restrict__ Q, int8_t *__rest
+                       const uint32_t stride_bz_o, const uint32_t stride_seq_o, const uint32_t stride_h_o,
+                       float sm_scale)
+ {
++  // Older CUDA headers omit BF16 intrinsics in pre-Ampere device passes.
++#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 800
+   // compile time check
+   static_assert(DTypeQK == DataType::kInt8 || DTypeQK == DataType::kInt4, "DTypeQK must be int8 or int4");
+   static_assert(Q_GRAN == QuantGranularity::kPerBlock || Q_GRAN == QuantGranularity::kPerWarp || Q_GRAN == QuantGranularity::kPerThread, "Q_GRAN must be kPerBlock, kPerWarp or kPerThread");
+@@ -663,6 +665,9 @@ __global__ void qk_int_sv_f16_attn_kernel(int8_t *__restrict__ Q, int8_t *__rest
+   }
+ 
+   // }
++#else
++  RUNTIME_ASSERT("SageAttention requires SM80 or newer");
++#endif
+ }
+ 
+ 
+diff --git a/src/ggml-cuda/sageattention/attn_fp8.cuh b/src/ggml-cuda/sageattention/attn_fp8.cuh
+index 0e8d67c0a7..9036c1b032 100644
+--- a/src/ggml-cuda/sageattention/attn_fp8.cuh
++++ b/src/ggml-cuda/sageattention/attn_fp8.cuh
+@@ -47,6 +47,8 @@ __global__ void qk_int_sv_f8_attn_kernel(int8_t *__restrict__ Q, int8_t *__restr
+                       const uint32_t stride_bz_o, const uint32_t stride_seq_o, const uint32_t stride_h_o,
+                       float sm_scale)
+ {
++  // Keep unsupported device passes from parsing architecture-specific intrinsics.
++#if !defined(__CUDA_ARCH__) || __CUDA_ARCH__ >= 890
+   // compile time check
+   static_assert(DTypeQK == DataType::kInt8 || DTypeQK == DataType::kInt4, "DTypeQK must be int8 or int4");
+   static_assert(Q_GRAN == QuantGranularity::kPerBlock || Q_GRAN == QuantGranularity::kPerWarp || Q_GRAN == QuantGranularity::kPerThread, "Q_GRAN must be kPerBlock, kPerWarp or kPerThread");
+@@ -696,6 +698,9 @@ __global__ void qk_int_sv_f8_attn_kernel(int8_t *__restrict__ Q, int8_t *__restr
+       lse_lane_ptr[0] = (math::ptx_log2(d[fq][k]) + m[fq][k]);
+     }
+   }
++#else
++  RUNTIME_ASSERT("FP8 SageAttention requires SM89 or newer");
++#endif
+ }
+ 
+ #undef PACK_SIZE_QK
