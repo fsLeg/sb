@@ -1,17 +1,43 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="llama-swap"
-VERSION="266"
+VERSION="267"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Model swapping for local LLM servers"
 HOMEPAGE="https://github.com/mostlygeek/llama-swap"
 DOWNLOAD="https://github.com/mostlygeek/llama-swap/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="c9b3083552ce9da8f3476ab0d2b41619a2b3ebfc85f10c5e8a964c858b46036f"
+SHA256SUM="af9306b3b39e80a6004896a3e1be2a5fed3b9723e136626f6ce0644bc003f188"
 BUILD_REQUIRES=(google-go-lang "nodejs|nodejs22|nodejs24-bin")
 SUGGESTS=(llama.cpp ollama stable-diffusion.cpp)
 
 unpack () {
   $UNTAR $CWD/$PRGNAM-$VERSION.tar.gz
+
+  # sidestep git requirement
+  rm -rf $TMP/.bin
+  mkdir -p $TMP/.bin
+	cat <<EOF > $TMP/.bin/git
+#!/bin/bash
+case "\$1" in
+  ls-files)
+    find . -path "./ui/node_modules" -prune -o -type f \( -name "*.go" -o -path "./ui/*.ts" -o -path "./ui/*.svelte" \) ! -name "*_test.go" ! -name "*.test.ts" -print0
+    ;;
+  describe)
+    echo $VERSION
+    ;;
+  rev-parse)
+    curl -s "https://api.github.com/repos/mostlygeek/llama-swap/git/ref/tags/v$VERSION" | awk '/sha/ {print \$2}' | tr -d '",' | head -c7
+    ;;
+  status)
+    :
+    ;;
+  *)
+    /usr/bin/git "\$@"
+    ;;
+esac
+EOF
+  chmod +x $TMP/.bin/git
+  export PATH=$TMP/.bin:$PATH
 }
 
 build () {
