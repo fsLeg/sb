@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="llama-swap"
-VERSION="267"
+VERSION="268"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Model swapping for local LLM servers"
 HOMEPAGE="https://github.com/mostlygeek/llama-swap"
 DOWNLOAD="https://github.com/mostlygeek/llama-swap/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="af9306b3b39e80a6004896a3e1be2a5fed3b9723e136626f6ce0644bc003f188"
+SHA256SUM="ddb232f548b6dc36a5ff4705df52f7b3f13f49669896957d54aae2dc6c1b04b4"
 BUILD_REQUIRES=(google-go-lang "nodejs|nodejs22|nodejs24-bin")
 SUGGESTS=(llama.cpp ollama stable-diffusion.cpp)
 
