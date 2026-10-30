@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="tpm2-tss"
-VERSION="4.2.0"
+VERSION="4.2.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="OSS implementation of the TCG TPM2 Software Stack (TSS2)"
 HOMEPAGE="https://tpm2-software.github.io/"
 DOWNLOAD="https://github.com/tpm2-software/tpm2-tss/releases/download/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="b53f0c5c8c4ce17f05701a410ca9688f725ca380c9bc4640eacd0eadb1fea124"
+SHA256SUM="d4aadbc1610876385a370494bbfd7d994356f446dff60cd09eea5933befb1471"
 
 unpack () {
   check_uid tss 374
