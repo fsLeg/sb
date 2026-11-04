@@ -2,17 +2,17 @@
 
 PRGNAM="yubico-authenticator-bin"
 PRGNAME="${PRGNAM%-bin}"
-VERSION="7.4.1"
+VERSION="7.5.0"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Yubico Authenticator for Desktop"
 HOMEPAGE="https://www.yubico.com/products/yubico-authenticator/"
-DOWNLOAD="https://developers.yubico.com/yubioath-flutter/Releases/${PRGNAME}-${VERSION}-linux.tar.gz"
-SHA256SUM="5c8f49cf3653ae9dd3911b53ca60475b03c8c957eb7385b1bd3d49ec4767ddac"
+DOWNLOAD="https://developers.yubico.com/yubioath-flutter/Releases/${PRGNAME}-${VERSION}-linux-${PLATFORM}.tar.gz"
+SHA256SUM="4fa2be54df0dd605ad19cc11db43cc08f5621513dba2e41c97cd1142c32289cb"
 REQUIRES=(pcsc-lite ccid)
 
 unpack () {
-  $UNTAR $CWD/$PRGNAME-$VERSION-linux.tar.gz
-  mv $PRGNAME-$VERSION-linux $PRGNAM-$VERSION
+  $UNTAR $CWD/$PRGNAME-$VERSION-linux-$PLATFORM.tar.gz
+  mv $PRGNAME-$VERSION-linux-$PLATFORM $PRGNAM-$VERSION
 }
 
 build () {
