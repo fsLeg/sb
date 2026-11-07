@@ -51,6 +51,13 @@ case "$PRGNAM" in
         "$PRGNAM.SlackBuild"
     unset SESHVER NEWSESH
     ;;
+  yubico-authenticator)
+    NEWFLUTTER="$(curl -fsSL "https://raw.githubusercontent.com/Yubico/yubioath-flutter/refs/tags/$NEWVER/.github/workflows/env" | grep FLUTTER | cut -d= -f2)"
+    sed -i "s|^VERSION=\"$VERSION\"$|VERSION=\"$NEWVER\"|
+            s|^FLUTTERVER=\"$FLUTTERVER\"$|FLUTTERVER=\"$NEWFLUTTER\"|" \
+        "$PRGNAM.SlackBuild"
+    unset FLUTTERVER NEWFLUTTER
+    ;;
   *)
     sed -i "s|${VERSION/\./\\.}|$NEWVER|g" "$PRGNAM.SlackBuild"
     ;;

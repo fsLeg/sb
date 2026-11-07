@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                    |-----handy-ruler------------------------------------------------------|
+yubico-authenticator: yubico-authenticator (Yubico Authenticator for Desktop)
+yubico-authenticator:
+yubico-authenticator: The Yubico Authenticator securely generates a code used to verify
+yubico-authenticator: your identity as you are logging into various services.
+yubico-authenticator:
+yubico-authenticator: Website: https://www.yubico.com/products/yubico-authenticator/
+yubico-authenticator:
+yubico-authenticator:
+yubico-authenticator:
+yubico-authenticator:
+yubico-authenticator:

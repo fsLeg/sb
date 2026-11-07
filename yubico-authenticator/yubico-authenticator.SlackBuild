@@ -1,0 +1,70 @@
+# Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
+
+PRGNAM="yubico-authenticator"
+TARNAM="yubioath-flutter"
+VERSION="7.5.0"
+FLUTTERVER="3.47.8"
+BUILD="${BUILD:-1}"
+DESCRIPTION="Yubico Authenticator for Desktop"
+HOMEPAGE="https://www.yubico.com/products/yubico-authenticator/"
+DOWNLOAD="git+https://github.com/Yubico/${TARNAM}.git
+          git+https://github.com/Yubico/yubikey-manager.git
+          https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTERVER}-stable.tar.xz"
+SHA256SUM="-
+           -
+           baf7dcc5a3dbba60fe863bf493a6cf203195621f7786eaa5a1bba02cd0d87dd2"
+REQUIRES=(pcsc-lite ccid)
+CONFLICTS=(yubico-authenticator-bin)
+
+unpack () {
+  if [ ! "$SLACKVER" = "current" ]; then
+    echo "This SlackBuild only works on -current."
+    exit 1
+  fi
+
+  git clone $CWD/$TARNAM.git $PRGNAM-$VERSION
+
+  pushd $PRGNAM-$VERSION
+    git -c advice.detachedHead=false checkout $VERSION
+    sed -i "/url/s|https.*$|$CWD/yubikey-manager.git|" .gitmodules
+    git -c protocol.file.allow=always submodule update --init --recursive
+  popd
+
+  $UNTAR $CWD/flutter_linux_$FLUTTERVER-stable.tar.xz
+  export PATH="$(pwd)/flutter/bin:$PATH"
+
+  # flutter can bug out when not using english locale
+  # https://github.com/dart-lang/pub/issues/4787#issuecomment-4541953378
+  export LC_ALL="C.UTF-8" LANG="C.UTF-8" LC_MESSAGES="C.UTF-8" LANGUAGE="C.UTF-8"
+}
+
+build () {
+  pushd helper
+    cargo build --locked --release
+    mkdir -p ../build/linux/helper
+    cp target/release/authenticator-helper ../build/linux/helper/
+  popd
+
+  flutter --disable-analytics
+  flutter build linux
+
+  pushd build/linux/x64/release/bundle
+    install -d $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
+    cp -a -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM data/ helper/ lib/ linux_support/ authenticator
+    install -Dm644 -t $PKG/$_PREFIX/share/applications linux_support/com.yubico.yubioath.desktop
+  popd
+  for LIB in $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/lib/*.so; do
+    if patchelf --print-rpath $LIB | grep -q $TMP; then
+      patchelf --set-rpath '$ORIGIN' $LIB
+    fi
+  done
+  sed -i "s|@EXEC_PATH|$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM|g" \
+    $PKG/$_PREFIX/share/applications/com.yubico.yubioath.desktop
+  install -d $PKG/$_PREFIX/bin
+  cat << EOF > $PKG/$_PREFIX/bin/authenticator
+#!/bin/sh
+$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/authenticator $@
+EOF
+  chmod 755 $PKG/$_PREFIX/bin/authenticator
+  install -Dm644 -t $PKGDOC LICENSE NEWS README.adoc
+}
