@@ -22,8 +22,8 @@ unpack () {
 
   pushd $PRGNAM-$VERSION
     git -c advice.detachedHead=false checkout $VERSION
-    sed -i "/url/s|https.*$|$CWD/yubikey-manager.git|" .gitmodules
-    git -c protocol.file.allow=always submodule update --init --recursive
+    git config submodule.yubikey-manager.url "$CWD/yubikey-manager.git"
+    git -c protocol.file.allow=always submodule update --init
   popd
 
   $UNTAR $CWD/flutter_linux_$FLUTTERVER-stable.tar.xz
@@ -46,21 +46,23 @@ build () {
 
   pushd build/linux/x64/release/bundle
     install -d $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM
-    cp -a -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM data/ helper/ lib/ linux_support/ authenticator
+    cp -a -t $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM data/ helper/ lib/ authenticator
     install -Dm644 -t $PKG/$_PREFIX/share/applications linux_support/com.yubico.yubioath.desktop
+    desktop-file-edit --set-key=Exec --set-value="authenticator" --set-icon="$PRGNAM" \
+      $PKG/$_PREFIX/share/applications/com.yubico.yubioath.desktop
+    for geometry in 16x16 24x24 32x32 48x48 64x64 96x96 128x128 256x256 512x512; do
+      install -d $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps
+      magick data/flutter_assets/resources/icons/com.yubico.yubioath-1000x1000.png -resize $geometry $PKG/$_PREFIX/share/icons/hicolor/$geometry/apps/$PRGNAM.png
+    done
   popd
+  # drop an unneeded library that links against JDK
+  rm -f $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/lib/libdartjni.so
   for LIB in $PKG/$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/lib/*.so; do
     if patchelf --print-rpath $LIB | grep -q $TMP; then
       patchelf --set-rpath '$ORIGIN' $LIB
     fi
   done
-  sed -i "s|@EXEC_PATH|$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM|g" \
-    $PKG/$_PREFIX/share/applications/com.yubico.yubioath.desktop
   install -d $PKG/$_PREFIX/bin
-  cat << EOF > $PKG/$_PREFIX/bin/authenticator
-#!/bin/sh
-$_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/authenticator $@
-EOF
-  chmod 755 $PKG/$_PREFIX/bin/authenticator
+  ln -s $_PREFIX/lib$LIBDIRSUFFIX/$PRGNAM/authenticator $PKG/$_PREFIX/bin/
   install -Dm644 -t $PKGDOC LICENSE NEWS README.adoc
 }
