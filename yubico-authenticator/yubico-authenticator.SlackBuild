@@ -14,14 +14,10 @@ SHA256SUM="-
            -
            baf7dcc5a3dbba60fe863bf493a6cf203195621f7786eaa5a1bba02cd0d87dd2"
 REQUIRES=(pcsc-lite ccid)
+BUILD_REQUIRES=(rust-opt)
 CONFLICTS=(yubico-authenticator-bin)
 
 unpack () {
-  if [ ! "$SLACKVER" = "current" ]; then
-    echo "This SlackBuild only works on -current."
-    exit 1
-  fi
-
   git clone $CWD/$TARNAM.git $PRGNAM-$VERSION
 
   pushd $PRGNAM-$VERSION
