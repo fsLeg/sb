@@ -1,0 +1,493 @@
+From 99285c7f0cf14b07bf7c5c049fe76f4c895dc9e3 Mon Sep 17 00:00:00 2001
+From: Zeng Xian <themezeng@gmail.com>
+Date: Fri, 4 Sep 2026 10:29:26 +0800
+Subject: [PATCH] chore: move pnpm settings to pnpm-workspace.yaml and declare
+ dependency build policy (#1233)
+
+* chore: move pnpm settings to pnpm-workspace.yaml and declare dependency build policy
+
+pnpm 10 no longer reads the `pnpm` field in package.json, so `onlyBuiltDependencies`
+and `overrides` there were inert and every pnpm command printed a warning. Move
+`overrides` into `pnpm-workspace.yaml` and replace the stale build allowlist with an
+explicit policy: `ignoreScripts: false`, `strictDepBuilds: true`,
+`dangerouslyAllowAllBuilds: false`, and an `allowBuilds` map that decides every
+script-bearing dependency. Only electron builds; the rest get their prebuilt binaries
+through optionalDependencies or have no effect on this repo.
+
+Keep npmmirror as the local registry for install speed and append registry.npmjs.org
+in CI, so frozen-lockfile runs resolve from the canonical origin.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01CVRYPU4vS2MGKaUmnrBEks
+
+* fix: align package builds with workspace policy
+
+---------
+
+Co-authored-by: Claude Fable 5.1 <noreply@anthropic.com>
+
+(cherry picked from pro commit d2b1f956b04cb2387e93de171dea2fe7230e0d50)
+---
+ .erb/scripts/ensure-app-deps.cjs | 27 ++++++++++++-
+ package.json                     | 23 -----------
+ pnpm-workspace.yaml              | 43 ++++++++++++++++++--
+ release/app/package-lock.json    | 68 ++++++++++++++++----------------
+ src/main/ensure-app-deps.test.ts | 31 ++++++++++++++-
+ 5 files changed, 129 insertions(+), 63 deletions(-)
+
+diff --git a/.erb/scripts/ensure-app-deps.cjs b/.erb/scripts/ensure-app-deps.cjs
+index b89b7fbc91..85b4bbb52d 100644
+--- a/.erb/scripts/ensure-app-deps.cjs
++++ b/.erb/scripts/ensure-app-deps.cjs
+@@ -10,7 +10,9 @@
+  *
+  * This script runs `npm ci --omit=dev` in release/app/
+  * to create a complete, flat node_modules/ before packaging,
+- * then removes dev-only artifacts that shouldn't ship.
++ * then removes dev-only artifacts that shouldn't ship. It uses the effective
++ * registry from the workspace root so local and CI installs follow the same
++ * registry selection as the root pnpm install.
+  */
+ const { execSync } = require('child_process')
+ const path = require('path')
+@@ -19,6 +21,7 @@ const { verifyInstalledRuntimeDeps } = require('./runtime-deps.cjs')
+ 
+ exports.default = async function ensureAppDeps(context) {
+   const appDir = path.join(__dirname, '..', '..', 'release', 'app')
++  const projectDir = path.join(appDir, '..', '..')
+   const nodeModulesDir = path.join(appDir, 'node_modules')
+ 
+   // Remove pnpm's incomplete hoisted node_modules if it exists
+@@ -30,7 +33,7 @@ exports.default = async function ensureAppDeps(context) {
+   execSync('npm ci --omit=dev --ignore-scripts', {
+     cwd: appDir,
+     stdio: 'inherit',
+-    env: { ...process.env, npm_config_registry: 'https://registry.npmmirror.com' },
++    env: { ...process.env, npm_config_registry: getProjectRegistry(projectDir) },
+   })
+ 
+   verifyInstalledRuntimeDeps(appDir)
+@@ -51,6 +54,25 @@ exports.default = async function ensureAppDeps(context) {
+   console.log('[ensure-app-deps] Done.')
+ }
+ 
++function readProjectNpmrc(projectDir) {
++  return fs.readFileSync(path.join(projectDir, '.npmrc'), 'utf8')
++}
++
++function getProjectRegistry(projectDir, options = {}) {
++  const readNpmrc = options.readNpmrc || readProjectNpmrc
++  let registry = ''
++  for (const line of readNpmrc(projectDir).split(/\r?\n/)) {
++    const separator = line.indexOf('=')
++    if (separator >= 0 && line.slice(0, separator).trim() === 'registry') {
++      registry = line.slice(separator + 1).trim()
++    }
++  }
++  if (!registry) {
++    throw new Error('[ensure-app-deps] workspace .npmrc must configure a default registry')
++  }
++  return registry
++}
++
+ /**
+  * Guard against version skew between release/app/package-lock.json (used by
+  * `npm ci` to materialize node_modules) and the root pnpm-lock.yaml (used by
+@@ -144,3 +166,4 @@ function verifyVersionsMatchPnpmWorkspace(appDir, options = {}) {
+ }
+ 
+ exports.verifyVersionsMatchPnpmWorkspace = verifyVersionsMatchPnpmWorkspace
++exports.getProjectRegistry = getProjectRegistry
+diff --git a/package.json b/package.json
+index c27b23b8fd..a80ffc416e 100644
+--- a/package.json
++++ b/package.json
+@@ -363,28 +363,5 @@
+   "lint-staged": {
+     "*.{js,jsx,ts,tsx}": "biome format --write --no-errors-on-unmatched"
+   },
+-  "pnpm": {
+-    "onlyBuiltDependencies": [
+-      "@parcel/watcher",
+-      "@sentry/cli",
+-      "core-js",
+-      "core-js-pure",
+-      "electron",
+-      "esbuild",
+-      "msw",
+-      "protobufjs",
+-      "sharp"
+-    ],
+-    "overrides": {
+-      "@tanstack/router-generator": "1.120.15",
+-      "@tanstack/router-plugin": "1.120.15",
+-      "@mastra/libsql": "0.13.2",
+-      "@mastra/rag": "1.0.8",
+-      "handlebars": ">=4.7.9",
+-      "convict": ">=6.2.5",
+-      "fast-xml-parser": ">=5.5.7",
+-      "shell-quote": "1.10.0"
+-    }
+-  },
+   "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
+ }
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index d671f7fdbd..ff959b44e6 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -1,8 +1,5 @@
+ packages:
+-  - .
+-  - apps/*
+   - packages/*
+-  - release/app
+ 
+ # Developers on Windows ARM64 may use both native ARM64 and x64-emulated Node
+ # processes against the same checkout. Keep native optional dependencies for
+diff --git a/release/app/package-lock.json b/release/app/package-lock.json
+index 55d4ed4875..37b1dab6f0 100644
+--- a/release/app/package-lock.json
++++ b/release/app/package-lock.json
+@@ -15,7 +15,7 @@
+     },
+     "node_modules/@anthropic-ai/sandbox-runtime": {
+       "version": "0.0.54",
+-      "resolved": "https://registry.npmmirror.com/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.54.tgz",
++      "resolved": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.54.tgz",
+       "integrity": "sha512-zszEoq/z02SgJLlPFcoegqz2UonYbn3Gi//Hwza6KdUolg9HeGw/mPuO7Ybp4EzgLxG6ifA4KOrozErYKJuFag==",
+       "license": "Apache-2.0",
+       "dependencies": {
+@@ -34,7 +34,7 @@
+     },
+     "node_modules/@libsql/client": {
+       "version": "0.15.15",
+-      "resolved": "https://registry.npmmirror.com/@libsql/client/-/client-0.15.15.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/client/-/client-0.15.15.tgz",
+       "integrity": "sha512-twC0hQxPNHPKfeOv3sNT6u2pturQjLcI+CnpTM0SjRpocEGgfiZ7DWKXLNnsothjyJmDqEsBQJ5ztq9Wlu470w==",
+       "license": "MIT",
+       "dependencies": {
+@@ -47,7 +47,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/darwin-arm64": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/darwin-arm64/-/darwin-arm64-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/darwin-arm64/-/darwin-arm64-0.5.22.tgz",
+       "integrity": "sha512-4B8ZlX3nIDPndfct7GNe0nI3Yw6ibocEicWdC4fvQbSs/jdq/RC2oCsoJxJ4NzXkvktX70C1J4FcmmoBy069UA==",
+       "cpu": [
+         "arm64"
+@@ -60,7 +60,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/darwin-x64": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/darwin-x64/-/darwin-x64-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/darwin-x64/-/darwin-x64-0.5.22.tgz",
+       "integrity": "sha512-ny2HYWt6lFSIdNFzUFIJ04uiW6finXfMNJ7wypkAD8Pqdm6nAByO+Fdqu8t7sD0sqJGeUCiOg480icjyQ2/8VA==",
+       "cpu": [
+         "x64"
+@@ -73,7 +73,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/linux-arm-gnueabihf": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/linux-arm-gnueabihf/-/linux-arm-gnueabihf-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/linux-arm-gnueabihf/-/linux-arm-gnueabihf-0.5.22.tgz",
+       "integrity": "sha512-3Uo3SoDPJe/zBnyZKosziRGtszXaEtv57raWrZIahtQDsjxBVjuzYQinCm9LRCJCUT5t2r5Z5nLDPJi2CwZVoA==",
+       "cpu": [
+         "arm"
+@@ -86,7 +86,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/linux-arm-musleabihf": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/linux-arm-musleabihf/-/linux-arm-musleabihf-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/linux-arm-musleabihf/-/linux-arm-musleabihf-0.5.22.tgz",
+       "integrity": "sha512-LCsXh07jvSojTNJptT9CowOzwITznD+YFGGW+1XxUr7fS+7/ydUrpDfsMX7UqTqjm7xG17eq86VkWJgHJfvpNg==",
+       "cpu": [
+         "arm"
+@@ -99,7 +99,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/linux-arm64-gnu": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/linux-arm64-gnu/-/linux-arm64-gnu-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/linux-arm64-gnu/-/linux-arm64-gnu-0.5.22.tgz",
+       "integrity": "sha512-KSdnOMy88c9mpOFKUEzPskSaF3VLflfSUCBwas/pn1/sV3pEhtMF6H8VUCd2rsedwoukeeCSEONqX7LLnQwRMA==",
+       "cpu": [
+         "arm64"
+@@ -112,7 +112,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/linux-arm64-musl": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/linux-arm64-musl/-/linux-arm64-musl-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/linux-arm64-musl/-/linux-arm64-musl-0.5.22.tgz",
+       "integrity": "sha512-mCHSMAsDTLK5YH//lcV3eFEgiR23Ym0U9oEvgZA0667gqRZg/2px+7LshDvErEKv2XZ8ixzw3p1IrBzLQHGSsw==",
+       "cpu": [
+         "arm64"
+@@ -125,7 +125,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/linux-x64-gnu": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/linux-x64-gnu/-/linux-x64-gnu-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/linux-x64-gnu/-/linux-x64-gnu-0.5.22.tgz",
+       "integrity": "sha512-kNBHaIkSg78Y4BqAdgjcR2mBilZXs4HYkAmi58J+4GRwDQZh5fIUWbnQvB9f95DkWUIGVeenqLRFY2pcTmlsew==",
+       "cpu": [
+         "x64"
+@@ -138,7 +138,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/linux-x64-musl": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/linux-x64-musl/-/linux-x64-musl-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/linux-x64-musl/-/linux-x64-musl-0.5.22.tgz",
+       "integrity": "sha512-UZ4Xdxm4pu3pQXjvfJiyCzZop/9j/eA2JjmhMaAhe3EVLH2g11Fy4fwyUp9sT1QJYR1kpc2JLuybPM0kuXv/Tg==",
+       "cpu": [
+         "x64"
+@@ -151,7 +151,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/@libsql/win32-x64-msvc": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/@libsql/win32-x64-msvc/-/win32-x64-msvc-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/win32-x64-msvc/-/win32-x64-msvc-0.5.22.tgz",
+       "integrity": "sha512-Fj0j8RnBpo43tVZUVoNK6BV/9AtDUM5S7DF3LB4qTYg1LMSZqi3yeCneUTLJD6XomQJlZzbI4mst89yspVSAnA==",
+       "cpu": [
+         "x64"
+@@ -164,7 +164,7 @@
+     },
+     "node_modules/@libsql/client/node_modules/libsql": {
+       "version": "0.5.22",
+-      "resolved": "https://registry.npmmirror.com/libsql/-/libsql-0.5.22.tgz",
++      "resolved": "https://registry.npmjs.org/libsql/-/libsql-0.5.22.tgz",
+       "integrity": "sha512-NscWthMQt7fpU8lqd7LXMvT9pi+KhhmTHAJWUB/Lj6MWa0MKFv0F2V4C6WKKpjCVZl0VwcDz4nOI3CyaT1DDiA==",
+       "cpu": [
+         "x64",
+@@ -196,7 +196,7 @@
+     },
+     "node_modules/@libsql/core": {
+       "version": "0.15.15",
+-      "resolved": "https://registry.npmmirror.com/@libsql/core/-/core-0.15.15.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/core/-/core-0.15.15.tgz",
+       "integrity": "sha512-C88Z6UKl+OyuKKPwz224riz02ih/zHYI3Ho/LAcVOgjsunIRZoBw7fjRfaH9oPMmSNeQfhGklSG2il1URoOIsA==",
+       "license": "MIT",
+       "dependencies": {
+@@ -205,7 +205,7 @@
+     },
+     "node_modules/@libsql/hrana-client": {
+       "version": "0.7.0",
+-      "resolved": "https://registry.npmmirror.com/@libsql/hrana-client/-/hrana-client-0.7.0.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/hrana-client/-/hrana-client-0.7.0.tgz",
+       "integrity": "sha512-OF8fFQSkbL7vJY9rfuegK1R7sPgQ6kFMkDamiEccNUvieQ+3urzfDFI616oPl8V7T9zRmnTkSjMOImYCAVRVuw==",
+       "license": "MIT",
+       "dependencies": {
+@@ -217,7 +217,7 @@
+     },
+     "node_modules/@libsql/isomorphic-fetch": {
+       "version": "0.3.1",
+-      "resolved": "https://registry.npmmirror.com/@libsql/isomorphic-fetch/-/isomorphic-fetch-0.3.1.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/isomorphic-fetch/-/isomorphic-fetch-0.3.1.tgz",
+       "integrity": "sha512-6kK3SUK5Uu56zPq/Las620n5aS9xJq+jMBcNSOmjhNf/MUvdyji4vrMTqD7ptY7/4/CAVEAYDeotUz60LNQHtw==",
+       "license": "MIT",
+       "engines": {
+@@ -226,7 +226,7 @@
+     },
+     "node_modules/@libsql/isomorphic-ws": {
+       "version": "0.1.5",
+-      "resolved": "https://registry.npmmirror.com/@libsql/isomorphic-ws/-/isomorphic-ws-0.1.5.tgz",
++      "resolved": "https://registry.npmjs.org/@libsql/isomorphic-ws/-/isomorphic-ws-0.1.5.tgz",
+       "integrity": "sha512-DtLWIH29onUYR00i0GlQ3UdcTRC6EP4u9w/h9LxpUZJWRMARk6dQwZ6Jkd+QdwVpuAOrdxt18v0K2uIYR3fwFg==",
+       "license": "MIT",
+       "dependencies": {
+@@ -236,7 +236,7 @@
+     },
+     "node_modules/@libsql/isomorphic-ws/node_modules/ws": {
+       "version": "8.19.0",
+-      "resolved": "https://registry.npmmirror.com/ws/-/ws-8.19.0.tgz",
++      "resolved": "https://registry.npmjs.org/ws/-/ws-8.19.0.tgz",
+       "integrity": "sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==",
+       "license": "MIT",
+       "engines": {
+@@ -257,19 +257,19 @@
+     },
+     "node_modules/@neon-rs/load": {
+       "version": "0.0.4",
+-      "resolved": "https://registry.npmmirror.com/@neon-rs/load/-/load-0.0.4.tgz",
++      "resolved": "https://registry.npmjs.org/@neon-rs/load/-/load-0.0.4.tgz",
+       "integrity": "sha512-kTPhdZyTQxB+2wpiRcFWrDcejc4JI6tkPuS7UZCG4l6Zvc5kU/gGQ/ozvHTh1XR5tS+UlfAfGuPajjzQjCiHCw==",
+       "license": "MIT"
+     },
+     "node_modules/@pondwader/socks5-server": {
+       "version": "1.0.10",
+-      "resolved": "https://registry.npmmirror.com/@pondwader/socks5-server/-/socks5-server-1.0.10.tgz",
++      "resolved": "https://registry.npmjs.org/@pondwader/socks5-server/-/socks5-server-1.0.10.tgz",
+       "integrity": "sha512-bQY06wzzR8D2+vVCUoBsr5QS2U6UgPUQRmErNwtsuI6vLcyRKkafjkr3KxbtGFf9aBBIV2mcvlsKD1UYaIV+sg==",
+       "license": "MIT"
+     },
+     "node_modules/@types/node": {
+       "version": "25.5.0",
+-      "resolved": "https://registry.npmmirror.com/@types/node/-/node-25.5.0.tgz",
++      "resolved": "https://registry.npmjs.org/@types/node/-/node-25.5.0.tgz",
+       "integrity": "sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==",
+       "license": "MIT",
+       "dependencies": {
+@@ -278,7 +278,7 @@
+     },
+     "node_modules/@types/ws": {
+       "version": "8.18.1",
+-      "resolved": "https://registry.npmmirror.com/@types/ws/-/ws-8.18.1.tgz",
++      "resolved": "https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz",
+       "integrity": "sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==",
+       "license": "MIT",
+       "dependencies": {
+@@ -287,7 +287,7 @@
+     },
+     "node_modules/commander": {
+       "version": "12.1.0",
+-      "resolved": "https://registry.npmmirror.com/commander/-/commander-12.1.0.tgz",
++      "resolved": "https://registry.npmjs.org/commander/-/commander-12.1.0.tgz",
+       "integrity": "sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==",
+       "license": "MIT",
+       "engines": {
+@@ -296,7 +296,7 @@
+     },
+     "node_modules/data-uri-to-buffer": {
+       "version": "4.0.1",
+-      "resolved": "https://registry.npmmirror.com/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz",
++      "resolved": "https://registry.npmjs.org/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz",
+       "integrity": "sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==",
+       "license": "MIT",
+       "engines": {
+@@ -305,7 +305,7 @@
+     },
+     "node_modules/detect-libc": {
+       "version": "2.0.2",
+-      "resolved": "https://registry.npmmirror.com/detect-libc/-/detect-libc-2.0.2.tgz",
++      "resolved": "https://registry.npmjs.org/detect-libc/-/detect-libc-2.0.2.tgz",
+       "integrity": "sha512-UX6sGumvvqSaXgdKGUsgZWqcUyIXZ/vZTrlRT/iobiKhGL0zL4d3osHj3uqllWJK+i+sixDS/3COVEOFbupFyw==",
+       "license": "Apache-2.0",
+       "engines": {
+@@ -314,7 +314,7 @@
+     },
+     "node_modules/fetch-blob": {
+       "version": "3.2.0",
+-      "resolved": "https://registry.npmmirror.com/fetch-blob/-/fetch-blob-3.2.0.tgz",
++      "resolved": "https://registry.npmjs.org/fetch-blob/-/fetch-blob-3.2.0.tgz",
+       "integrity": "sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==",
+       "funding": [
+         {
+@@ -337,7 +337,7 @@
+     },
+     "node_modules/formdata-polyfill": {
+       "version": "4.0.10",
+-      "resolved": "https://registry.npmmirror.com/formdata-polyfill/-/formdata-polyfill-4.0.10.tgz",
++      "resolved": "https://registry.npmjs.org/formdata-polyfill/-/formdata-polyfill-4.0.10.tgz",
+       "integrity": "sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==",
+       "license": "MIT",
+       "dependencies": {
+@@ -349,13 +349,13 @@
+     },
+     "node_modules/js-base64": {
+       "version": "3.7.8",
+-      "resolved": "https://registry.npmmirror.com/js-base64/-/js-base64-3.7.8.tgz",
++      "resolved": "https://registry.npmjs.org/js-base64/-/js-base64-3.7.8.tgz",
+       "integrity": "sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow==",
+       "license": "BSD-3-Clause"
+     },
+     "node_modules/node-domexception": {
+       "version": "1.0.0",
+-      "resolved": "https://registry.npmmirror.com/node-domexception/-/node-domexception-1.0.0.tgz",
++      "resolved": "https://registry.npmjs.org/node-domexception/-/node-domexception-1.0.0.tgz",
+       "integrity": "sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==",
+       "deprecated": "Use your platform's native DOMException instead",
+       "funding": [
+@@ -375,7 +375,7 @@
+     },
+     "node_modules/node-fetch": {
+       "version": "3.3.2",
+-      "resolved": "https://registry.npmmirror.com/node-fetch/-/node-fetch-3.3.2.tgz",
++      "resolved": "https://registry.npmjs.org/node-fetch/-/node-fetch-3.3.2.tgz",
+       "integrity": "sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==",
+       "license": "MIT",
+       "dependencies": {
+@@ -402,13 +402,13 @@
+     },
+     "node_modules/promise-limit": {
+       "version": "2.7.0",
+-      "resolved": "https://registry.npmmirror.com/promise-limit/-/promise-limit-2.7.0.tgz",
++      "resolved": "https://registry.npmjs.org/promise-limit/-/promise-limit-2.7.0.tgz",
+       "integrity": "sha512-7nJ6v5lnJsXwGprnGXga4wx6d1POjvi5Qmf1ivTRxTjH4Z/9Czja/UCMLVmB9N93GeWOU93XaFaEt6jbuoagNw==",
+       "license": "ISC"
+     },
+     "node_modules/shell-quote": {
+       "version": "1.10.0",
+-      "resolved": "https://registry.npmmirror.com/shell-quote/-/shell-quote-1.10.0.tgz",
++      "resolved": "https://registry.npmjs.org/shell-quote/-/shell-quote-1.10.0.tgz",
+       "integrity": "sha512-w1aiOKwKuRgtwAReIIj89puqg+I7GvX4IbLrvmhXbzQsj1+Zwi4VO3+fa6ZF91TWSjIxoEkKnMeHcLEODK5ZXA==",
+       "license": "MIT",
+       "engines": {
+@@ -420,13 +420,13 @@
+     },
+     "node_modules/undici-types": {
+       "version": "7.18.2",
+-      "resolved": "https://registry.npmmirror.com/undici-types/-/undici-types-7.18.2.tgz",
++      "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-7.18.2.tgz",
+       "integrity": "sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==",
+       "license": "MIT"
+     },
+     "node_modules/web-streams-polyfill": {
+       "version": "3.3.3",
+-      "resolved": "https://registry.npmmirror.com/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz",
++      "resolved": "https://registry.npmjs.org/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz",
+       "integrity": "sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==",
+       "license": "MIT",
+       "engines": {
+@@ -435,7 +435,7 @@
+     },
+     "node_modules/zod": {
+       "version": "3.25.76",
+-      "resolved": "https://registry.npmmirror.com/zod/-/zod-3.25.76.tgz",
++      "resolved": "https://registry.npmjs.org/zod/-/zod-3.25.76.tgz",
+       "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==",
+       "license": "MIT",
+       "funding": {
+diff --git a/src/main/ensure-app-deps.test.ts b/src/main/ensure-app-deps.test.ts
+index cc9e06b24f..89d98d9459 100644
+--- a/src/main/ensure-app-deps.test.ts
++++ b/src/main/ensure-app-deps.test.ts
+@@ -1,12 +1,41 @@
++import fs from 'node:fs'
+ import { createRequire } from 'node:module'
+ import { describe, expect, test } from 'vitest'
+ 
+ interface EnsureAppDepsModule {
++  getProjectRegistry: (projectDir: string, options?: { readNpmrc?: (projectDir: string) => string }) => string
+   verifyVersionsMatchPnpmWorkspace: (appDir: string, options?: { readPnpmList?: (appDir: string) => string }) => void
+ }
+ 
+ const require = createRequire(import.meta.url)
+-const { verifyVersionsMatchPnpmWorkspace } = require('../../.erb/scripts/ensure-app-deps.cjs') as EnsureAppDepsModule
++const { getProjectRegistry, verifyVersionsMatchPnpmWorkspace } =
++  require('../../.erb/scripts/ensure-app-deps.cjs') as EnsureAppDepsModule
++
++describe('ensure-app-deps registry', () => {
++  test('uses the effective registry from the workspace root', () => {
++    expect(
++      getProjectRegistry('/workspace', {
++        readNpmrc: (projectDir) => {
++          expect(projectDir).toBe('/workspace')
++          return 'registry=https://registry.npmmirror.com\nregistry=https://registry.npmjs.org/\n'
++        },
++      })
++    ).toBe('https://registry.npmjs.org/')
++  })
++
++  test('fails when the effective registry is empty', () => {
++    expect(() =>
++      getProjectRegistry('/workspace', {
++        readNpmrc: () => 'auto-install-peers=true\n',
++      })
++    ).toThrow('[ensure-app-deps] workspace .npmrc must configure a default registry')
++  })
++
++  test('keeps the release lockfile switchable by the configured registry', () => {
++    const lockfile = fs.readFileSync(new URL('../../release/app/package-lock.json', import.meta.url), 'utf8')
++    expect(lockfile).not.toContain('registry.npmmirror.com')
++  })
++})
+ 
+ describe('ensure-app-deps version guard', () => {
+   test('fails closed when pnpm dependency collection fails', () => {

@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="chatbox"
-VERSION="1.24.2"
+VERSION="1.24.3"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Powerful AI Client"
 HOMEPAGE="https://chatboxai.app/"
 DOWNLOAD="https://github.com/chatboxai/chatbox/archive/v${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="aaf2bf91095f128ea55e4466b9aa6902ba607cac31295d25be039c659ce9511a"
+SHA256SUM="3a6434304e268eadefcfa64d8ad479fae809b88dd452fdb718488f696d6b6fc0"
 BUILD_REQUIRES=("nodejs|nodejs22")
 
 unpack () {
@@ -20,6 +20,10 @@ unpack () {
 
   # fix electron fetching
   sed -i '/UPDATE_CHANNEL/d' $PRGNAM-$VERSION/electron-builder.yml
+
+  # they broke their own script:
+  # https://github.com/chatboxai/chatbox/commit/99285c7f0cf14b07bf7c5c049fe76f4c895dc9e3
+  patch -R -d $PRGNAM-$VERSION -p1 -i $CWD/99285c7f0cf14b07bf7c5c049fe76f4c895dc9e3.patch
 }
 
 build () {
