@@ -1,12 +1,12 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="amnezia-client"
-VERSION="5.1.1.4"
+VERSION="5.1.1.10"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Amnezia VPN client for desktop"
 HOMEPAGE="https://amnezia.org"
 DOWNLOAD="https://github.com/amnezia-vpn/amnezia-client/archive/${VERSION}/${PRGNAM}-${VERSION}.tar.gz"
-SHA256SUM="ed11e381cb60abe0c4d47c3d441c546d498cbaeaa5eff932e1e1c13c0e242a78"
+SHA256SUM="1d973c987285780f0e2f3d5d76d15c3d9b2ecc23ca865b605f6bd49be2ef095c"
 
 unpack () {
   if [ ! "$SLACKVER" = "current" ]; then
@@ -27,20 +27,27 @@ unpack () {
   source $PRGNAM-$VERSION/conan/bin/activate
   pip install conan
   export CONAN_HOME=$TMP/.conan2
-  # LLVM 23 is too new for Conan to know about it. Popullate local settings and add the clang version.
-  conan --version &> /dev/null
-  python3 -c "
-import yaml
-c='$CONAN_HOME/settings.yml'
-d=yaml.safe_load(open(c))
-d['compiler']['clang']['version'].append('23')
-yaml.safe_dump(d, open(c, 'w'))
-"
+
   unset GOROOT
 
-  # Export AGW public key and S3 endpoint for VPN from Amnezia to work
-  export PROD_AGW_PUBLIC_KEY="-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAj5mxl/4DL3Sk89ntxs5G\nX3JawGQWIoq6rvNkOzNGuNgedNS2+pi6hZl3Izl1Io9om4KiUlMT6mgLO1hTr9q+\ns7CYhlvroFA7ErucF+9L+7FCt0Igi0kIK/R2/vxd/2HaUrorn/aSvvutkYwbfxqW\nSwtzE+RuBeDWGvEt937OW0oqYONPYv9E4T56Dz/EZ6v2t8ejAnKLbGD/GocMmipK\n7etFSiSMAB2RmaztqTq4NleBepfO80XpYlW9pCSXuHcE8wxHczkzxsbyMAMsG/K3\nvUQY6qPtohqqzSSBwa/8u2ptNHBeor7l7DdYXeR/Nqcc4z92VUkZ5lOVR4evkS5V\n/wQqp5tnOJEj3NjUhEhXFoNEapbZd1bh6iQoUk7jC1TdvKJ/nPKGZAsHRpr0rNKz\nfx/N/Oo6lr2yh/+ps6VxTkbPmB6E85WOO3UvjImZUY0XQdBjWle/4iJLdEC77Nr0\njXhdgeypucy6jkB6iBHMeVMlrNMEV7UxoBR/cCNx55zu/8sml5ByiDvCDT7sRomN\nNgVt5S/FaVjYuzFUifJ12ToChXFgESKFmuso7WluEaWvMIGREdrMrKQKHfYLOzWF\n2B5ZJDqw4o03fU4J/6rw61M1b+rjVpXMjPnzc2A+RgcjTvXv955gfZkwe4lt5wk/\n3j8zMVo3+zLrMTAaEeIUM0UCAwEAAQ==\n-----END PUBLIC KEY-----"
-  export PROD_S3_ENDPOINT="https://s3.eu-north-1.amazonaws.com/amnezia/endpoints.json, https://storage.googleapis.com/lambda-list/endpoints.json"
+  # https://packages.altlinux.org/en/sisyphus/srpms/amnezia-vpn/specfiles/
+  # Export AGW public keys and endpoints for work VPN from Amnezia
+  # Since 5.1.1.10 the client expects the public keys base64-encoded
+  # (single line, upstream commit a9e6a2222 "chore: pass AGW public keys as base64")
+  export PROD_AGW_PUBLIC_KEY_B64="LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFqNW14bC80REwzU2s4OW50eHM1RwpYM0phd0dRV0lvcTZydk5rT3pOR3VOZ2VkTlMyK3BpNmhabDNJemwxSW85b200S2lVbE1UNm1nTE8xaFRyOXErCnM3Q1lobHZyb0ZBN0VydWNGKzlMKzdGQ3QwSWdpMGtJSy9SMi92eGQvMkhhVXJvcm4vYVN2dnV0a1l3YmZ4cVcKU3d0ekUrUnVCZURXR3ZFdDkzN09XMG9xWU9OUFl2OUU0VDU2RHovRVo2djJ0OGVqQW5LTGJHRC9Hb2NNbWlwSwo3ZXRGU2lTTUFCMlJtYXp0cVRxNE5sZUJlcGZPODBYcFlsVzlwQ1NYdUhjRTh3eEhjemt6eHNieU1BTXNHL0szCnZVUVk2cVB0b2hxcXpTU0J3YS84dTJwdE5IQmVvcjdsN0RkWVhlUi9OcWNjNHo5MlZVa1o1bE9WUjRldmtTNVYKL3dRcXA1dG5PSkVqM05qVWhFaFhGb05FYXBiWmQxYmg2aVFvVWs3akMxVGR2S0ovblBLR1pBc0hScHIwck5LegpmeC9OL09vNmxyMnloLytwczZWeFRrYlBtQjZFODVXT08zVXZqSW1aVVkwWFFkQmpXbGUvNGlKTGRFQzc3TnIwCmpYaGRnZXlwdWN5NmprQjZpQkhNZVZNbHJOTUVWN1V4b0JSL2NDTng1NXp1LzhzbWw1QnlpRHZDRFQ3c1JvbU4KTmdWdDVTL0ZhVmpZdXpGVWlmSjEyVG9DaFhGZ0VTS0ZtdXNvN1dsdUVhV3ZNSUdSRWRyTXJLUUtIZllMT3pXRgoyQjVaSkRxdzRvMDNmVTRKLzZydzYxTTFiK3JqVnBYTWpQbnpjMkErUmdjalR2WHY5NTVnZlprd2U0bHQ1d2svCjNqOHpNVm8zK3pMck1UQWFFZUlVTTBVQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="
+  export PROD_S3_ENDPOINT="https://s3.eu-north-1.amazonaws.com/amnezia/, https://storage.googleapis.com/lambda-list/, https://amnzstrg01.blob.core.windows.net/lambda-list/, https://objectstorage.eu-zurich-1.oraclecloud.com/n/zrhfyaq6qxvh/b/lambda-list/o/";
+  export FALLBACK_S3_ENDPOINT="https://storage.mwsapis.ru/lambda-list/, https://s3.cloudruserapi.net/lambda-list/, https://188.225.57.22/lambda-list/"
+  export SANDBOX_AGW_PUBLIC_KEY_B64="LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUF3TUpiWWxHeG4zbCswWGlHQTlJLwpCSEs4SFgvYWV0N0E5R1ZMODE3YXBEVWVMNnNkSVNSQmRvcHY1WTBGZHJCSFNKV1NVZFd0VnhWYXpKQjQ2Sjh4CjMyNy81SDVwaTBua2ZSYmNneEJHU0d4aEtPdndSZStXUFZiMmY4MWpsa2VuWks0NmM5QzdkTm1YLzMxMHJsSFkKQndPblpjZHcyb0t1NmhUTkR3azNueVVvMnYyL2xlTklNTHN2ODRSbEhBWDZUeXg1c2xxOHlzZXdoY21kZnYxNwpXUWpGN2FsYnExMlphZlRTanRYcURjc3JrMm9GOG1meXp4TGpTWGJ4UUhLSURIa2Z6M1NVWENzL0g5dHQxeWRLCjJZajZuSXh2OThIRVNaOE5nNDBPWlBoSERleDhSdTFOamNXbG8yRVdOTTF4VDhJcW1CVDIxUEx1eXpHak5Td0cKT2pubTFWMkVjamVyVm1STmhGVEpHNzBSa1VSRC9pMk1EYkcrWktwcVB0VzF1TDh3RXQySWtTcU5mS2NmK1RGKwpVSlpaZm0xbERVTXBXSjJlV0pHcmdPVVg4L2Y4di9HQit4NFB4VW8xbTdWL3BETHFDVVBtM2wyZGthTTlQMHNNCjZsTzAraktxZklGbkcxempjM2lmN3IxWWJEc1pseWwzODlxOUhyaDd0K0x3ai9KWGtEeEZhVG51ZE04ZWdhWGsKR1g1WXhaaUVEbUNDTFJza1J3QkJVYVlmZlhJcEZiSThzTzJYajBKNS9pbTV4dHU3VHRmSmt0Y1B6REw5dXlHMQpFYnQ4b1NBNEZUelRpZDZad2o1NVlnRGZ6MEZNbk5tWGg4MFQxeE16bGJpNnkrQkN1bmErSSs3TWNNUm84eXozClZ6ellKMC9KN1BwSHBYb1p2N0sxcURzQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="
+  export SANDBOX_AGW_ENDPOINT="http://gw.dev.amzsvc.com:80/"
+  export SANDBOX_S3_ENDPOINT="https://s3.eu-north-1.amazonaws.com/amnezia-dev/"
+  export FREE_V2_ENDPOINT="13.248.139.44"
+  export PREM_V1_ENDPOINT="52.223.54.40"
+
+  # Try to fix DNS
+  # https://bugzilla.altlinux.org/52679
+  for PATCH in $CWD/amnezia-vpn-{dns-fallback,killswitch-dns,xray-fingerprint}.patch; do
+    patch -p1 -d $PRGNAM-$VERSION -i $PATCH
+  done
 }
 
 build () {

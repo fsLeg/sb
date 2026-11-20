@@ -1,0 +1,91 @@
+--- a/service/server/killswitch.cpp
++++ b/service/server/killswitch.cpp
+@@ -2,6 +2,7 @@
+ 
+ 
+ #include <QApplication>
++#include <QFile>
+ #include <QHostAddress>
+ #include <QRegularExpression>
+ #include <algorithm>
+@@ -392,7 +393,31 @@
+     dnsServers.append("127.0.0.53");
+     dnsServers.append(allowedDnsServers);
+ 
+-    LinuxFirewall::updateDNSServers(dnsServers);
++    // The system may keep resolving through the nameservers from
++    // /etc/resolv.conf (e.g. until the tunnel DNS is applied, or on systems
++    // where the per-link tunnel DNS is not consumed). Rejecting them breaks
++    // name resolution completely, so keep them reachable. They are usually
++    // reached via the physical interface, so they are passed separately and
++    // get rules without the tunnel interface restriction.
++    QStringList systemDnsServers;
++    QFile resolvConf(QStringLiteral("/etc/resolv.conf"));
++    if (resolvConf.open(QIODevice::ReadOnly)) {
++        static const QRegularExpression nameserverRe(
++            QStringLiteral("^\\s*nameserver\\s+(\\S+)"));
++        while (!resolvConf.atEnd()) {
++            const QRegularExpressionMatch match =
++                nameserverRe.match(QString::fromLocal8Bit(resolvConf.readLine()));
++            if (match.hasMatch()) {
++                const QString server = match.captured(1);
++                if (!systemDnsServers.contains(server)) {
++                    systemDnsServers.append(server);
++                }
++            }
++        }
++        resolvConf.close();
++    }
++
++    LinuxFirewall::updateDNSServers(dnsServers, systemDnsServers);
+     LinuxFirewall::setAnchorEnabled(LinuxFirewall::IPv4, QStringLiteral("320.allowDNS"), true);
+     LinuxFirewall::setAnchorEnabled(LinuxFirewall::Both, QStringLiteral("400.allowPIA"), true);
+ #endif
+--- a/client/platforms/linux/daemon/linuxfirewall.cpp
++++ b/client/platforms/linux/daemon/linuxfirewall.cpp
+@@ -418,7 +418,8 @@
+     }
+ }
+ 
+-void LinuxFirewall::updateDNSServers(const QStringList& servers)
++void LinuxFirewall::updateDNSServers(const QStringList& servers,
++                                     const QStringList& systemServers)
+ {
+     static QStringList existingServers {};
+ 
+@@ -440,6 +441,23 @@
+                  QStringLiteral("--dport"), QStringLiteral("53"), QStringLiteral("-j"), QStringLiteral("ACCEPT")});
+         }
+     }
++    // Servers the system is currently configured with (e.g. the nameservers
++    // from /etc/resolv.conf) have to stay reachable through the physical
++    // interface too: queries to them do not leave via the tunnel interfaces
++    // above, and rejecting them breaks name resolution entirely.
++    for (const QString& server : systemServers) {
++        if (servers.contains(server)) {
++            continue;
++        }
++        executeIptables(QStringLiteral("iptables"),
++            {QStringLiteral("-A"), chain, QStringLiteral("-d"), server,
++             QStringLiteral("-p"), QStringLiteral("udp"),
++             QStringLiteral("--dport"), QStringLiteral("53"), QStringLiteral("-j"), QStringLiteral("ACCEPT")});
++        executeIptables(QStringLiteral("iptables"),
++            {QStringLiteral("-A"), chain, QStringLiteral("-d"), server,
++             QStringLiteral("-p"), QStringLiteral("tcp"),
++             QStringLiteral("--dport"), QStringLiteral("53"), QStringLiteral("-j"), QStringLiteral("ACCEPT")});
++    }
+ }
+ 
+ void LinuxFirewall::updateAllowNets(const QStringList& servers)
+--- a/client/platforms/linux/daemon/linuxfirewall.h
++++ b/client/platforms/linux/daemon/linuxfirewall.h
+@@ -97,7 +97,8 @@
+     static bool isAnchorEnabled(IPVersion ip, const QString& anchor, const QString& tableName = kFilterTable);
+     static void setAnchorEnabled(IPVersion ip, const QString& anchor, bool enabled, const QString& tableName = kFilterTable);
+     static void replaceAnchor(LinuxFirewall::IPVersion ip, const QString &anchor, const QString &newRule, const QString& tableName);
+-    static void updateDNSServers(const QStringList& servers);
++    static void updateDNSServers(const QStringList& servers,
++                                 const QStringList& systemServers = {});
+     static void updateAllowNets(const QStringList& servers);
+     static void updateBlockNets(const QStringList& servers);
+ };

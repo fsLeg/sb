@@ -1,0 +1,26 @@
+--- a/client/core/utils/constants/protocolConstants.h
++++ b/client/core/utils/constants/protocolConstants.h
+@@ -80,6 +80,9 @@
+             constexpr char defaultFlow[] = "xtls-rprx-vision";
+             constexpr char defaultTransport[] = "raw";
+             constexpr char defaultFingerprint[] = "firefox";
++            // The default fingerprint of the previous releases (persisted in
++            // saved configs); migrated to the current default on load.
++            constexpr char legacyDefaultFingerprint[] = "hellochrome_120";
+             constexpr char defaultAlpn[] = "h2";
+ 
+             constexpr char defaultXhttpMode[] = "Stream-one";
+--- a/client/core/models/protocols/xrayProtocolConfig.cpp
++++ b/client/core/models/protocols/xrayProtocolConfig.cpp
+@@ -324,6 +324,11 @@
+     }
+     if (json.contains(configKey::xrayFingerprint)) {
+         c.fingerprint = json.value(configKey::xrayFingerprint).toString();
++        // Migrate configs saved with the default fingerprint of the previous
++        // releases to the current default.
++        if (c.fingerprint == QLatin1String(protocols::xray::legacyDefaultFingerprint)) {
++            c.fingerprint = QLatin1String(protocols::xray::defaultFingerprint);
++        }
+     }
+     if (json.contains(configKey::xrayTransport)) {
+         c.transport = json.value(configKey::xrayTransport).toString();
