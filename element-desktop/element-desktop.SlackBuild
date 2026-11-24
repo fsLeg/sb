@@ -2,14 +2,14 @@
 
 PRGNAM="element-desktop"
 WEBNAM="element-web"
-VERSION="1.12.35"
+VERSION="1.12.36"
 SESHVER="6.0.1"
 BUILD="${BUILD:-1}"
 DESCRIPTION="secure and independent communication via Matrix"
 HOMEPAGE="https://element.io/"
 DOWNLOAD="https://github.com/element-hq/$WEBNAM/archive/v$VERSION/$WEBNAM-$VERSION.tar.gz
           https://github.com/matrix-org/seshat/archive/$SESHVER/seshat-$SESHVER.tar.gz"
-SHA256SUM="5f153456e91075881a74ecd595600d28624d9c3c7e931f0a63ca8a6df894e945
+SHA256SUM="1a8fa6ff2a44a1a90fa09e674bac421838790466bb182f104546980c60ff0979
            600b494343cb01a4d4970c0ec46bcac2b11e4a1a5ddb3adea627d38906f2340e"
 REQUIRES=(sqlcipher)
 BUILD_REQUIRES=(rust-opt "nodejs|nodejs22|nodejs24-bin")
