@@ -1,13 +1,13 @@
 # Maintainer: Vladislav 'fsLeg' Borisov <fsleg at t-rg dot ws>
 
 PRGNAM="yubico-authenticator"
-TARNAM="yubioath-flutter"
+SRCNAM="yubioath-flutter"
 VERSION="7.5.0"
 FLUTTERVER="3.47.8"
 BUILD="${BUILD:-1}"
 DESCRIPTION="Yubico Authenticator for Desktop"
 HOMEPAGE="https://www.yubico.com/products/yubico-authenticator/"
-DOWNLOAD="git+https://github.com/Yubico/${TARNAM}.git
+DOWNLOAD="git+https://github.com/Yubico/${SRCNAM}.git
           git+https://github.com/Yubico/yubikey-manager.git
           https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTERVER}-stable.tar.xz"
 SHA256SUM="-
@@ -18,7 +18,7 @@ BUILD_REQUIRES=(rust-opt)
 CONFLICTS=(yubico-authenticator-bin)
 
 unpack () {
-  git clone $CWD/$TARNAM.git $PRGNAM-$VERSION
+  git clone $CWD/$SRCNAM.git $PRGNAM-$VERSION
 
   pushd $PRGNAM-$VERSION
     git -c advice.detachedHead=false checkout $VERSION
@@ -26,6 +26,7 @@ unpack () {
     git -c protocol.file.allow=always submodule update --init
   popd
 
+  # fvm could be better but it'll download flutter sdk on each run, and it's huge
   $UNTAR $CWD/flutter_linux_$FLUTTERVER-stable.tar.xz
   export PATH="$(pwd)/flutter/bin:$PATH"
 
